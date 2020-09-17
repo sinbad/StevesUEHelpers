@@ -19,29 +19,29 @@ void UOptionWidgetBase::NativeConstruct()
         ClearOptions();
     }
     else
-        UE_LOG(LogCustomUI, Error, TEXT("StevesGameSubsystem is missing!"));
+        UE_LOG(LogStevesUI, Error, TEXT("StevesGameSubsystem is missing!"));
 
     // Check we can bind everything we need, bind click
     if (!MouseVersion)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a MouseVersion instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a MouseVersion instance."), *this->GetClass()->GetName());
     if (!GamepadVersion)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a GamepadVersion instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadVersion instance."), *this->GetClass()->GetName());
     if (MouseUpButton)
         MouseUpButton->OnClicked.AddDynamic(this, &UOptionWidgetBase::MouseUpClicked);
     else        
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a MouseUpButton instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a MouseUpButton instance."), *this->GetClass()->GetName());
     if (MouseDownButton)
         MouseDownButton->OnClicked.AddDynamic(this, &UOptionWidgetBase::MouseDownClicked);
     else
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a MouseDownButton instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a MouseDownButton instance."), *this->GetClass()->GetName());
     if (!MouseUpImage)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a MouseUpImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a MouseUpImage instance."), *this->GetClass()->GetName());
     if (!MouseDownImage)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a MouseDownImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a MouseDownImage instance."), *this->GetClass()->GetName());
     if (!GamepadUpImage)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a GamepadUpImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadUpImage instance."), *this->GetClass()->GetName());
     if (!GamepadDownImage)
-        UE_LOG(LogCustomUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
 
     
 }

@@ -94,6 +94,6 @@ void UMenuBase::EmbedInParent()
         ParentStack->MenuContainer->SetContent(this);
     }
     else
-        UE_LOG(LogCustomUI, Error, TEXT("Cannot embed %s in parent, missing container"), *this->GetName())
+        UE_LOG(LogStevesUI, Error, TEXT("Cannot embed %s in parent, missing container"), *this->GetName())
     
 }
