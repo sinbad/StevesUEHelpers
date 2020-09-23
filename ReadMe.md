@@ -21,6 +21,8 @@ which makes a bunch of things better:
   * Events raised whenever a player uses a different input method (in game, and in UI)
     (Actually reliable and not dependent on vagaries of input mappings / differences between UI and game input)
 
+:heart: **[Support my work on Patreon!](https://www.patreon.com/stevestreeting)**
+
 ## Installing this plugin
 
 ### Cloning
