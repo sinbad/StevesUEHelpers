@@ -9,7 +9,7 @@
 	"CreatedByURL" : "https://www.stevestreeting.com",
 	"DocsURL" : "",
 	"MarketplaceURL" : "",
-	"SupportURL" : "",
+	"SupportURL" : "https://github.com/sinbad/StevesUEHelpers",
 	"EnabledByDefault" : true,
 	"CanContainContent" : false,
 	"IsBetaVersion" : true,
