@@ -14,7 +14,7 @@ class STEVESUEHELPERS_API UFocusableUserWidget : public UUserWidget
 public:
     /// UWidget::SetFocus is not virtual FFS. This does the same as SetFocus by default but can be overridden,
     /// e.g. to delegate focus to specific children
-    UFUNCTION(BlueprintNativeEvent)
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
     void SetFocusProperly();
         
 };
