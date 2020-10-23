@@ -26,11 +26,11 @@ which makes a bunch of things better:
 ### Cloning
 
 The best way is to clone this repository as a submodule; that way you can contribute
-pull requests if you want. 
+pull requests if you want. The project should be placed in your project's Plugins folder.
 
 ```
-> cd YourProject\Plugins
-> git submodule add https://github.com/sinbad/StevesUEHelpers
+> cd YourProject
+> git submodule add https://github.com/sinbad/StevesUEHelpers Plugins/StevesUEHelpers
 > git add ../.gitmodules
 > git commit
 ```
