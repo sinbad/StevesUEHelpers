@@ -30,17 +30,17 @@ Several custom widgets are supplied to assist with some common challenges:
   and also remembers the last focus widget if you switch away & back
   without destroying it.
 
-* [MenuBase](MenuBase.md)
+* [MenuBase](Menus.md)
 
   A specialised [FocusablePanel](FocusablePanel.md) which adds the ability
-  to be part of a contextual [MenuStack](MenuStack.md), and which 
+  to be part of a contextual [MenuStack](Menus.md), and which 
   as it becomes the top of the stack can automatically grab focus, change game 
   pause state, alter input modes, and change the mouse pointer visibility 
   (all individually optional).
 
-* [MenuStack](MenuStack.md)
+* [MenuStack](Menus.md)
 
-  A container for and stack of [MenuBase](MenuBase.md) instances, making it
+  A container for and stack of [MenuBase](Menus.md) instances, making it
   easy to create multi-level on-screen menus with a simple "back" navigation.
 
 

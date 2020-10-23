@@ -22,7 +22,7 @@ auto GS = GetStevesGameSubsystem(GetWorld());
 
 Blueprint:
 
-![Game Instance Subsystem](../Resources/lastinput.png)
+![Getting last input](../Resources/lastinput.png)
 
 C++:
 
@@ -34,7 +34,7 @@ EInputMode Mode = GS->GetLastInputModeUsed(PlayerIndex);
 
 Blueprint:
 
-![Game Instance Subsystem](../Resources/inputchangeevent.png)
+![Input change events](../Resources/inputchangeevent.png)
 
 C++:
 
