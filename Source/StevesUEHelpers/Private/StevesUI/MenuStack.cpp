@@ -123,7 +123,7 @@ void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
     }
     else
     {
-        UE_LOG(LogCustomUI, Error, TEXT("Tried to pop menu %s but it wasn't the top level"), *UiMenuBase->GetName());
+        UE_LOG(LogStevesUI, Error, TEXT("Tried to pop menu %s but it wasn't the top level"), *UiMenuBase->GetName());
     }
 }
 

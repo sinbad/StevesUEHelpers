@@ -5,7 +5,7 @@
 class UWidget;
 class SWidget;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogCustomUI, Warning, Warning)
+DECLARE_LOG_CATEGORY_EXTERN(LogStevesUI, Warning, Warning)
 
 
 /**

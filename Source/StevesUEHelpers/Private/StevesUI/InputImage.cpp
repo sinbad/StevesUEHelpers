@@ -149,7 +149,11 @@ void UInputImage::UpdateImageFromTable(const FKey& InKey, const TSoftObjectPtr<U
     // Rows are named the same as the key name
     const auto SpriteRow = Table->FindRow<FKeySprite>(InKey.GetFName(), "Find Key Image");
     if (SpriteRow)
-        SetBrushFromAtlasInterface(SpriteRow->Sprite);
+    {
+        // Match size is needed incase size has changed
+        // Need to make it update region in case inside a scale box or something else that needs to adjust
+        SetBrushFromAtlasInterface(SpriteRow->Sprite, true);
+    }
 }
 
 UUiTheme* UInputImage::GetTheme()

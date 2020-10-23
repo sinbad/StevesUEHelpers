@@ -5,6 +5,7 @@
 #include "StevesUEHelpers.h"
 #include "StevesUI/MenuStack.h"
 #include "Components/ContentWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMenuBase::Close(bool bWasCancel)
 {
@@ -13,26 +14,19 @@ void UMenuBase::Close(bool bWasCancel)
     if (ParentStack.IsValid())
     {
         ParentStack->PopMenuIfTop(this, bWasCancel);
+    } else
+    {
+        // standalone mode
+        RemoveFromParent();
+        PreviousFocusWidget.Reset();
     }
 }
 
 void UMenuBase::AddedToStack(UMenuStack* Parent)
 {
     ParentStack = MakeWeakObjectPtr(Parent);
-    if (bEmbedInParentContainer)
-        EmbedInParent();
-    else
-        AddToViewport();
-    SetVisibility(ESlateVisibility::Visible);
 
-    auto GS = GetStevesGameSubsystem(GetWorld());
-    if (bRequestFocus &&
-        GS && (GS->GetLastInputModeUsed() != EInputMode::Gamepad || GS->GetLastInputModeUsed() != EInputMode::Keyboard))
-    {
-        SetFocusProperly();
-    }
-        
-    
+    Open(false);
 }
 
 
@@ -73,16 +67,7 @@ void UMenuBase::SupercededInStack()
 
 void UMenuBase::RegainedFocusInStack()
 {
-    if (bEmbedInParentContainer)
-        EmbedInParent();
-    else
-        AddToViewport();
-    SetVisibility(ESlateVisibility::Visible);
-
-    if (bRequestFocus)
-    {
-        SetFocusProperly();
-    }
+    Open(true);
     
 }
 
@@ -94,6 +79,64 @@ void UMenuBase::EmbedInParent()
         ParentStack->MenuContainer->SetContent(this);
     }
     else
-        UE_LOG(LogCustomUI, Error, TEXT("Cannot embed %s in parent, missing container"), *this->GetName())
+        UE_LOG(LogStevesUI, Error, TEXT("Cannot embed %s in parent, missing container"), *this->GetName())
+    
+}
+
+void UMenuBase::Open(bool bIsRegain)
+{
+    if (ParentStack.IsValid() && bEmbedInParentContainer)
+        EmbedInParent();
+    else
+        AddToViewport();
+    SetVisibility(ESlateVisibility::Visible);
+
+    auto PC = GetOwningPlayer();    
+    switch (InputModeSetting)
+    {
+    case EInputModeChange::DoNotChange:
+        break;
+    case EInputModeChange::UIOnly:
+        PC->SetInputMode(FInputModeUIOnly());
+        break;
+    case EInputModeChange::GameAndUI:
+        PC->SetInputMode(FInputModeGameAndUI());
+        break;
+    case EInputModeChange::GameOnly:
+        PC->SetInputMode(FInputModeGameOnly());
+        break;
+    }
+
+    switch (MousePointerVisibility)
+    {
+    case EMousePointerVisibilityChange::DoNotChange:
+        break;
+    case EMousePointerVisibilityChange::Visible:
+        PC->bShowMouseCursor = true;
+        break;
+    case EMousePointerVisibilityChange::Hidden:
+        PC->bShowMouseCursor = false;
+        break;
+    }
+
+    switch (GamePauseSetting)
+    {
+    case EGamePauseChange::DoNotChange:
+        break;
+    case EGamePauseChange::Paused:
+        UGameplayStatics::SetGamePaused(GetWorld(), true);
+        break;
+    case EGamePauseChange::Unpaused:
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        break;
+    }    
+
+    auto GS = GetStevesGameSubsystem(GetWorld());
+    if (bRequestFocus &&
+        GS && (GS->GetLastInputModeUsed() != EInputMode::Gamepad || GS->GetLastInputModeUsed() != EInputMode::Keyboard))
+    {
+        SetFocusProperly();
+    }
+
     
 }

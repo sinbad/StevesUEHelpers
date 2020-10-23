@@ -7,7 +7,7 @@
 #include "Components/PanelWidget.h"
 #include "Components/Widget.h"
 
-DEFINE_LOG_CATEGORY(LogCustomUI);
+DEFINE_LOG_CATEGORY(LogStevesUI);
 
 UWidget* FindWidgetFromSlate(SWidget* SW, UWidget* Parent)
 {
