@@ -34,7 +34,7 @@ EInputMode Mode = GS->GetLastInputModeUsed(PlayerIndex);
 
 Blueprint:
 
-![Game Instance Subsystem](../Resources/bpexample.png)
+![Game Instance Subsystem](../Resources/inputchangeevent.png)
 
 C++:
 

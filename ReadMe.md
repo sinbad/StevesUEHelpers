@@ -70,28 +70,11 @@ you can tap into anywhere in Blueprints by searching for it:
 
 ![Game Instance Subsystem](./Resources/gameinstance.png)
 
-Once you have access to this you can do things like tie events into the input mode
-changing:
+Once you have access to this you can do things like get the latest input device used:
 
-![Game Instance Subsystem](./Resources/bpexample.png)
+![Game Instance Subsystem](./Resources/lastinput.png)
 
-To access this in C++, just do this:
-
-```c++
-#include "StevesUEHelpers.h"
-
-...
-auto GS = GetStevesGameSubsystem(GetWorld());
-if (GS)
-{
-    // get current mode (first player assumed)
-    EInputMode CurrentInputMode = GS->GetLastInputModeUsed();
-    // Subscribe to input mode changes (remember this must be a UFUNCTION)
-    GS->OnInputModeChanged.AddUniqueDynamic(this, &AMyActor::OnInputModeChanged);
-}
- 
-```
-
+For more details, see the [Input section](doc/Input.md).
 
 # License
 
