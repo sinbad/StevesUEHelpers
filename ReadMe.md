@@ -10,7 +10,19 @@ which makes a bunch of things better:
 * [Input events](doc/Input.md)
   * Reliable notification when the player changes input method
 
-:heart: **[Support my work on Patreon!](https://www.patreon.com/stevestreeting)**
+
+## Examples
+
+This project contains the master documentation for this library, but if you want
+to see examples of its use, see the [Steve's UE Examples](https://github.com/sinbad/StevesUEExamples) project.
+
+
+## Support This Work!!
+
+It's not a trivial amount of work to separate things I make for my own UE projects
+and document them so other people can use them! 😀
+
+If you appreciate these efforts, why not :heart::heart: **[Support my work on Patreon!](https://www.patreon.com/stevestreeting)** :heart::heart:
 
 ## Installing this plugin
 
