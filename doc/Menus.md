@@ -145,6 +145,12 @@ Here's an example of doing that in Blueprints:
 To progress to a deeper level in the menu, you just push another instance on
 to the same stack exactly as you did with the first. 
 
+You can also push a menu by class instead of manually creating the instance
+yourself:
+
+![Create menu by class](../Resources/menupushbyclass.png)
+
+
 The default behaviour is that the existing top of stack
 is hidden (but not destroyed, so it keeps its state). You can change that
 by unchecking the "Hide when Superceded" option on a MenuBase level. Then, the
