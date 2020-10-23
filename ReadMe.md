@@ -73,20 +73,11 @@ public class YourProject : ModuleRules
 You can use most of the features without doing anything else, but certain features
 require some additional setup, see below.
 
-## Usage
-
-### Widgets
-
-Many features are contained in new widget types, which can be created directly in 
-UMG Design mode. 
-
-TODO: specific tutorials on new widget types.
-
-### Game instance subsystem
+## Game instance subsystem
 
 In order to track stateful things like the current input mode for each player, 
 there is a custom `GameInstanceSubsystem` called `StevesGameSubsystem`, which 
-you can tap into anywhere in Blueprints by searchign for it:
+you can tap into anywhere in Blueprints by searching for it:
 
 ![Game Instance Subsystem](./Resources/gameinstance.png)
 
@@ -112,12 +103,58 @@ if (GS)
  
 ```
 
+## Widgets
+
+Several custom widgets are supplied to assist with some common challenges:
+
+* [OptionWidgetBase](docs/OptionWidget.md)
+
+  This widget base class adds "option switch" functionality, allowing a user to 
+  select one of a number of options by moving through them in a linear list.
+  It handles both mouse and gamepad by automatically switching styles between
+  separate clickable arrows for mouse, and a unified left/right rocker style
+  for gamepads. Styleable in Blueprint subclasses.
+
+* [InputImage](docs/InputImage.md)
+
+  This custom Image widget takes an Action or Axis name and will automatically
+  display the image for an associated bound control, based on the currently
+  active input method. Dynamically switches as input method changes.
+
+* [FocusableButton](docs/FocusableButton.md)
+
+  A refined Button widget which raises focus events you can listen to, and
+  which can apply the "Hovered" style to itself when focused (very important
+  for gamepad navigation).
+
+* [FocusablePanel](docs/FocusablePanel.md)
+
+  A Panel widget which can make sure that something is selected when a
+  gamepad is in use, and resists loss of focus. Has a default focus widget,
+  and also remembers the last focus widget if you switch away & back
+  without destroying it.
+
+* [MenuBase](docs/MenuBase.md)
+
+  A specialised [FocusablePanel](docs/FocusablePanel.md) which adds the ability
+  to be part of a contextual [MenuStack](docs/FocusablePanel.md), and which 
+  as it becomes the top of the stack can automatically grab focus, change game 
+  pause state, alter input modes, and change the mouse pointer visibility 
+  (all individually optional).
+
+* [MenuStack](docs/MenuStack.md)
+
+  A container for and stack of [MenuBase](docs/MenuBase.md) instances, making it
+  easy to create multi-level on-screen menus with a simple "back" navigation.
+
+
 # Additional Configuration
 
 ## UiTheme
 
-Some features of this plugin such as InputImage need a `UUiTheme` asset, which is just a Data Asset
-based on the `UUiTheme` class which references other resources like button images. There is one in the Examples project as reference.
+Some features of this plugin such as InputImage need a `UUiTheme` asset, which 
+is just a Data Asset based on the `UUiTheme` class which references other 
+resources like button images. There is one in the Examples project as reference.
 
 ### Create a UiTheme:
 
