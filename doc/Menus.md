@@ -26,6 +26,11 @@ dotted line nonsense.
 
 All better. 😉
 
+## GameViewportClient customisations
+
+To get full functionality we need to use a custom viewport client, see 
+[Configuring A Custom GameViewportClient](../Readme.md/#configure-custom-gameviewportclient)
+
 ## Creating the MenuStack
 
 The MenuStack class is best used as a dual purpose: keeping track of the stack 

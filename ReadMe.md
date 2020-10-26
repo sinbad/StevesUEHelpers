@@ -71,8 +71,30 @@ public class YourProject : ModuleRules
 
 ```
 
+After adding this you should right-click your .uproject file and "Generate Visual
+Studio Project Files". 
+
 You can use most of the features without doing anything else, but certain features
 require some additional setup, see below.
+
+### Configure Custom GameViewportClient
+
+This library contains a new `UGameViewportClient` subclass called `UStevesGameViewportClientBase`,
+which is used to suppress the mouse cursor in menus then using a gamepad.
+
+Unfortunately UE4's Slate overrides the mouse pointer visibility sometimes, so
+this fixes that.
+
+To use it, simply:
+
+1. Open Project Settings
+1. Go to Engine > General Settings
+1. Change Game Viewport Client Class to StevesGameViewportClientBase
+
+### Configure UiTheme
+
+Some features require you to configure some theme information for the UI, which 
+is discussed in more detail in the [UiTheme section](./doc/UiTheme.md).
 
 ## Game instance subsystem
 
