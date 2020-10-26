@@ -42,7 +42,9 @@ void UOptionWidgetBase::NativeConstruct()
     if (!GamepadDownImage)
         UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
 
-    
+
+    SynchronizeProperties();
+
     // To support option set up in designer
     SetSelectedIndex(SelectedIndex);
 }
@@ -167,6 +169,9 @@ void UOptionWidgetBase::SetMouseMode()
     }
 
     MouseVersion->SetVisibility(ESlateVisibility::Visible);
+
+    SynchronizeProperties();
+    
     if (bHadFocus)
         SetFocusProperly();
     
@@ -182,6 +187,9 @@ void UOptionWidgetBase::SetButtonMode()
         MouseVersion->SetVisibility(ESlateVisibility::Hidden);
 
     GamepadVersion->SetVisibility(ESlateVisibility::Visible);
+
+    SynchronizeProperties();
+    
     if (bHadFocus)
         SetFocusProperly();
     
