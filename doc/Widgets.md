@@ -34,13 +34,18 @@ Several custom widgets are supplied to assist with some common challenges:
 
   A specialised [FocusablePanel](FocusablePanel.md) which adds the ability
   to be part of a contextual [MenuStack](Menus.md), and which 
-  as it becomes the top of the stack can automatically grab focus, change game 
-  pause state, alter input modes, and change the mouse pointer visibility 
-  (all individually optional).
+  as it becomes the top of the stack can automatically grab focus if you 
+  like. Each menu level can change game pause state, alter input modes, and change 
+  the mouse pointer visibility if required (although if you're doing this for
+  the entire menu system, then best to use the parent MenuStack to do it).
 
 * [MenuStack](Menus.md)
 
   A container for and stack of [MenuBase](Menus.md) instances, making it
   easy to create multi-level on-screen menus with a simple "back" navigation.
+
+  Stacks can change the game pause state, alter input modes and change the
+  mouse pointer visibility, on both opening and closing, to make it easier
+  to create menu systems with this common behaviour.
 
 
