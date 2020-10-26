@@ -29,7 +29,7 @@ All better. 😉
 ## GameViewportClient customisations
 
 To get full functionality we need to use a custom viewport client, see 
-[Configuring A Custom GameViewportClient](../Readme.md/#configure-custom-gameviewportclient)
+[Configuring A Custom GameViewportClient](../ReadMe.md/#configure-custom-gameviewportclient)
 
 ## Creating the MenuStack
 
