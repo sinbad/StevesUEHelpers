@@ -16,7 +16,6 @@ void UOptionWidgetBase::NativeConstruct()
     {
         GS->OnInputModeChanged.AddDynamic(this, &UOptionWidgetBase::InputModeChanged);
         UpdateFromInputMode(GS->GetLastInputModeUsed());
-        ClearOptions();
     }
     else
         UE_LOG(LogStevesUI, Error, TEXT("StevesGameSubsystem is missing!"));
@@ -44,6 +43,8 @@ void UOptionWidgetBase::NativeConstruct()
         UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
 
     
+    // To support option set up in designer
+    SetSelectedIndex(SelectedIndex);
 }
 
 
