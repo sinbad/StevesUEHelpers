@@ -5,6 +5,7 @@
 #include "StevesUEHelpers.h"
 #include "StevesUI/MenuBase.h"
 #include "Framework/Application/SlateApplication.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void UMenuStack::NativeConstruct()
@@ -25,6 +26,10 @@ void UMenuStack::NativeConstruct()
         GS->OnInputModeChanged.AddDynamic(this, &UMenuStack::InputModeChanged);
         LastInputMode = GS->GetLastInputModeUsed();
     }
+
+    ApplyInputModeChange(InputModeSettingOnOpen);
+    ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
+    ApplyGamePauseChange(GamePauseSettingOnOpen);
 }
 
 void UMenuStack::NativeDestruct()
@@ -36,6 +41,56 @@ void UMenuStack::NativeDestruct()
     if (GS)
         GS->OnInputModeChanged.RemoveDynamic(this, &UMenuStack::InputModeChanged);
 
+}
+
+void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
+{
+    auto PC = GetOwningPlayer();    
+    switch (Change)
+    {
+    case EInputModeChange::DoNotChange:
+        break;
+    case EInputModeChange::UIOnly:
+        PC->SetInputMode(FInputModeUIOnly());
+        break;
+    case EInputModeChange::GameAndUI:
+        PC->SetInputMode(FInputModeGameAndUI());
+        break;
+    case EInputModeChange::GameOnly:
+        PC->SetInputMode(FInputModeGameOnly());
+        break;
+    }
+}
+
+void UMenuStack::ApplyMousePointerVisibility(EMousePointerVisibilityChange Change) const
+{
+    auto PC = GetOwningPlayer();    
+    switch (Change)
+    {
+    case EMousePointerVisibilityChange::DoNotChange:
+        break;
+    case EMousePointerVisibilityChange::Visible:
+        PC->bShowMouseCursor = true;
+        break;
+    case EMousePointerVisibilityChange::Hidden:
+        PC->bShowMouseCursor = false;
+        break;
+    }
+}
+
+void UMenuStack::ApplyGamePauseChange(EGamePauseChange Change) const
+{
+    switch (Change)
+    {
+    case EGamePauseChange::DoNotChange:
+        break;
+    case EGamePauseChange::Paused:
+        UGameplayStatics::SetGamePaused(GetWorld(), true);
+        break;
+    case EGamePauseChange::Unpaused:
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        break;
+    }    
     
 }
 
@@ -131,6 +186,11 @@ void UMenuStack::LastMenuClosed(bool bWasCancel)
 {
     RemoveFromParent();
     OnClosed.Broadcast(this, bWasCancel);
+
+    ApplyInputModeChange(InputModeSettingOnClose);
+    ApplyMousePointerVisibility(MousePointerVisibilityOnClose);
+    ApplyGamePauseChange(GamePauseSettingOnClose);
+    
 }
 
 void UMenuStack::CloseAll(bool bWasCancel)

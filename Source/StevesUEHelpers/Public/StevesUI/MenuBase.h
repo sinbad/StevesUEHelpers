@@ -8,33 +8,7 @@
 
 #include "MenuBase.generated.h"
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMenuClosed, UMenuBase*, Menu, bool, bWasCancelled);
-
-UENUM(BlueprintType)
-enum class EInputModeChange : uint8
-{
-    DoNotChange UMETA(DisplayName="No Change"),
-    UIOnly UMETA(DisplayName="UI Only"),
-    GameAndUI UMETA(DisplayName="Game And UI"),
-    GameOnly UMETA(DisplayName="Game Only")
-};
-    
-UENUM(BlueprintType)
-enum class EMousePointerVisibilityChange : uint8
-{
-    DoNotChange UMETA(DisplayName="No Change"),
-    Visible UMETA(DisplayName="Pointer Visible"),
-    Hidden UMETA(DisplayName="Pointer Hidden")
-};
-
-UENUM(BlueprintType)
-enum class EGamePauseChange : uint8
-{
-    DoNotChange UMETA(DisplayName="No Change"),
-    Paused UMETA(DisplayName="Pause Game"),
-    Unpaused UMETA(DisplayName="Unpause Game")
-};
 
 /// This class is a type of focusable panel designed for menus or other dialogs.
 /// It can be added to a UMenuStack to put it in context of a larger navigable group,

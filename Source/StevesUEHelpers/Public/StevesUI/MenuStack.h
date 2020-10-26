@@ -5,7 +5,6 @@
 #include "FocusableUserWidget.h"
 #include "Framework/Application/IInputProcessor.h"
 #include "StevesHelperCommon.h"
-#include "UObject/ObjectMacros.h"
 
 
 #include "MenuStack.generated.h"
@@ -49,10 +48,15 @@ protected:
 
     TSharedPtr<FUiInputPreprocessor> InputPreprocessor;
 
-    void LastMenuClosed(bool bWasCancel);
+    virtual void LastMenuClosed(bool bWasCancel);
 
     virtual void NativeConstruct() override;
     virtual void NativeDestruct() override;
+
+    virtual void ApplyInputModeChange(EInputModeChange Change) const;
+    virtual void ApplyMousePointerVisibility(EMousePointerVisibilityChange Change) const;
+    virtual void ApplyGamePauseChange(EGamePauseChange Change) const;
+
     UFUNCTION()
     bool HandleKeyDownEvent(const FKeyEvent& InKeyEvent);
     UFUNCTION()
@@ -69,6 +73,30 @@ public:
     /// last item was cancelled.
     UPROPERTY(BlueprintAssignable)
     FOnMenuStackClosed OnClosed;
+
+    /// How this stack should change the input mode when it opens (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EInputModeChange InputModeSettingOnOpen = EInputModeChange::DoNotChange;
+
+    /// How this stack should set the mouse pointer visibility when it opens (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EMousePointerVisibilityChange MousePointerVisibilityOnOpen = EMousePointerVisibilityChange::DoNotChange;
+
+    /// How this stack should set the game pause state when it opens (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EGamePauseChange GamePauseSettingOnOpen = EGamePauseChange::DoNotChange;
+
+    /// How this stack should change the input mode when it closes (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EInputModeChange InputModeSettingOnClose = EInputModeChange::DoNotChange;
+
+    /// How this stack should set the mouse pointer visibility when it closes (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EMousePointerVisibilityChange MousePointerVisibilityOnClose = EMousePointerVisibilityChange::DoNotChange;
+
+    /// How this stack should set the game pause state when it closes (default no change)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    EGamePauseChange GamePauseSettingOnClose = EGamePauseChange::DoNotChange;
 
     /// Push a new menu level by class. This will instantiate the new menu, display it, and inform the previous menu that it's
     /// been superceded. Use the returned instance if you want to cache it
