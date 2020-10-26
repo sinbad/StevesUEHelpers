@@ -5,6 +5,11 @@ a keyboard key, mouse button, gamepad stick / button, etc. It can also look
 up the key currently assigned as input for an associated Action or Axis, changing
 dynamically based on what the current input method is (mouse, keyboard, gamepad).
 
+Here's an example of the icons changing as the player moves a gamepad stick or 
+touches keyboard/mouse:
+
+![Dynamic InputImage](../Resources/UInputImageDemo2.gif)
+
 InputImage requires a [UiTheme](UiTheme.md) to operate, which links to the images it needs.
 
 ## Properties
