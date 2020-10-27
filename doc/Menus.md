@@ -6,25 +6,8 @@ going "back" pops that off the top and returns focus to the previous menu.
 Fairly standard hierarchical menus.
 
 The [Examples Project](https://github.com/sinbad/StevesUEExamples) includes a
-funcitoning menu you can look over to see how it's done, and/or you can follow
+functioning menu you can look over to see how it's done, and/or you can follow
 these steps.
-
-## Important: Disabling default focus rendering
-
-Unreal makes a token effort at providing a way to render which of your controls
-has the keyboard / gamepad focus, but it's rubbish. It's a grey dotted line
-that looks awful. No-one wants that.
-
-The FocusableButton widget in this library provides a much nicer default focus
-option (using the Hovered style), and also provides you focus events you can
-use to do something more advanced if you want. So we have no need for Unreal's
-dotted line nonsense.
-
-1. Open Project Settings
-1. Find the Focus section
-1. Change Render Focus Rule to Never
-
-All better. 😉
 
 ## GameViewportClient customisations
 
@@ -96,8 +79,8 @@ as being able to become part of a MenuStack. So our widget needs to be one of th
 ### 3. Create the Menu Buttons
 
 This library comes with a custom button which is perfect for menus, called
-FocusableButton. It has the advantage of automatically highlighting when
-focussed (e.g. gamepad or keyboard navigation).
+[FocusableButton](FocusableButton.md). It has the advantage of automatically highlighting when
+focussed (e.g. gamepad or keyboard navigation). 
 
 1. Change the view mode (top-right) from Fill Screen to Desired
     * This is because we're fitting inside the container so will only take the space we need
