@@ -3,49 +3,40 @@
 
 Several custom widgets are supplied to assist with some common challenges:
 
-* [OptionWidgetBase](OptionWidget.md)
+* [Option Widget](OptionWidget.md)
 
-  This widget base class adds "option switch" functionality, allowing a user to 
+  A widget that adds "option switch" functionality, allowing a user to 
   select one of a number of options by moving through them in a linear list.
   It handles both mouse and gamepad by automatically switching styles between
   separate clickable arrows for mouse, and a unified left/right rocker style
   for gamepads. Styleable in Blueprint subclasses.
 
-* [InputImage](InputImage.md)
+* [Input Prompts](InputImage.md)
 
-  This custom Image widget takes an Action or Axis name and will automatically
+  A custom Image widget that takes an Action or Axis name and will automatically
   display the image for an associated bound control, based on the currently
   active input method. Dynamically switches as input method changes.
 
-* [FocusableButton](FocusableButton.md)
+* [Menu System](Menus.md)
+
+  A couple of classes to make it  easy to create multi-level on-screen menus 
+  with a simple "back" navigation. They're compatible with mouse and gamepad/keyboard 
+  navigation and deal with a bunch of edge cases around switching between those. 
+
+  Menus can change the game pause state, alter input modes and change the
+  mouse pointer visibility, on both opening and closing, to make it easier
+  to implement this common behaviour.
+
+* [Focusable Button](FocusableButton.md)
 
   A refined Button widget which raises focus events you can listen to, and
   which can apply the "Hovered" style to itself when focused (very important
   for gamepad navigation).
 
-* [FocusablePanel](FocusablePanel.md)
+* [Focusable Panel](FocusablePanel.md)
 
   A Panel widget which can make sure that something is selected when a
   gamepad is in use, and resists loss of focus. Has a default focus widget,
   and also remembers the last focus widget if you switch away & back
   without destroying it.
-
-* [MenuBase](Menus.md)
-
-  A specialised [FocusablePanel](FocusablePanel.md) which adds the ability
-  to be part of a contextual [MenuStack](Menus.md), and which 
-  as it becomes the top of the stack can automatically grab focus if you 
-  like. Each menu level can change game pause state, alter input modes, and change 
-  the mouse pointer visibility if required (although if you're doing this for
-  the entire menu system, then best to use the parent MenuStack to do it).
-
-* [MenuStack](Menus.md)
-
-  A container for and stack of [MenuBase](Menus.md) instances, making it
-  easy to create multi-level on-screen menus with a simple "back" navigation.
-
-  Stacks can change the game pause state, alter input modes and change the
-  mouse pointer visibility, on both opening and closing, to make it easier
-  to create menu systems with this common behaviour.
-
 
