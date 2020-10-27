@@ -24,23 +24,26 @@ public:
     // I'd love to make the above a drop-down but it's a lot of faff
     // See Engine\Source\Editor\UMGEditor\Private\Customizations\WidgetNavigationCustomization.cpp
     // Specifically OnGenerateWidgetList
-    
+
     /**
      * @brief Set the current focus to the initial focus widget
      * @return Whether the focus was successfully set
      */
+    UFUNCTION(BlueprintCallable)
     bool SetFocusToInitialWidget() const;
 
     /**
      * @brief Try to restore focus to the previously focussed child
      * @return Whether the focus was successfully set
      */
+    UFUNCTION(BlueprintCallable)
     bool RestorePreviousFocus() const;
 
     /**
      * @brief Try to save the currently focussed child as something that can be restored later.
      * @return Whether focus was saved
      */
+    UFUNCTION(BlueprintCallable)
     bool SavePreviousFocus();
 
     
