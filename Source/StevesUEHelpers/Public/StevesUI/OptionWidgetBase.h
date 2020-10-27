@@ -118,7 +118,9 @@ public:
 
 protected:
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     TArray<FText> Options;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     int SelectedIndex;
 
     virtual void SyncButtonProperties(UButton* Button) const;
