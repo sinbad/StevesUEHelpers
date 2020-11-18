@@ -20,6 +20,8 @@ void UMenuStack::NativeConstruct()
         LastInputMode = GS->GetLastInputModeUsed();
     }
 
+    SavePreviousInputMousePauseState();
+
     ApplyInputModeChange(InputModeSettingOnOpen);
     ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
     ApplyGamePauseChange(GamePauseSettingOnOpen);
@@ -33,6 +35,36 @@ void UMenuStack::NativeDestruct()
     if (GS)
         GS->OnInputModeChanged.RemoveDynamic(this, &UMenuStack::InputModeChanged);
 
+}
+
+
+void UMenuStack::SavePreviousInputMousePauseState()
+{
+    auto PC = GetOwningPlayer();    
+    UGameViewportClient* GVC = GetWorld()->GetGameViewport();
+
+    if (GVC->IgnoreInput())
+    {
+        PreviousInputMode = EInputModeChange::UIOnly;
+    }
+    else
+    {
+        const auto CaptureMode = GVC->CaptureMouseOnClick();
+        // Game-only mode captures permanently, that seems to be the best way to detect
+        if (CaptureMode == EMouseCaptureMode::CapturePermanently ||
+            CaptureMode == EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown)
+        {
+            PreviousInputMode = EInputModeChange::GameOnly;
+        }
+        else
+        {
+            PreviousInputMode = EInputModeChange::GameAndUI;
+        }
+    }
+    PreviousMouseVisibility = PC->bShowMouseCursor ? EMousePointerVisibilityChange::Visible : EMousePointerVisibilityChange::Hidden;
+    PreviousPauseState = UGameplayStatics::IsGamePaused(GetWorld()) ? EGamePauseChange::Paused : EGamePauseChange::Unpaused;
+    
+    
 }
 
 void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
@@ -51,6 +83,9 @@ void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
     case EInputModeChange::GameOnly:
         PC->SetInputMode(FInputModeGameOnly());
         break;
+    case EInputModeChange::Restore:
+        ApplyInputModeChange(PreviousInputMode);
+        break;
     }
 }
 
@@ -67,6 +102,9 @@ void UMenuStack::ApplyMousePointerVisibility(EMousePointerVisibilityChange Chang
     case EMousePointerVisibilityChange::Hidden:
         PC->bShowMouseCursor = false;
         break;
+    case EMousePointerVisibilityChange::Restore:
+        ApplyMousePointerVisibility(PreviousMouseVisibility);
+        break;
     }
 }
 
@@ -81,6 +119,9 @@ void UMenuStack::ApplyGamePauseChange(EGamePauseChange Change) const
         break;
     case EGamePauseChange::Unpaused:
         UGameplayStatics::SetGamePaused(GetWorld(), false);
+        break;
+    case EGamePauseChange::Restore:
+        ApplyGamePauseChange(PreviousPauseState);
         break;
     }    
     

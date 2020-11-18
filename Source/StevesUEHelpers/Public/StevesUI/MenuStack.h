@@ -27,6 +27,9 @@ class STEVESUEHELPERS_API UMenuStack : public UFocusableInputInterceptorUserWidg
 
 protected:
     EInputMode LastInputMode;
+    EInputModeChange PreviousInputMode;
+    EMousePointerVisibilityChange PreviousMouseVisibility;
+    EGamePauseChange PreviousPauseState;
     
     TArray<UMenuBase*> Menus;
 
@@ -35,6 +38,7 @@ protected:
     virtual void NativeConstruct() override;
     virtual void NativeDestruct() override;
 
+    void SavePreviousInputMousePauseState();
     virtual void ApplyInputModeChange(EInputModeChange Change) const;
     virtual void ApplyMousePointerVisibility(EMousePointerVisibilityChange Change) const;
     virtual void ApplyGamePauseChange(EGamePauseChange Change) const;
