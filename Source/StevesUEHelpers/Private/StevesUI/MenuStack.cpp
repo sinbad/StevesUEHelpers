@@ -12,13 +12,6 @@ void UMenuStack::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    if (!InputPreprocessor.IsValid())
-    {
-        InputPreprocessor = MakeShareable(new FUiInputPreprocessor());
-        InputPreprocessor->OnUiKeyDown.BindUObject(this, &UMenuStack::HandleKeyDownEvent);
-    }
-    FSlateApplication::Get().RegisterInputPreProcessor(InputPreprocessor);
-
     // We could technically do input change detection in our own input processor, but since this already does it nicely...
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS)
@@ -35,7 +28,6 @@ void UMenuStack::NativeConstruct()
 void UMenuStack::NativeDestruct()
 {
     Super::NativeDestruct();
-    FSlateApplication::Get().UnregisterInputPreProcessor(InputPreprocessor);
 
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS)
@@ -96,6 +88,8 @@ void UMenuStack::ApplyGamePauseChange(EGamePauseChange Change) const
 
 bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
 {
+    Super::HandleKeyDownEvent(InKeyEvent);
+    
     // Hardcoding the Back / Exit menu navigation inputs because input mappings can't be trusted in UMG
     // This is probably OK though, no-one redefines menu controls, right?
     FKey Key = InKeyEvent.GetKey();
