@@ -68,7 +68,11 @@ void UMenuStack::SavePreviousInputMousePauseState()
 
 void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
 {
-    auto PC = GetOwningPlayer();    
+    auto PC = GetOwningPlayer();
+
+    if (!PC) // possible during shutdown
+        return;
+    
     switch (Change)
     {
     case EInputModeChange::DoNotChange:
@@ -91,6 +95,10 @@ void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
 void UMenuStack::ApplyMousePointerVisibility(EMousePointerVisibilityChange Change) const
 {
     auto PC = GetOwningPlayer();    
+
+    if (!PC) // possible during shutdown
+        return;
+    
     switch (Change)
     {
     case EMousePointerVisibilityChange::DoNotChange:
