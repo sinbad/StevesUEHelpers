@@ -238,6 +238,13 @@ void UMenuStack::FirstMenuOpened()
 
 void UMenuStack::RemoveFromParent()
 {
+    if (Menus.Num() > 0)
+    {
+        CloseAll(false);
+        // LastMenuClosed will re-call this so don't duplicate
+        return;
+    }
+    
     Super::RemoveFromParent();
 
     // tell menu system if we're in-game (this gets called in editor too)
