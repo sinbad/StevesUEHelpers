@@ -16,7 +16,11 @@ class UMenuBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMenuStackClosed, class UMenuStack*, Stack, bool, bWasCancel);
 
 /// Represents a modal stack of menus which take focus and have a concept of "Back"
-/// Each level is a MenuBase
+/// Each level within is a MenuBase, which must be "pushed" on to the stack.
+/// Contained within MenuSystem (multiple menu stacks supported)
+/// Has a Priority so that when multiple menu stacks are open, higher priority gets focus,
+/// and when closed, next highest priority gets focus back. Focus is given when the first MenuBase is pushed onto the stack,
+/// and given up when the last one is popped.
 /// You can style this widget to be the general surrounds in which all MenuBase levels live inside
 /// Create a Blueprint subclass of this and make sure you include a UContentWidget with the name
 /// "MenuContainer" somewhere in the tree, which is where the menu contents will be placed. 
@@ -33,6 +37,7 @@ protected:
     
     TArray<UMenuBase*> Menus;
 
+    virtual void FirstMenuOpened();
     virtual void LastMenuClosed(bool bWasCancel);
 
     virtual void NativeConstruct() override;
@@ -48,6 +53,12 @@ protected:
     void InputModeChanged(int PlayerIndex, EInputMode NewMode);
 
 public:
+    /// The focus priority of this stack compared to others. When a MenuStack is opened, if it has higher priority than
+    /// any existing MenuStack open, it will be given focus. When a MenuStack with focus is closed, the next highest
+    /// priority one will be given focus. 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behaviour")
+    int FocusPriority = 0;
+
     /// This property will bind to a blueprint variable of the same name to contain the actual menu content
     /// If not set, or the UiMenuBase is set to not use this container, levels are added independently to viewport
     /// Use a NamedSlot for this most of the time, it gives you the most layout flexibility.
@@ -107,7 +118,16 @@ public:
     UFUNCTION(BlueprintCallable)
     void CloseAll(bool bWasCancel);
 
-
+    /// Whether the top MenuBase on this stack is requesting focus
+    UFUNCTION(BlueprintCallable)
+    bool IsRequestingFocus() const;
+    
+    /// Triggers this stack to take focus (specifically its topmost MenuBase) if appropriate
+    /// This means if both top menu on the stack requests focus, and gamepad or keyboard is in use
+    UFUNCTION(BlueprintCallable)
+    void TakeFocusIfDesired();
+    
     virtual void SetFocusProperly_Implementation() override;
-    void PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel);
+    virtual void PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel);
+    virtual void RemoveFromParent() override;
 };

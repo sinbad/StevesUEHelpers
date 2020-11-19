@@ -87,6 +87,11 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
     OnInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 
+FMenuSystem* UStevesGameSubsystem::GetMenuSystem()
+{
+    return &MenuSystem;
+}
+
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 {
     // 4 local players should be plenty usually (will expand if necessary)

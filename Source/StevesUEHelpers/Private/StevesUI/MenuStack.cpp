@@ -4,7 +4,6 @@
 #include "StevesGameSubsystem.h"
 #include "StevesUEHelpers.h"
 #include "StevesUI/MenuBase.h"
-#include "Framework/Application/SlateApplication.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -180,6 +179,9 @@ void UMenuStack::PushMenuByObject(UMenuBase* NewMenu)
     }
     Menus.Add(NewMenu);
     NewMenu->AddedToStack(this);
+
+    if (Menus.Num() == 1)
+        FirstMenuOpened();
 }
 
 void UMenuStack::PopMenu(bool bWasCancel)
@@ -217,9 +219,28 @@ void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
     }
 }
 
+
+void UMenuStack::FirstMenuOpened()
+{
+    // tell menu system
+    auto GS = GetStevesGameSubsystem(GetWorld());
+    GS->GetMenuSystem()->MenuStackOpened(this);       
+}
+
+void UMenuStack::RemoveFromParent()
+{
+    Super::RemoveFromParent();
+
+    // tell menu system if we're in-game (this gets called in editor too)
+    auto GS = GetStevesGameSubsystem(GetWorld());
+    if (GS)
+        GS->GetMenuSystem()->MenuStackClosed(this);
+    
+}
+
 void UMenuStack::LastMenuClosed(bool bWasCancel)
 {
-    RemoveFromParent();
+    RemoveFromParent(); // this will do MenuSystem interaction
     OnClosed.Broadcast(this, bWasCancel);
 
     ApplyInputModeChange(InputModeSettingOnClose);
@@ -227,6 +248,7 @@ void UMenuStack::LastMenuClosed(bool bWasCancel)
     ApplyGamePauseChange(GamePauseSettingOnClose);
     
 }
+
 
 void UMenuStack::CloseAll(bool bWasCancel)
 {
@@ -237,6 +259,19 @@ void UMenuStack::CloseAll(bool bWasCancel)
     }
     Menus.Empty();
     LastMenuClosed(bWasCancel);
+}
+
+bool UMenuStack::IsRequestingFocus() const
+{
+    return Menus.Num() > 0 && Menus.Last()->IsRequestingFocus();
+}
+
+void UMenuStack::TakeFocusIfDesired()
+{
+    if (IsRequestingFocus())
+    {
+        Menus.Last()->TakeFocusIfDesired();
+    }
 }
 
 void UMenuStack::SetFocusProperly_Implementation()
