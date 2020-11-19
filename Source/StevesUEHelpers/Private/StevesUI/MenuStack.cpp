@@ -140,14 +140,14 @@ bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
     
     // Hardcoding the Back / Exit menu navigation inputs because input mappings can't be trusted in UMG
     // This is probably OK though, no-one redefines menu controls, right?
-    FKey Key = InKeyEvent.GetKey();
-    if (Key == EKeys::Escape || Key == EKeys::Gamepad_FaceButton_Right)
+    const FKey Key = InKeyEvent.GetKey();
+    if (BackKeys.Contains(Key))
     {
         // This is "Back"
         PopMenu(true);
         return true;
     }
-    else if (Key == EKeys::Gamepad_Special_Right)
+    else if (InstantCloseKeys.Contains(Key))
     {
         // Shortcut to exit all menus
         CloseAll(true);

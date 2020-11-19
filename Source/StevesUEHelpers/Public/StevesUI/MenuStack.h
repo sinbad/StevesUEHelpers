@@ -59,6 +59,16 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behaviour")
     int FocusPriority = 0;
 
+    /// Input keys which go back a level in the menu stack (default Esc and B gamepad button)
+    /// Clear this list if you don't want this behaviour
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+    TArray<FKey> BackKeys = TArray<FKey> { EKeys::Escape, EKeys::Gamepad_FaceButton_Right };
+
+    /// Input keys which instantly close the menu stack (default gamepad start)
+    /// Clear this list if you don't want this behaviour
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+    TArray<FKey> InstantCloseKeys = TArray<FKey> { EKeys::Gamepad_Special_Right };
+
     /// This property will bind to a blueprint variable of the same name to contain the actual menu content
     /// If not set, or the UiMenuBase is set to not use this container, levels are added independently to viewport
     /// Use a NamedSlot for this most of the time, it gives you the most layout flexibility.
