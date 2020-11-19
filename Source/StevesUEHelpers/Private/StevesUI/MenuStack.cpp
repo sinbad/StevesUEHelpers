@@ -224,7 +224,8 @@ void UMenuStack::FirstMenuOpened()
 {
     // tell menu system
     auto GS = GetStevesGameSubsystem(GetWorld());
-    GS->GetMenuSystem()->MenuStackOpened(this);       
+    if (GS)
+        GS->GetMenuSystem()->MenuStackOpened(this);       
 }
 
 void UMenuStack::RemoveFromParent()
