@@ -76,13 +76,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void Close(bool bWasCancel);
 
-    /// Triggers this menu to take focus if appropriate
-    /// This means if the menu both requests focus, and gamepad or keyboard is in use
-    UFUNCTION(BlueprintCallable)
-    void TakeFocusIfDesired();
-
     TWeakObjectPtr<UMenuStack> GetParentStack() const { return ParentStack; }
-    bool IsRequestingFocus() const { return bRequestFocus; }
+    virtual bool IsRequestingFocus_Implementation() const override { return bRequestFocus; }
 
     void AddedToStack(UMenuStack* Parent);
     void RemovedFromStack(UMenuStack* Parent);

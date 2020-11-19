@@ -5,7 +5,7 @@
 #include "InputCoreTypes.h"
 #include "Framework/Application/IInputProcessor.h"
 #include "StevesHelperCommon.h"
-#include "StevesUI/MenuSystem.h"
+#include "StevesUI/FocusSystem.h"
 #include "StevesUI/UiTheme.h"
 
 #include "StevesGameSubsystem.generated.h"
@@ -92,7 +92,7 @@ protected:
 
 protected:
     TSharedPtr<FInputModeDetector> InputDetector;
-    FMenuSystem MenuSystem;
+    FFocusSystem FocusSystem;
 
     UPROPERTY(BlueprintReadWrite)
     UUiTheme* DefaultUiTheme;
@@ -123,6 +123,6 @@ public:
     /// Changes the default theme to a different one
     void SetDefaultUiTheme(UUiTheme* NewTheme) { DefaultUiTheme = NewTheme; }
 
-    /// Get the global menu system
-    FMenuSystem* GetMenuSystem();
+    /// Get the global focus system
+    FFocusSystem* GetFocusSystem();
 };

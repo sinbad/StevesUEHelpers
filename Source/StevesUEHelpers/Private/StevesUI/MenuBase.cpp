@@ -134,14 +134,3 @@ void UMenuBase::Open(bool bIsRegain)
     TakeFocusIfDesired();
     
 }
-
-void UMenuBase::TakeFocusIfDesired()
-{
-    auto GS = GetStevesGameSubsystem(GetWorld());
-    if (bRequestFocus &&
-        GS && (GS->GetLastInputModeUsed() != EInputMode::Gamepad || GS->GetLastInputModeUsed() != EInputMode::Keyboard))
-    {
-        SetFocusProperly();
-    }    
-}
-

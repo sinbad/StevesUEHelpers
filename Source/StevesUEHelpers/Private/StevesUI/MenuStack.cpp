@@ -230,10 +230,7 @@ void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
 
 void UMenuStack::FirstMenuOpened()
 {
-    // tell menu system
-    auto GS = GetStevesGameSubsystem(GetWorld());
-    if (GS)
-        GS->GetMenuSystem()->MenuStackOpened(this);       
+    // Nothing to do now but keep for future use
 }
 
 void UMenuStack::RemoveFromParent()
@@ -247,11 +244,12 @@ void UMenuStack::RemoveFromParent()
     
     Super::RemoveFromParent();
 
-    // tell menu system if we're in-game (this gets called in editor too)
-    auto GS = GetStevesGameSubsystem(GetWorld());
-    if (GS)
-        GS->GetMenuSystem()->MenuStackClosed(this);
-    
+}
+
+UMenuStack::UMenuStack()
+{
+    // Default to enabling automatic focus for menus (can still be overridden in serialized properties)
+    bEnableAutomaticFocus = true;
 }
 
 void UMenuStack::LastMenuClosed(bool bWasCancel)
@@ -277,17 +275,10 @@ void UMenuStack::CloseAll(bool bWasCancel)
     LastMenuClosed(bWasCancel);
 }
 
-bool UMenuStack::IsRequestingFocus() const
+bool UMenuStack::IsRequestingFocus_Implementation() const
 {
+    // Delegate to top menu
     return Menus.Num() > 0 && Menus.Last()->IsRequestingFocus();
-}
-
-void UMenuStack::TakeFocusIfDesired()
-{
-    if (IsRequestingFocus())
-    {
-        Menus.Last()->TakeFocusIfDesired();
-    }
 }
 
 void UMenuStack::SetFocusProperly_Implementation()

@@ -87,9 +87,9 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
     OnInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 
-FMenuSystem* UStevesGameSubsystem::GetMenuSystem()
+FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
 {
-    return &MenuSystem;
+    return &FocusSystem;
 }
 
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()

@@ -53,12 +53,6 @@ protected:
     void InputModeChanged(int PlayerIndex, EInputMode NewMode);
 
 public:
-    /// The focus priority of this stack compared to others. When a MenuStack is opened, if it has higher priority than
-    /// any existing MenuStack open, it will be given focus. When a MenuStack with focus is closed, the next highest
-    /// priority one will be given focus. 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behaviour")
-    int FocusPriority = 0;
-
     /// Input keys which go back a level in the menu stack (default Esc and B gamepad button)
     /// Clear this list if you don't want this behaviour
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
@@ -129,15 +123,12 @@ public:
     void CloseAll(bool bWasCancel);
 
     /// Whether the top MenuBase on this stack is requesting focus
-    UFUNCTION(BlueprintCallable)
-    bool IsRequestingFocus() const;
-    
-    /// Triggers this stack to take focus (specifically its topmost MenuBase) if appropriate
-    /// This means if both top menu on the stack requests focus, and gamepad or keyboard is in use
-    UFUNCTION(BlueprintCallable)
-    void TakeFocusIfDesired();
+    virtual bool IsRequestingFocus_Implementation() const override;
     
     virtual void SetFocusProperly_Implementation() override;
     virtual void PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel);
     virtual void RemoveFromParent() override;
+
+
+    UMenuStack();
 };
