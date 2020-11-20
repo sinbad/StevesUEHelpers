@@ -33,6 +33,12 @@ Several custom widgets are supplied to assist with some common challenges:
   which can apply the "Hovered" style to itself when focused (very important
   for gamepad navigation).
 
+* [Focusable User Widget](FocusableUserWidget.md)
+
+  A base class to use as an alternative to plain UserWidget if you want this
+  widget to have the option to automatically gain focus. This is a good base class
+  for dialogs or other systems which are navigable by gamepad or keyboard.
+
 * [Focusable Panel](FocusablePanel.md)
 
   A Panel widget which can make sure that something is selected when a
