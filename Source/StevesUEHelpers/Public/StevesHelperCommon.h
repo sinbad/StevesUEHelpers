@@ -38,3 +38,14 @@ enum class EGamePauseChange : uint8
     Unpaused UMETA(DisplayName="Unpause Game")
 };
 
+UENUM(BlueprintType)
+enum class EInputBindingType : uint8
+{
+    /// A button action, will be looked up based on input mappings
+    Action = 0,
+    /// An axis action, will be looked up based on input mappings
+    Axis = 1,
+    /// A manually specified FKey (which can be key, button, axis)
+    Key = 2
+};
+

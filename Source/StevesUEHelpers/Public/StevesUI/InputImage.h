@@ -7,18 +7,6 @@
 #include "StevesHelperCommon.h"
 #include "InputImage.generated.h"
 
-UENUM(BlueprintType)
-enum class EInputBindingType : uint8
-{
-    /// A button action, will be looked up based on input mappings
-    Action = 0,
-    /// An axis action, will be looked up based on input mappings
-    Axis = 1,
-    /// A manually specified FKey (which can be key, button, axis)
-    Key = 2
-};
-
-
 /// A special widget containing an image which populates itself based on an input action / axis and can dynamically
 /// change based on the active input method.
 UCLASS()
@@ -38,6 +26,10 @@ protected:
     /// If BindingType is Key, the key 
     UPROPERTY(EditAnywhere)
     FKey Key;
+
+    /// The player index for which the input should be looked up 
+    UPROPERTY(EditAnywhere)
+    int PlayerIndex = 0;
 
     /// Custom theme to use for this input image set; if not supplied will use UStevesGameSubsystem::DefaultUiTheme
     UPROPERTY(EditAnywhere)   
@@ -80,14 +72,9 @@ public:
 protected:
 
     virtual TSharedRef<SWidget> RebuildWidget() override;
-    void UpdateImageFromAction(const FName& Name);
-    void UpdateImageFromAxis(const FName& Name);
-    void UpdateImageFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
-    void UpdateImageFromKey(const FKey& Key);
     virtual void UpdateImage();
-    virtual UUiTheme* GetTheme();
         
     UFUNCTION()
-    void OnInputModeChanged(int PlayerIndex, EInputMode InputMode);
+    void OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode);
     
 };

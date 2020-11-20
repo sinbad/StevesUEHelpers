@@ -4,7 +4,10 @@
 #include "Engine/AssetManager.h"
 #include "Engine/GameInstance.h"
 #include "Framework/Application/SlateApplication.h"
+#include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerInput.h"
+#include "StevesUI/KeySprite.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -90,6 +93,102 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
 FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
 {
     return &FocusSystem;
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType BindingType, FName ActionOrAxis,
+    FKey Key, int PlayerIdx, const UUiTheme* Theme)
+{
+    switch(BindingType)
+    {
+    case EInputBindingType::Action:
+        return GetInputImageSpriteFromAction(ActionOrAxis, PlayerIdx, Theme);
+    case EInputBindingType::Axis:
+        return GetInputImageSpriteFromAxis(ActionOrAxis, PlayerIdx, Theme);
+    case EInputBindingType::Key:
+        return GetInputImageSpriteFromKey(Key, Theme);
+    default:
+        return nullptr;
+    }
+}
+
+// This is not threadsafe! But only used in UI thread in practice
+TArray<FInputActionKeyMapping> GS_TempActionMap;
+TArray<FInputAxisKeyMapping> GS_TempAxisMap;
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& Name, int PlayerIdx, const UUiTheme* Theme)
+{
+    
+    // Look up the key for this action
+    UInputSettings* Settings = UInputSettings::GetInputSettings();
+    GS_TempActionMap.Empty();
+    Settings->GetActionMappingByName(Name, GS_TempActionMap);
+    const bool WantGamepad = LastInputWasGamePad(PlayerIdx);
+    for (auto && ActionMap : GS_TempActionMap)
+    {
+        if (ActionMap.Key.IsGamepadKey() == WantGamepad)
+        {
+            return GetInputImageSpriteFromKey(ActionMap.Key, Theme);
+        }
+    }
+    // if we fell through, didn't find a mapping which matched our gamepad preference
+    if (GS_TempActionMap.Num())
+    {
+        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, Theme);
+    }
+    return nullptr;
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Name, int PlayerIdx, const UUiTheme* Theme)
+{
+    // Look up the key for this axis
+    UInputSettings* Settings = UInputSettings::GetInputSettings();
+    GS_TempAxisMap.Empty();
+    Settings->GetAxisMappingByName(Name, GS_TempAxisMap);
+    const bool WantGamepad = LastInputWasGamePad(PlayerIdx);
+    for (auto && AxisMap : GS_TempAxisMap)
+    {
+        if (AxisMap.Key.IsGamepadKey() == WantGamepad)
+        {
+            return GetInputImageSpriteFromKey(AxisMap.Key, Theme);
+        }
+    }
+    // if we fell through, didn't find a mapping which matched our gamepad preference
+    if (GS_TempAxisMap.Num())
+    {
+        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, Theme);
+    }    
+    return nullptr;
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey, const UUiTheme* Theme)
+{
+    if (!IsValid(Theme))
+        Theme = GetDefaultUiTheme();
+    
+    if (Theme)
+    {
+        if (InKey.IsGamepadKey())
+            return GetImageSpriteFromTable(InKey, Theme->XboxControllerImages);
+        else
+            return GetImageSpriteFromTable(InKey, Theme->KeyboardMouseImages);
+    }
+
+    return nullptr;
+}
+
+
+UPaperSprite* UStevesGameSubsystem::GetImageSpriteFromTable(const FKey& InKey,
+    const TSoftObjectPtr<UDataTable>& Asset)
+{
+    // Sync load for simplicity for now
+    const auto Table = Asset.LoadSynchronous();
+    // Rows are named the same as the key name
+    const auto SpriteRow = Table->FindRow<FKeySprite>(InKey.GetFName(), "Find Key Image");
+    if (SpriteRow)
+    {
+        return SpriteRow->Sprite;
+    }
+    return nullptr;
 }
 
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()

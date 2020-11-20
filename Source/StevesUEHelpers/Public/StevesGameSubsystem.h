@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InputCoreTypes.h"
+#include "PaperSprite.h"
 #include "Framework/Application/IInputProcessor.h"
 #include "StevesHelperCommon.h"
 #include "StevesUI/FocusSystem.h"
@@ -103,7 +104,9 @@ protected:
 
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
-	
+
+    UPaperSprite* GetImageSpriteFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
+    
 public:
 
     /// Event raised when input mode changed between gamepad and keyboard / mouse
@@ -125,4 +128,42 @@ public:
 
     /// Get the global focus system
     FFocusSystem* GetFocusSystem();
+
+
+    /**
+     * @brief Get an input button / key / axis image as a sprite based on any combination of action / axis binding or manual key
+     * @param BindingType The type of input binding to look up 
+     * @param ActionOrAxis The name of the action or axis, if BindingType is looking for that
+     * @param Key The explicit key you want to display, if the BindingType is set to custom key
+     * @param PlayerIndex The player index to look up the binding for 
+     * @param Theme Optional explicit theme, if blank use the default theme
+     * @return 
+     */
+    UFUNCTION(BlueprintCallable)
+    UPaperSprite* GetInputImageSprite(EInputBindingType BindingType, FName ActionOrAxis, FKey Key, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+
+    /**
+    * @brief Get an input button / key image from an action
+    * @param Name The name of the action
+    * @param PlayerIndex The player index to look up the binding for 
+    * @param Theme Optional explicit theme, if blank use the default theme
+    * @return 
+    */
+    UPaperSprite* GetInputImageSpriteFromAction(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    /**
+    * @brief Get an input image from an axis
+    * @param Name The name of the axis
+    * @param PlayerIndex The player index to look up the binding for 
+    * @param Theme Optional explicit theme, if blank use the default theme
+    * @return 
+    */
+    UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    /**
+    * @brief Get an input image for a specific key
+    * @param Key The key to look up
+    * @param Theme Optional explicit theme, if blank use the default theme
+    * @return 
+    */
+    UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, const UUiTheme* Theme = nullptr);
+
 };
