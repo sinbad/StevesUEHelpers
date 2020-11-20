@@ -18,6 +18,12 @@ this option on all your dialogs (it's automatically enabled on [Menus](Menus.md)
 and setting priorities accordingly, you can ensure that focus is reliably 
 transferred without having to do it manually in all combinations of sequences.
 
+Focus is given by calling the `SetFocusProperly` method. Some subclasses like
+[Focusable Panel](FocusablePanel.md) automatically override this to give focus
+to a child widget, but you can override it to do whatever you like (default is
+just to call `SetFocus` on self). The reason for using `SetFocusProperly` is that `SetFocus`
+isn't virtual in the Unreal base classes 🙄
+
 ## See Also
 
 * [Focusable Panel](FocusablePanel.md)
