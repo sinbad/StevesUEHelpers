@@ -20,7 +20,8 @@ public:
 
 inline UStevesGameSubsystem* GetStevesGameSubsystem(UWorld* WorldContext)
 {
-	if (IsValid(WorldContext) && IsValid(WorldContext->GetGameInstance()))
+	if (IsValid(WorldContext) && IsValid(WorldContext->GetGameInstance()) &&
+		WorldContext->IsGameWorld())
 	{
 		return WorldContext->GetGameInstance()->GetSubsystem<UStevesGameSubsystem>();		
 	}
