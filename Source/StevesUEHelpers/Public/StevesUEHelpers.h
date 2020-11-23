@@ -20,10 +20,11 @@ public:
 
 inline UStevesGameSubsystem* GetStevesGameSubsystem(UWorld* WorldContext)
 {
-	if (IsValid(WorldContext) && IsValid(WorldContext->GetGameInstance()) &&
-		WorldContext->IsGameWorld())
+	if (IsValid(WorldContext) && WorldContext->IsGameWorld())
 	{
-		return WorldContext->GetGameInstance()->GetSubsystem<UStevesGameSubsystem>();		
+		auto GI = WorldContext->GetGameInstance();
+		if (IsValid(GI))
+			return GI->GetSubsystem<UStevesGameSubsystem>();		
 	}
 		
 	return nullptr;
