@@ -29,16 +29,16 @@ class SRichInlineInputImage : public SCompoundWidget
 {
 protected:
     /// What type of an input binding this image should look up
-    EInputBindingType BindingType;
+    EInputBindingType BindingType = EInputBindingType::Key;
     /// If BindingType is Action/Axis, the name of it 
     FName ActionOrAxisName;
     /// If BindingType is Key, the key 
     FKey Key;
     /// Player index, if binding type is action or axis
-    int PlayerIndex;
+    int PlayerIndex = 0;
     /// Theme, if any
-    UUiTheme* CustomTheme;
-    UWorld* WorldContext;
+    UUiTheme* CustomTheme = nullptr;
+    UWorld* WorldContext = nullptr;
 
     FSlateBrush Brush;
 
