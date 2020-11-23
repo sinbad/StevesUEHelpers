@@ -191,6 +191,31 @@ UPaperSprite* UStevesGameSubsystem::GetImageSpriteFromTable(const FKey& InKey,
     return nullptr;
 }
 
+void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterface<ISlateTextureAtlasInterface> AtlasRegion, bool bMatchSize)
+{
+    if(Brush->GetResourceObject() != AtlasRegion.GetObject())
+    {
+        Brush->SetResourceObject(AtlasRegion.GetObject());
+
+        if (bMatchSize)
+        {
+            if (AtlasRegion)
+            {
+                const FSlateAtlasData AtlasData = AtlasRegion->GetSlateAtlasData();
+                Brush->ImageSize = AtlasData.GetSourceDimensions();
+            }
+            else
+            {
+                Brush->ImageSize = FVector2D(0, 0);
+            }
+        }
+    }
+}
+
+
+
+
+
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 {
     // 4 local players should be plenty usually (will expand if necessary)

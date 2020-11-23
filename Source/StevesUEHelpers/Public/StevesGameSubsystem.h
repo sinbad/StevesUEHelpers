@@ -166,4 +166,13 @@ public:
     */
     UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, const UUiTheme* Theme = nullptr);
 
+    /**
+     * @brief Set the content of a slate brush from an atlas (e.g. sprite)
+     * @param Brush The brush to update
+     * @param AtlasRegion Atlas to use as source e.g. a Sprite
+     * @param bMatchSize Whether to resize the brush to match the atlas entry
+     */
+    void SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterface<ISlateTextureAtlasInterface> AtlasRegion,
+                          bool bMatchSize);
+
 };
