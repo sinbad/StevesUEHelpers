@@ -78,18 +78,16 @@ public:
         const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
         MaxCharHeight = FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f);
         float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
-        float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
-
-        if (Width.IsSet())
-        {
-            IconWidth = Width.GetValue();
-        }
-
         if (Height.IsSet())
         {
             IconHeight = Height.GetValue();
         }
 
+        float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
+        if (Width.IsSet())
+        {
+            IconWidth = Width.GetValue();
+        }
 
         ChildSlot
         [
@@ -133,17 +131,17 @@ public:
                     TSharedPtr<SWidget> Widget = ChildSlot.GetWidget();
                     SBox* Box = static_cast<SBox*>(Widget.Get());
                     float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
+                    if (RequestedHeight.IsSet())
+                    {
+                        IconHeight = RequestedHeight.GetValue();
+                    }
+                    
                     float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
-
                     if (RequestedWidth.IsSet())
                     {
                         IconWidth = RequestedWidth.GetValue();
                     }
 
-                    if (RequestedHeight.IsSet())
-                    {
-                        IconHeight = RequestedHeight.GetValue();
-                    }
                     Box->SetWidthOverride(IconWidth);
                     Box->SetHeightOverride(IconHeight);
                     
