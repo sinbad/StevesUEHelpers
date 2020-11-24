@@ -172,7 +172,7 @@ public:
      * @param AtlasRegion Atlas to use as source e.g. a Sprite
      * @param bMatchSize Whether to resize the brush to match the atlas entry
      */
-    void SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterface<ISlateTextureAtlasInterface> AtlasRegion,
+    static void SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterface<ISlateTextureAtlasInterface> AtlasRegion,
                           bool bMatchSize);
 
 };
