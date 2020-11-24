@@ -42,6 +42,10 @@ protected:
 
     FSlateBrush Brush;
     float TimeUntilNextSpriteCheck = 0;
+    uint16 MaxCharHeight = 0;
+    TOptional<int32> RequestedWidth;
+    TOptional<int32> RequestedHeight;
+    SBox* ContainerBox = nullptr;
 
 public:
     SLATE_BEGIN_ARGS(SRichInlineInputImage)
@@ -58,6 +62,8 @@ public:
         Key = InParams.Key;
         PlayerIndex = InParams.PlayerIndex;
         Decorator = InParams.Decorator;
+        RequestedWidth = Width;
+        RequestedHeight = Height;
 
         // Sadly, we cannot hook into the events needed to update based on input changes here
         // All attempts to use GetStevesGameSubsystem() fail because the world pointer
@@ -70,7 +76,8 @@ public:
         TimeUntilNextSpriteCheck = 0.25f;
 
         const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-        float IconHeight = FMath::Min((float)FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f), Brush.ImageSize.Y);
+        MaxCharHeight = FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f);
+        float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
         float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
 
         if (Width.IsSet())
@@ -119,7 +126,28 @@ public:
                 // Can only support default theme, no way to edit theme in decorator config 
                 auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, PlayerIndex);
                 if (Sprite && Brush.GetResourceObject() != Sprite)
+                {
                     UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
+
+                    // Deal with aspect ratio changes
+                    TSharedPtr<SWidget> Widget = ChildSlot.GetWidget();
+                    SBox* Box = static_cast<SBox*>(Widget.Get());
+                    float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
+                    float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
+
+                    if (RequestedWidth.IsSet())
+                    {
+                        IconWidth = RequestedWidth.GetValue();
+                    }
+
+                    if (RequestedHeight.IsSet())
+                    {
+                        IconHeight = RequestedHeight.GetValue();
+                    }
+                    Box->SetWidthOverride(IconWidth);
+                    Box->SetHeightOverride(IconHeight);
+                    
+                }
                 
             }
             TimeUntilNextSpriteCheck = 0.25f;
