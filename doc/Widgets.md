@@ -17,6 +17,13 @@ Several custom widgets are supplied to assist with some common challenges:
   display the image for an associated bound control, based on the currently
   active input method. Dynamically switches as input method changes.
 
+* [Rich Text Input Decorator](RichTextInputDecorator.md)
+
+  A decorator for Rich Text controls that allows you to use markup like
+  `<input action="SomeGameAction"/>` in your text to inline an image of 
+  the input control which is bound to that input action right now. 
+  Again this dynamically switches as input method changes.
+
 * [Menu System](Menus.md)
 
   A couple of classes to make it  easy to create multi-level on-screen menus 

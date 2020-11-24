@@ -39,3 +39,7 @@ that.
 
 This is an optional link to a [UiTheme](UiTheme.md) you want to use for this
 InputImage. If blank, the default UiTheme is used.
+
+## See Also
+
+ * [Rich Text Input Decorator](RichTextInputDecorator.md)
