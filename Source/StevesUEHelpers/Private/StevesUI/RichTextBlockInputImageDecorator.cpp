@@ -20,9 +20,10 @@ struct FInputImageParams
     FKey Key;
     /// Player index, if binding type is action or axis
     int PlayerIndex;
-    /// Theme, if any
-    UUiTheme* CustomTheme;
-    UWorld* WorldContext;
+    /// Initial Sprite to use
+    UPaperSprite* InitialSprite;
+    /// Parent decorator, for looking up things later
+    URichTextBlockInputImageDecorator* Decorator;
 };
 // Basically the same as SRichInlineImage but I can't re-use that since private
 class SRichInlineInputImage : public SCompoundWidget
@@ -36,9 +37,8 @@ protected:
     FKey Key;
     /// Player index, if binding type is action or axis
     int PlayerIndex = 0;
-    /// Theme, if any
-    UUiTheme* CustomTheme = nullptr;
-    UWorld* WorldContext = nullptr;
+    /// Parent decorator, for looking up things later
+    URichTextBlockInputImageDecorator* Decorator = nullptr;
 
     FSlateBrush Brush;
 
@@ -56,12 +56,20 @@ public:
         ActionOrAxisName = InParams.ActionOrAxisName;
         Key = InParams.Key;
         PlayerIndex = InParams.PlayerIndex;
-        CustomTheme = InParams.CustomTheme;
-        WorldContext = InParams.WorldContext;
+        Decorator = InParams.Decorator;
+
+        // Sadly, we cannot hook into the events needed to update based on input changes here
+        // All attempts to use GetStevesGameSubsystem() fail because the world pointer
+        // doesn't work, I think perhaps because this Slate Construct call is in another thread.
+        // We will need to do the work to update the brush from the main thread later
+
+        // We can use static methods though
+        if (InParams.InitialSprite)
+            UStevesGameSubsystem::SetBrushFromAtlas(&Brush, InParams.InitialSprite, true);
 
         const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
         float IconHeight = FMath::Min((float)FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f), Brush.ImageSize.Y);
-        float IconWidth = IconHeight;
+        float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
 
         if (Width.IsSet())
         {
@@ -73,12 +81,6 @@ public:
             IconHeight = Height.GetValue();
         }
 
-        auto GS = GetStevesGameSubsystem(WorldContext);
-        if (GS)
-        {
-            auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, PlayerIndex, CustomTheme);
-            GS->SetBrushFromAtlas(&Brush, Sprite, true);
-        }
 
         ChildSlot
         [
@@ -129,6 +131,7 @@ protected:
         Params.PlayerIndex = 0;
         Params.BindingType = EInputBindingType::Key;
         Params.Key = EKeys::AnyKey;
+        Params.Decorator = Decorator;
         
         if (const FString* PlayerStr = RunInfo.MetaData.Find(TEXT("player")))
         {
@@ -151,6 +154,22 @@ protected:
             Params.BindingType = EInputBindingType::Axis;
             Params.ActionOrAxisName = **AxisStr;        
         }
+
+        // Look up the initial sprite here
+        // The Slate widget can't do it in Construct because World pointer doesn't work (thread issues?)
+        auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
+        if (GS)
+        {
+            // Can only support default theme, no way to edit theme in decorator config 
+            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, Params.PlayerIndex);
+        }
+        else
+        {
+            // Might be false because this gets executed in the editor too
+            // TODO use a placeholder?
+            Params.InitialSprite = nullptr;            
+        }
+    
 
         // Support the same width/height/stretch overrides as standard rich text images
         TOptional<int32> Width;
