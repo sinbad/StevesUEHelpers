@@ -9,8 +9,8 @@
 #include "Widgets/Images/SImage.h"
 
 
-// Slat SNew only supports 5 custom arguments so we need to batch things up
-struct FInputImageParams
+// Slate SNew only supports 5 custom arguments so we need to batch things up
+struct FRichTextInputImageParams
 {
     /// What type of an input binding this image should look up
     EInputBindingType BindingType;
@@ -41,6 +41,7 @@ protected:
     URichTextBlockInputImageDecorator* Decorator = nullptr;
 
     FSlateBrush Brush;
+    float TimeUntilNextSpriteCheck = 0;
 
 public:
     SLATE_BEGIN_ARGS(SRichInlineInputImage)
@@ -49,7 +50,7 @@ public:
 
 public:
 
-    void Construct(const FArguments& InArgs, FInputImageParams InParams,
+    void Construct(const FArguments& InArgs, FRichTextInputImageParams InParams,
         const FTextBlockStyle& TextStyle, TOptional<int32> Width, TOptional<int32> Height, EStretch::Type Stretch)
     {
         BindingType = InParams.BindingType;
@@ -60,12 +61,13 @@ public:
 
         // Sadly, we cannot hook into the events needed to update based on input changes here
         // All attempts to use GetStevesGameSubsystem() fail because the world pointer
-        // doesn't work, I think perhaps because this Slate Construct call is in another thread.
+        // doesn't work, I think perhaps because this Slate Construct call is in another thread which pre-dates it.
         // We will need to do the work to update the brush from the main thread later
 
         // We can use static methods though
         if (InParams.InitialSprite)
             UStevesGameSubsystem::SetBrushFromAtlas(&Brush, InParams.InitialSprite, true);
+        TimeUntilNextSpriteCheck = 0.25f;
 
         const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
         float IconHeight = FMath::Min((float)FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f), Brush.ImageSize.Y);
@@ -99,6 +101,30 @@ public:
             ]
         ];
     }
+
+
+    virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override
+    {
+        SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
+
+        // I would prefer to hook into the events here but there is NO safe teardown in these RichText decorators
+        // with which to unsub from events, so we're down to brute forcing this in Tick() le sigh
+        // At least limit the frequency and only change as needed
+        TimeUntilNextSpriteCheck -= InDeltaTime;
+        if (TimeUntilNextSpriteCheck <= 0)
+        {
+            auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
+            if (GS)
+            {
+                // Can only support default theme, no way to edit theme in decorator config 
+                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, PlayerIndex);
+                if (Sprite && Brush.GetResourceObject() != Sprite)
+                    UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
+                
+            }
+            TimeUntilNextSpriteCheck = 0.25f;
+        }
+    }
 };
 
 // Again, wish I could just subclass FRichInlineImage here, le sigh
@@ -127,7 +153,7 @@ protected:
 
     virtual TSharedPtr<SWidget> CreateDecoratorWidget(const FTextRunInfo& RunInfo, const FTextBlockStyle& TextStyle) const override
     {
-        FInputImageParams Params;
+        FRichTextInputImageParams Params;
         Params.PlayerIndex = 0;
         Params.BindingType = EInputBindingType::Key;
         Params.Key = EKeys::AnyKey;
@@ -157,6 +183,7 @@ protected:
 
         // Look up the initial sprite here
         // The Slate widget can't do it in Construct because World pointer doesn't work (thread issues?)
+        // Also annoying: can't keep Brush on this class because this method is const. UGH
         auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
         if (GS)
         {
