@@ -306,7 +306,7 @@ void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMo
         
         LastInputModeByPlayer[PlayerIndex] = NewMode;
         OnInputModeChanged.ExecuteIfBound(PlayerIndex, NewMode);
-        UE_LOG(LogTemp, Warning, TEXT("Input mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
+        //UE_LOG(LogStevesUEHelpers, Display, TEXT("Input mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
     }
 }
 
