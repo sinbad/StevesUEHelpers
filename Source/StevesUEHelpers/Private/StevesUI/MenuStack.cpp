@@ -48,7 +48,12 @@ void UMenuStack::SavePreviousInputMousePauseState()
     }
     else
     {
-        const auto CaptureMode = GVC->CaptureMouseOnClick();
+#if ENGINE_MINOR_VERSION >= 26		
+		const auto CaptureMode = GVC->GetMouseCaptureMode();
+#else
+		const auto CaptureMode = GVC->CaptureMouseOnClick();
+#endif
+
         // Game-only mode captures permanently, that seems to be the best way to detect
         if (CaptureMode == EMouseCaptureMode::CapturePermanently ||
             CaptureMode == EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown)
