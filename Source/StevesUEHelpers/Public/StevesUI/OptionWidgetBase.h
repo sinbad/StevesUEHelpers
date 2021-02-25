@@ -77,6 +77,7 @@ public:
     UTextBlock* GamepadText;
 
     /// Event raised when the selected option changes
+    UPROPERTY(BlueprintAssignable)
     FOnSelectedOptionChanged OnSelectedOptionChanged;
 
     virtual void SynchronizeProperties() override;
