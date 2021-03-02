@@ -75,11 +75,14 @@ void SFocusableCheckBox::OnMouseEnter(const FGeometry& MyGeometry, const FPointe
 	SCheckBox::OnMouseEnter(MyGeometry, MouseEvent);
 
 	// SCheckbox doesn't have hovered / unhovered events so we need to add them
+	OnHoveredDelegate.ExecuteIfBound();
 }
 
 void SFocusableCheckBox::OnMouseLeave(const FPointerEvent& MouseEvent)
 {
 	SCheckBox::OnMouseLeave(MouseEvent);
+
+	OnUnhoveredDelegate.ExecuteIfBound();
 }
 
 FReply SFocusableCheckBox::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent)
