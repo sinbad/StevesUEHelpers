@@ -56,8 +56,8 @@ void SFocusableCheckBox::Construct(const FArguments& InArgs)
 
 FReply SFocusableCheckBox::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	// Default behaviour is to return Unhandled for ANY keys apart from Accept, which breaks keyboard nav
-	// I'm sure this is a bug
+	// Default 4.26.1 behaviour is to return Unhandled for ANY keys apart from Accept, which breaks keyboard nav
+	// This is a bug and it's been fixed in the source version but not released yet, so work around it
 	if (FSlateApplication::Get().GetNavigationActionFromKey(InKeyEvent) == EUINavigationAction::Accept)
 	{
 		// for accept, let the immediate superclass do it
