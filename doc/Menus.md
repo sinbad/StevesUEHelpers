@@ -79,7 +79,7 @@ as being able to become part of a MenuStack. So our widget needs to be one of th
 ### 3. Create the Menu Buttons
 
 This library comes with a custom button which is perfect for menus, called
-[FocusableButton](FocusableButton.md). It has the advantage of automatically highlighting when
+[FocusableButton](FocusableWidgets.md). It has the advantage of automatically highlighting when
 focussed (e.g. gamepad or keyboard navigation). 
 
 1. Change the view mode (top-right) from Fill Screen to Desired

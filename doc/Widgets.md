@@ -34,11 +34,17 @@ Several custom widgets are supplied to assist with some common challenges:
   mouse pointer visibility, on both opening and closing, to make it easier
   to implement this common behaviour.
 
-* [Focusable Button](FocusableButton.md)
+* [Focusable Button](FocusableWidgets.md)
 
   A refined Button widget which raises focus events you can listen to, and
   which can apply the "Hovered" style to itself when focused (very important
   for gamepad navigation).
+
+* [Focusable CheckBox](FocusableWidgets.md)
+
+  An improved CheckBox widget which raises focus events you can listen to, 
+  is navigable by gamepad / keyboard, and which can apply the "Hovered" 
+  style to itself when focused.
 
 * [Focusable User Widget](FocusableUserWidget.md)
 

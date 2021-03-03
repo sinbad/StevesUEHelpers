@@ -36,7 +36,7 @@ MouseUpButton|The button which will increment the selection index in mouse mode
 MouseDownImage|The image displayed inside the button for decrementing the selection index in mouse mode
 MouseUpImage|The image displayed inside the button for incrementing the selection index in mouse mode
 MouseText|The text widget which displays the selected item in mouse mode
-GamepadVersion|The container for all elements which will be shown when a gamepad is active (or keyboard navigation). This is almost certainly a [FocusableButton](FocusableButton.md) so it can hold focus.
+GamepadVersion|The container for all elements which will be shown when a gamepad is active (or keyboard navigation). This is almost certainly a [FocusableButton](FocusableWidgets.md) so it can hold focus.
 GamepadDownImage|The image displayed when decrementing the selection index in gamepad mode is allowed
 GamepadUpImage|The image displayed when incrementing the selection index in gamepad mode is allowed
 GamepadText|The text widget which displays the selected item in gamepad mode
