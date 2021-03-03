@@ -20,31 +20,6 @@ class STEVESUEHELPERS_API UOptionWidgetBase : public UFocusableUserWidget
 
 public:
 
-    // -- Properties we replicate to child widgets
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Appearance")
-    FButtonStyle ButtonStyle;
-    
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FSlateBrush ButtonImage;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FLinearColor ButtonImageColour = FLinearColor::White;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FSlateFontInfo Font;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FLinearColor TextColour = FLinearColor::White;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FSlateBrush TextStrikeBrush;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FVector2D TextShadowOffset;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Appearance")
-    FLinearColor TextShadowColor;
-
     // -- Properties automatically bound to Blueprint widget
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
     UWidget* MouseVersion;
@@ -79,8 +54,6 @@ public:
     /// Event raised when the selected option changes
     UPROPERTY(BlueprintAssignable)
     FOnSelectedOptionChanged OnSelectedOptionChanged;
-
-    virtual void SynchronizeProperties() override;
 
     UFUNCTION(BlueprintCallable)
     /// Remove all options
@@ -117,16 +90,13 @@ public:
 
     virtual void SetFocusProperly_Implementation() override;
 
+
 protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     TArray<FText> Options;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     int SelectedIndex;
-
-    virtual void SyncButtonProperties(UButton* Button) const;
-    virtual void SyncButtonImageProperties(UImage* Img) const;
-    virtual void SyncTextProperties(UTextBlock* Txt) const;
 
     UFUNCTION(BlueprintCallable)
     virtual void SetMouseMode();

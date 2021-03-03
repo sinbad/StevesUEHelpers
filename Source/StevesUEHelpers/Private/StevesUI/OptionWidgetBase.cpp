@@ -109,52 +109,6 @@ void UOptionWidgetBase::InputModeChanged(int PlayerIndex, EInputMode NewMode)
     UpdateFromInputMode(NewMode);
 }
 
-void UOptionWidgetBase::SynchronizeProperties()
-{
-    Super::SynchronizeProperties();
-
-    SyncButtonProperties(MouseUpButton);
-    SyncButtonProperties(MouseDownButton);
-    SyncButtonProperties(GamepadVersion);
-    
-    SyncTextProperties(MouseText);
-    SyncTextProperties(GamepadText);
-
-    SyncButtonImageProperties(MouseUpImage);
-    SyncButtonImageProperties(MouseDownImage);
-    SyncButtonImageProperties(GamepadUpImage);
-    SyncButtonImageProperties(GamepadDownImage);
-}
-
-void UOptionWidgetBase::SyncButtonProperties(UButton* Button) const
-{
-    if (Button)
-    {
-        Button->SetStyle(ButtonStyle);
-    }
-}
-
-void UOptionWidgetBase::SyncButtonImageProperties(UImage* Img) const
-{
-    if (Img)
-    {
-        Img->SetBrush(ButtonImage);
-        Img->SetColorAndOpacity(ButtonImageColour);
-    }
-}
-
-void UOptionWidgetBase::SyncTextProperties(UTextBlock* Txt) const
-{
-    if (Txt)
-    {
-        Txt->SetFont(Font);
-        Txt->SetColorAndOpacity(TextColour);
-        Txt->SetStrikeBrush(TextStrikeBrush);
-        Txt->SetShadowOffset(TextShadowOffset);
-        Txt->SetShadowColorAndOpacity(TextShadowColor);
-    }
-}
-
 
 void UOptionWidgetBase::SetMouseMode()
 {
@@ -170,8 +124,6 @@ void UOptionWidgetBase::SetMouseMode()
 
     MouseVersion->SetVisibility(ESlateVisibility::Visible);
 
-    SynchronizeProperties();
-    
     if (bHadFocus)
         SetFocusProperly();
     
@@ -188,8 +140,6 @@ void UOptionWidgetBase::SetButtonMode()
 
     GamepadVersion->SetVisibility(ESlateVisibility::Visible);
 
-    SynchronizeProperties();
-    
     if (bHadFocus)
         SetFocusProperly();
     
