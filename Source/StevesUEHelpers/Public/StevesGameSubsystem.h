@@ -65,7 +65,11 @@ protected:
         const EInputMode DefaultInputMode = EInputMode::Mouse;
         const float MouseMoveThreshold = 1;
         const float GamepadAxisThreshold = 0.2;
+
+        bool ShouldProcessInputEvents() const;
     public:
+        /// Whether this detector should process events when the application is in the background
+        bool bProcessEventsInBackground = false;
 
         // Single delegate caller, owner should propagate if they want (this isn't a UObject)
         FInternalInputModeChanged OnInputModeChanged;

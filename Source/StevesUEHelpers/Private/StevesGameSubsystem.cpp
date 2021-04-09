@@ -219,8 +219,19 @@ void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterfac
 }
 
 
+bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
+{
+    if (!bProcessEventsInBackground)
+    {
+        if (IsValid(GEngine) && IsValid(GEngine->GameViewport) && GEngine->GameViewport->Viewport)
+            return GEngine->GameViewport->Viewport->IsForegroundWindow();
 
-
+        // If we're not supposed to process in the background but there's no viewport, don't process
+        return false;
+    }
+   
+    return true;
+}
 
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 {
@@ -230,8 +241,11 @@ UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
 {
-    // Key down also registers for gamepad buttons
-    ProcessKeyOrButton(InKeyEvent.GetUserIndex(), InKeyEvent.GetKey());
+    if (ShouldProcessInputEvents())
+    {
+        // Key down also registers for gamepad buttons
+        ProcessKeyOrButton(InKeyEvent.GetUserIndex(), InKeyEvent.GetKey());
+    }
 
     // Don't consume
     return false;
@@ -240,18 +254,25 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplicat
 bool UStevesGameSubsystem::FInputModeDetector::HandleAnalogInputEvent(FSlateApplication& SlateApp,
     const FAnalogInputEvent& InAnalogInputEvent)
 {
-    if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
-        SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad);
+    if (ShouldProcessInputEvents())
+    {
+        if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
+            SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad);
+    }
+    
     // Don't consume
     return false;
 }
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
-    if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
+    if (ShouldProcessInputEvents())
     {
-        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+        FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
+        if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
+        {
+            SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+        }
     }
     // Don't consume
     return false;
@@ -259,8 +280,12 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplic
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    // We don't care which button
-    SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+    if (ShouldProcessInputEvents())
+    {
+        // We don't care which button
+        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+    }
+    
     // Don't consume
     return false;
 }
@@ -268,7 +293,11 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlate
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& InWheelEvent,
     const FPointerEvent* InGestureEvent)
 {
-    SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse);
+    if (ShouldProcessInputEvents())
+    {
+        SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse);
+    }
+    
     // Don't consume
     return false;
 }
