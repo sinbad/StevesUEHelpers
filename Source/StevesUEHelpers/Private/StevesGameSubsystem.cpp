@@ -15,13 +15,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
     CreateInputDetector();
-    InitTheme();
-
-    auto GI = GetGameInstance();        
-    auto VC = Cast<UStevesGameViewportClientBase>(GI->GetGameViewportClient());
-    if (!VC)
-        UE_LOG(LogStevesUEHelpers, Warning, TEXT("Your GameViewportClient needs to be set to a subclass of UStevesGameViewportClientBase if you want full functionality!"))
-    
+    InitTheme();    
 }
 
 void UStevesGameSubsystem::Deinitialize()
@@ -59,6 +53,18 @@ void UStevesGameSubsystem::InitTheme()
 
 void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)
 {
+    // We can't check this during Initialize because it's too early
+    if (!bCheckedViewportClient)
+    {
+        auto GI = GetGameInstance();        
+        auto VC = Cast<UStevesGameViewportClientBase>(GI->GetGameViewportClient());
+        if (!VC)
+            UE_LOG(LogStevesUEHelpers, Warning, TEXT("Your GameViewportClient needs to be set to a subclass of UStevesGameViewportClientBase if you want full functionality!"))
+
+        bCheckedViewportClient = true;
+    
+    }
+    
     auto GI = GetGameInstance();
     auto VC = GI->GetGameViewportClient();
     auto SVC = Cast<UStevesGameViewportClientBase>(VC);

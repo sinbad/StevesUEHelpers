@@ -94,6 +94,7 @@ protected:
 protected:
     TSharedPtr<FInputModeDetector> InputDetector;
     FFocusSystem FocusSystem;
+    bool bCheckedViewportClient = false;
 
     UPROPERTY(BlueprintReadWrite)
     UUiTheme* DefaultUiTheme;
