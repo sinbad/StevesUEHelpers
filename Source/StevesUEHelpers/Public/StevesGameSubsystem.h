@@ -12,6 +12,7 @@
 #include "StevesGameSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 
 UCLASS(Config=Game)
 class STEVESUEHELPERS_API UStevesGameSubsystem : public UGameInstanceSubsystem
@@ -68,8 +69,8 @@ protected:
 
         bool ShouldProcessInputEvents() const;
     public:
-        /// Whether this detector should process events when the application is in the background
-        bool bProcessEventsInBackground = false;
+        /// Whether this detector should ignore events (e.g. because the application is in the background)
+        bool bIgnoreEvents = false;
 
         // Single delegate caller, owner should propagate if they want (this isn't a UObject)
         FInternalInputModeChanged OnInputModeChanged;
@@ -100,12 +101,20 @@ protected:
     FFocusSystem FocusSystem;
     bool bCheckedViewportClient = false;
 
+    FTimerHandle ForegroundCheckHandle;
+
+    UPROPERTY(BlueprintReadOnly)
+    bool bIsForeground = true;
+
     UPROPERTY(BlueprintReadWrite)
     UUiTheme* DefaultUiTheme;
 
     void CreateInputDetector();
     void DestroyInputDetector();
     void InitTheme();
+    void InitForegroundCheck();
+    void CheckForeground();
+
 
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
@@ -117,6 +126,10 @@ public:
     /// Event raised when input mode changed between gamepad and keyboard / mouse
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnInputModeChanged;
+
+    /// Event raised when the game window's foreground status changes
+    UPROPERTY(BlueprintAssignable)
+    FOnWindowForegroundChanged OnWindowForegroundChanged;
 
     UFUNCTION(BlueprintCallable)
     EInputMode GetLastInputModeUsed(int PlayerIndex = 0) const { return InputDetector->GetLastInputMode(PlayerIndex); }
@@ -134,6 +147,8 @@ public:
     /// Get the global focus system
     FFocusSystem* GetFocusSystem();
 
+    /// Return whether the game is currently in the foreground
+    bool IsForeground() const { return bIsForeground; }
 
     /**
      * @brief Get an input button / key / axis image as a sprite based on any combination of action / axis binding or manual key

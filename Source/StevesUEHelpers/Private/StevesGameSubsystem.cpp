@@ -15,7 +15,8 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
     CreateInputDetector();
-    InitTheme();    
+    InitTheme();
+    InitForegroundCheck();
 }
 
 void UStevesGameSubsystem::Deinitialize()
@@ -51,6 +52,30 @@ void UStevesGameSubsystem::InitTheme()
     DefaultUiTheme = LoadObject<UUiTheme>(nullptr, *DefaultUiThemePath, nullptr);
 }
 
+
+void UStevesGameSubsystem::InitForegroundCheck()
+{
+    // Check foreground status every 0.5 seconds
+    GetWorld()->GetTimerManager().SetTimer(ForegroundCheckHandle, this, &UStevesGameSubsystem::CheckForeground, 0.5);
+}
+
+void UStevesGameSubsystem::CheckForeground()
+{
+    bool bNewForeground = bIsForeground;
+
+    if (IsValid(GEngine) && IsValid(GEngine->GameViewport) && GEngine->GameViewport->Viewport)
+        bNewForeground = GEngine->GameViewport->Viewport->IsForegroundWindow();
+
+    if (bNewForeground != bIsForeground)
+    {
+        bIsForeground = bNewForeground;
+        InputDetector->bIgnoreEvents = !bIsForeground;
+        
+        OnWindowForegroundChanged.Broadcast(bIsForeground);
+    }
+
+    
+}
 void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)
 {
     // We can't check this during Initialize because it's too early
@@ -221,16 +246,7 @@ void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterfac
 
 bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
 {
-    if (!bProcessEventsInBackground)
-    {
-        if (IsValid(GEngine) && IsValid(GEngine->GameViewport) && GEngine->GameViewport->Viewport)
-            return GEngine->GameViewport->Viewport->IsForegroundWindow();
-
-        // If we're not supposed to process in the background but there's no viewport, don't process
-        return false;
-    }
-   
-    return true;
+    return !bIgnoreEvents;
 }
 
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
