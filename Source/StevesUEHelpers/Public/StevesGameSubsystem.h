@@ -119,6 +119,8 @@ protected:
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
 
+
+    TSoftObjectPtr<UDataTable> GetGamepadImages(int PlayerIndex, const UUiTheme* Theme);
     UPaperSprite* GetImageSpriteFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
     
 public:
@@ -178,13 +180,14 @@ public:
     * @return 
     */
     UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    
     /**
     * @brief Get an input image for a specific key
     * @param Key The key to look up
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
-    UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, const UUiTheme* Theme = nullptr);
+    UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
 
     /**
      * @brief Set the content of a slate brush from an atlas (e.g. sprite)

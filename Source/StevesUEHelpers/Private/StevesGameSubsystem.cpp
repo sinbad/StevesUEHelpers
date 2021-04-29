@@ -136,7 +136,7 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType Bindin
     case EInputBindingType::Axis:
         return GetInputImageSpriteFromAxis(ActionOrAxis, PlayerIdx, Theme);
     case EInputBindingType::Key:
-        return GetInputImageSpriteFromKey(Key, Theme);
+        return GetInputImageSpriteFromKey(Key, PlayerIdx, Theme);
     default:
         return nullptr;
     }
@@ -158,13 +158,13 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& N
     {
         if (ActionMap.Key.IsGamepadKey() == WantGamepad)
         {
-            return GetInputImageSpriteFromKey(ActionMap.Key, Theme);
+            return GetInputImageSpriteFromKey(ActionMap.Key, PlayerIdx, Theme);
         }
     }
     // if we fell through, didn't find a mapping which matched our gamepad preference
     if (GS_TempActionMap.Num())
     {
-        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, Theme);
+        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, PlayerIdx, Theme);
     }
     return nullptr;
 }
@@ -180,18 +180,24 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
     {
         if (AxisMap.Key.IsGamepadKey() == WantGamepad)
         {
-            return GetInputImageSpriteFromKey(AxisMap.Key, Theme);
+            return GetInputImageSpriteFromKey(AxisMap.Key, PlayerIdx, Theme);
         }
     }
     // if we fell through, didn't find a mapping which matched our gamepad preference
     if (GS_TempAxisMap.Num())
     {
-        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, Theme);
+        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, PlayerIdx, Theme);
     }    
     return nullptr;
 }
 
-UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey, const UUiTheme* Theme)
+TSoftObjectPtr<UDataTable> UStevesGameSubsystem::GetGamepadImages(int PlayerIndex, const UUiTheme* Theme)
+{
+    // TODO: determine type of controller
+    return Theme->XboxControllerImages;    
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey, int PlayerIndex, const UUiTheme* Theme)
 {
     if (!IsValid(Theme))
         Theme = GetDefaultUiTheme();
@@ -199,7 +205,7 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey
     if (Theme)
     {
         if (InKey.IsGamepadKey())
-            return GetImageSpriteFromTable(InKey, Theme->XboxControllerImages);
+            return GetImageSpriteFromTable(InKey,  GetGamepadImages(PlayerIndex, Theme));
         else
             return GetImageSpriteFromTable(InKey, Theme->KeyboardMouseImages);
     }
