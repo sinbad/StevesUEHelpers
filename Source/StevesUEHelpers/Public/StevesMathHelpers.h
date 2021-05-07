@@ -13,7 +13,7 @@ public:
 	* @param Distance Length of the cone
 	* @param SphereCentre Centre of the sphere
 	* @param SphereRadius Radius of the sphere
-	* @return True if any collider in the component overlaps the cone
+	* @return True if the sphere overlaps the cone
 	*/
 	static bool SphereOverlapCone(const FVector& ConeOrigin, const FVector& ConeDir, float ConeHalfAngle, float Distance, const FVector& SphereCentre, float SphereRadius)
 	{
