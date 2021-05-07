@@ -21,16 +21,16 @@ public:
 	* Return whether a sphere overlaps a cone
 	* @param ConeOrigin Origin of the cone
 	* @param ConeDir Direction of the cone, must be normalised
-	* @param ConeHalfAngle Half-angle of the cone, in degrees
+	* @param ConeAngle Angle of the cone, in degrees
 	* @param Distance Length of the cone
 	* @param SphereCentre Centre of the sphere
 	* @param SphereRadius Radius of the sphere
 	* @return True if the sphere overlaps the cone
 	*/
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Math")
-	static bool SphereOverlapCone(FVector ConeOrigin, FVector ConeDir, float ConeHalfAngle, float Distance, FVector SphereCentre, float SphereRadius)
+	static bool SphereOverlapCone(FVector ConeOrigin, FVector ConeDir, float ConeAngle, float Distance, FVector SphereCentre, float SphereRadius)
 	{
-		return StevesMathHelpers::SphereOverlapCone(ConeOrigin, ConeDir, FMath::DegreesToRadians(ConeHalfAngle), Distance, SphereCentre, SphereRadius);
+		return StevesMathHelpers::SphereOverlapCone(ConeOrigin, ConeDir, FMath::DegreesToRadians(ConeAngle*0.5f), Distance, SphereCentre, SphereRadius);
 	}
 	
 };
