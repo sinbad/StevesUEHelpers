@@ -2,3 +2,10 @@
 
 
 #include "StevesBPL.h"
+
+#include "StevesUI/StevesUI.h"
+
+void UStevesBPL::SetWidgetFocus(UWidget* Widget)
+{
+	SetWidgetFocusProperly(Widget);
+}

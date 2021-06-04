@@ -7,6 +7,7 @@
 #include "StevesMathHelpers.h"
 #include "StevesBPL.generated.h"
 
+class UWidget;
 /**
  * Blueprint library exposing various things in a Blueprint-friendly way e.g. using by-value FVectors so they can
  * be entered directly if required, rather than const& as in C++. Also use degrees not radians.
@@ -32,5 +33,14 @@ public:
 	{
 		return StevesMathHelpers::SphereOverlapCone(ConeOrigin, ConeDir, FMath::DegreesToRadians(ConeAngle*0.5f), Distance, SphereCentre, SphereRadius);
 	}
+
+
 	
+	/**
+	* Set the focus to a given widget "properly", which means that if this is a widget derived
+	* from UFocusableWidget, it calls SetFocusProperly on it which allows a customised implementation.
+    * @param Widget The widget to give focus to
+	*/
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|UI")
+	static void SetWidgetFocus(UWidget* Widget);
 };
