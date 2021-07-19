@@ -12,6 +12,7 @@
 #include "StevesGameSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 
 UCLASS(Config=Game)
 class STEVESUEHELPERS_API UStevesGameSubsystem : public UGameInstanceSubsystem
@@ -65,7 +66,11 @@ protected:
         const EInputMode DefaultInputMode = EInputMode::Mouse;
         const float MouseMoveThreshold = 1;
         const float GamepadAxisThreshold = 0.2;
+
+        bool ShouldProcessInputEvents() const;
     public:
+        /// Whether this detector should ignore events (e.g. because the application is in the background)
+        bool bIgnoreEvents = false;
 
         // Single delegate caller, owner should propagate if they want (this isn't a UObject)
         FInternalInputModeChanged OnInputModeChanged;
@@ -94,6 +99,12 @@ protected:
 protected:
     TSharedPtr<FInputModeDetector> InputDetector;
     FFocusSystem FocusSystem;
+    bool bCheckedViewportClient = false;
+
+    FTimerHandle ForegroundCheckHandle;
+
+    UPROPERTY(BlueprintReadOnly)
+    bool bIsForeground = true;
 
     UPROPERTY(BlueprintReadWrite)
     UUiTheme* DefaultUiTheme;
@@ -101,10 +112,15 @@ protected:
     void CreateInputDetector();
     void DestroyInputDetector();
     void InitTheme();
+    void InitForegroundCheck();
+    void CheckForeground();
+
 
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
 
+
+    TSoftObjectPtr<UDataTable> GetGamepadImages(int PlayerIndex, const UUiTheme* Theme);
     UPaperSprite* GetImageSpriteFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
     
 public:
@@ -112,6 +128,10 @@ public:
     /// Event raised when input mode changed between gamepad and keyboard / mouse
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnInputModeChanged;
+
+    /// Event raised when the game window's foreground status changes
+    UPROPERTY(BlueprintAssignable)
+    FOnWindowForegroundChanged OnWindowForegroundChanged;
 
     UFUNCTION(BlueprintCallable)
     EInputMode GetLastInputModeUsed(int PlayerIndex = 0) const { return InputDetector->GetLastInputMode(PlayerIndex); }
@@ -129,6 +149,8 @@ public:
     /// Get the global focus system
     FFocusSystem* GetFocusSystem();
 
+    /// Return whether the game is currently in the foreground
+    bool IsForeground() const { return bIsForeground; }
 
     /**
      * @brief Get an input button / key / axis image as a sprite based on any combination of action / axis binding or manual key
@@ -158,13 +180,14 @@ public:
     * @return 
     */
     UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    
     /**
     * @brief Get an input image for a specific key
     * @param Key The key to look up
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
-    UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, const UUiTheme* Theme = nullptr);
+    UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
 
     /**
      * @brief Set the content of a slate brush from an atlas (e.g. sprite)

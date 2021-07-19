@@ -16,12 +16,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     Super::Initialize(Collection);
     CreateInputDetector();
     InitTheme();
-
-    auto GI = GetGameInstance();        
-    auto VC = Cast<UStevesGameViewportClientBase>(GI->GetGameViewportClient());
-    if (!VC)
-        UE_LOG(LogStevesUEHelpers, Warning, TEXT("Your GameViewportClient needs to be set to a subclass of UStevesGameViewportClientBase if you want full functionality!"))
-    
+    InitForegroundCheck();
 }
 
 void UStevesGameSubsystem::Deinitialize()
@@ -57,8 +52,44 @@ void UStevesGameSubsystem::InitTheme()
     DefaultUiTheme = LoadObject<UUiTheme>(nullptr, *DefaultUiThemePath, nullptr);
 }
 
+
+void UStevesGameSubsystem::InitForegroundCheck()
+{
+    // Check foreground status every 0.5 seconds
+    GetWorld()->GetTimerManager().SetTimer(ForegroundCheckHandle, this, &UStevesGameSubsystem::CheckForeground, 0.5);
+}
+
+void UStevesGameSubsystem::CheckForeground()
+{
+    bool bNewForeground = bIsForeground;
+
+    if (IsValid(GEngine) && IsValid(GEngine->GameViewport) && GEngine->GameViewport->Viewport)
+        bNewForeground = GEngine->GameViewport->Viewport->IsForegroundWindow();
+
+    if (bNewForeground != bIsForeground)
+    {
+        bIsForeground = bNewForeground;
+        InputDetector->bIgnoreEvents = !bIsForeground;
+        
+        OnWindowForegroundChanged.Broadcast(bIsForeground);
+    }
+
+    
+}
 void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)
 {
+    // We can't check this during Initialize because it's too early
+    if (!bCheckedViewportClient)
+    {
+        auto GI = GetGameInstance();        
+        auto VC = Cast<UStevesGameViewportClientBase>(GI->GetGameViewportClient());
+        if (!VC)
+            UE_LOG(LogStevesUEHelpers, Warning, TEXT("Your GameViewportClient needs to be set to a subclass of UStevesGameViewportClientBase if you want full functionality!"))
+
+        bCheckedViewportClient = true;
+    
+    }
+    
     auto GI = GetGameInstance();
     auto VC = GI->GetGameViewportClient();
     auto SVC = Cast<UStevesGameViewportClientBase>(VC);
@@ -105,7 +136,7 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType Bindin
     case EInputBindingType::Axis:
         return GetInputImageSpriteFromAxis(ActionOrAxis, PlayerIdx, Theme);
     case EInputBindingType::Key:
-        return GetInputImageSpriteFromKey(Key, Theme);
+        return GetInputImageSpriteFromKey(Key, PlayerIdx, Theme);
     default:
         return nullptr;
     }
@@ -127,13 +158,13 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& N
     {
         if (ActionMap.Key.IsGamepadKey() == WantGamepad)
         {
-            return GetInputImageSpriteFromKey(ActionMap.Key, Theme);
+            return GetInputImageSpriteFromKey(ActionMap.Key, PlayerIdx, Theme);
         }
     }
     // if we fell through, didn't find a mapping which matched our gamepad preference
     if (GS_TempActionMap.Num())
     {
-        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, Theme);
+        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, PlayerIdx, Theme);
     }
     return nullptr;
 }
@@ -149,18 +180,24 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
     {
         if (AxisMap.Key.IsGamepadKey() == WantGamepad)
         {
-            return GetInputImageSpriteFromKey(AxisMap.Key, Theme);
+            return GetInputImageSpriteFromKey(AxisMap.Key, PlayerIdx, Theme);
         }
     }
     // if we fell through, didn't find a mapping which matched our gamepad preference
     if (GS_TempAxisMap.Num())
     {
-        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, Theme);
+        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, PlayerIdx, Theme);
     }    
     return nullptr;
 }
 
-UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey, const UUiTheme* Theme)
+TSoftObjectPtr<UDataTable> UStevesGameSubsystem::GetGamepadImages(int PlayerIndex, const UUiTheme* Theme)
+{
+    // TODO: determine type of controller
+    return Theme->XboxControllerImages;    
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey, int PlayerIndex, const UUiTheme* Theme)
 {
     if (!IsValid(Theme))
         Theme = GetDefaultUiTheme();
@@ -168,7 +205,7 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromKey(const FKey& InKey
     if (Theme)
     {
         if (InKey.IsGamepadKey())
-            return GetImageSpriteFromTable(InKey, Theme->XboxControllerImages);
+            return GetImageSpriteFromTable(InKey,  GetGamepadImages(PlayerIndex, Theme));
         else
             return GetImageSpriteFromTable(InKey, Theme->KeyboardMouseImages);
     }
@@ -213,8 +250,10 @@ void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterfac
 }
 
 
-
-
+bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
+{
+    return !bIgnoreEvents;
+}
 
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 {
@@ -224,8 +263,11 @@ UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
 {
-    // Key down also registers for gamepad buttons
-    ProcessKeyOrButton(InKeyEvent.GetUserIndex(), InKeyEvent.GetKey());
+    if (ShouldProcessInputEvents())
+    {
+        // Key down also registers for gamepad buttons
+        ProcessKeyOrButton(InKeyEvent.GetUserIndex(), InKeyEvent.GetKey());
+    }
 
     // Don't consume
     return false;
@@ -234,18 +276,25 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplicat
 bool UStevesGameSubsystem::FInputModeDetector::HandleAnalogInputEvent(FSlateApplication& SlateApp,
     const FAnalogInputEvent& InAnalogInputEvent)
 {
-    if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
-        SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad);
+    if (ShouldProcessInputEvents())
+    {
+        if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
+            SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad);
+    }
+    
     // Don't consume
     return false;
 }
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
-    if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
+    if (ShouldProcessInputEvents())
     {
-        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+        FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
+        if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
+        {
+            SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+        }
     }
     // Don't consume
     return false;
@@ -253,8 +302,12 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplic
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    // We don't care which button
-    SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+    if (ShouldProcessInputEvents())
+    {
+        // We don't care which button
+        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+    }
+    
     // Don't consume
     return false;
 }
@@ -262,7 +315,11 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlate
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& InWheelEvent,
     const FPointerEvent* InGestureEvent)
 {
-    SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse);
+    if (ShouldProcessInputEvents())
+    {
+        SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse);
+    }
+    
     // Don't consume
     return false;
 }
