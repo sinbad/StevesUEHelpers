@@ -56,7 +56,7 @@ void UStevesGameSubsystem::InitTheme()
 void UStevesGameSubsystem::InitForegroundCheck()
 {
     // Check foreground status every 0.5 seconds
-    GetWorld()->GetTimerManager().SetTimer(ForegroundCheckHandle, this, &UStevesGameSubsystem::CheckForeground, 0.5);
+    GetWorld()->GetTimerManager().SetTimer(ForegroundCheckHandle, this, &UStevesGameSubsystem::CheckForeground, 0.5, true);
 }
 
 void UStevesGameSubsystem::CheckForeground()
