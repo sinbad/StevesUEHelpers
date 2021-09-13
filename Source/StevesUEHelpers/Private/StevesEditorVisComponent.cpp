@@ -47,6 +47,6 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 		B = B + FBoxSphereBounds(C.Location, FVector(C.Radius), C.Radius);
 	}
 
-	return B;
+	return B.TransformBy(LocalToWorld);
 }
 
