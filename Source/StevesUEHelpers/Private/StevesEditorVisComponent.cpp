@@ -4,16 +4,18 @@
 #include "StevesEditorVisComponent.h"
 #include "StevesDebugRenderSceneProxy.h"
 
-void UStevesEditorVisComponent::OnRegister()
+UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer)
+	: UPrimitiveComponent(ObjectInitializer)
 {
-	Super::OnRegister();
-	
 	// set up some constants
-	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PrimaryComponentTick.bCanEverTick = false;
 	SetCastShadow(false);
+#if WITH_EDITORONLY_DATA
 	SetIsVisualizationComponent(true);
+#endif
 	SetHiddenInGame(true);
 	AlwaysLoadOnClient = false;
+	bIsEditorOnly = true;
 	
 }
 

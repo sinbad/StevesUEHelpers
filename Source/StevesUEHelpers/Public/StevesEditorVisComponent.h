@@ -58,7 +58,7 @@ struct FStevesEditorVisCircle
  * If you want to, you can add this to your Blueprints too. This component automatically marks itself as "visualisation
  * only" so shouldn't have a runtime impact.
  */
-UCLASS(ClassGroup="Debug", hidecategories=(Collision,Object,LOD,Lighting,TextureStreaming), meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
+UCLASS(ClassGroup="Debug", hidecategories=(Collision,Physics,Object,LOD,Lighting,TextureStreaming), meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
 class STEVESUEHELPERS_API UStevesEditorVisComponent : public UPrimitiveComponent
 {
 	GENERATED_BODY()
@@ -67,7 +67,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisCircle> Circles;
 
-	virtual void OnRegister() override;
+	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
+
 	virtual FPrimitiveSceneProxy* CreateSceneProxy() override;
 	virtual FBoxSphereBounds CalcBounds(const FTransform& LocalToWorld) const override;
 	/// Needs to update on transform since proxy is detached
