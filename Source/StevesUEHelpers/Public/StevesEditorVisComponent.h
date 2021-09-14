@@ -78,7 +78,59 @@ struct FStevesEditorVisCircle
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FStevesEditorVisArc
+{
+	GENERATED_BODY()
+
+	/// Location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector Location;
+	/// Rotation relative to component; arcs will be rendered in the X/Y plane
+	UPROPERTY(EditAnywhere)
+	FRotator Rotation;
+	/// Minimum angle to render arc from 
+	UPROPERTY(EditAnywhere)
+	float MinAngle;
+	/// Maximum angle to render arc to 
+	UPROPERTY(EditAnywhere)
+	float MaxAngle;
+	/// Circle radius
+	UPROPERTY(EditAnywhere)
+	float Radius;
+	/// The number of line segments to render the circle with
+	UPROPERTY(EditAnywhere)
+	int NumSegments;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere)
+	FColor Colour;
+
+	FStevesEditorVisArc(const FVector& InLocation, const FRotator& InRotation, float InMinAngle, float InMaxAngle,
+	                    float InRadius, int InNumSegments,
+	                    const FColor& InColour, float InThickness)
+		: Location(InLocation),
+		  Rotation(InRotation),
+		  MinAngle(InMinAngle),
+		  MaxAngle(InMaxAngle),
+		  Radius(InRadius),
+		  NumSegments(InNumSegments),
+		  Colour(InColour)
+	{
+	}
+
+	FStevesEditorVisArc():
+		Location(FVector::ZeroVector),
+		Rotation(FRotator::ZeroRotator),
+		MinAngle(0),
+		MaxAngle(180),
+		Radius(50), NumSegments(12),
+		Colour(FColor::White)
+	{
+	}
+};
+
 /**
+ *
  * A component that solely exists to provide arbitrary editor visualisation when not selected.
  * FComponentVisualizer can only display visualisation when selected. 
  * To display vis on an unselected object, you need a UPrimitiveComponent, and sometimes you don't want/need one of those
@@ -89,17 +141,19 @@ struct FStevesEditorVisCircle
  * If you want to, you can add this to your Blueprints too. This component automatically marks itself as "visualisation
  * only" so shouldn't have a runtime impact.
  */
-UCLASS(Blueprintable, ClassGroup="Utility", hidecategories=(Collision,Physics,Object,LOD,Lighting,TextureStreaming), meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup="Utility", hidecategories=(Collision,Physics,Object,LOD,Lighting,TextureStreaming),
+	meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
 class STEVESUEHELPERS_API UStevesEditorVisComponent : public UPrimitiveComponent
 {
 	GENERATED_BODY()
 public:
-	
 	/// Circles to render
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisLine> Lines;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisCircle> Circles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisArc> Arcs;
 
 	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
 

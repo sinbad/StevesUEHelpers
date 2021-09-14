@@ -43,6 +43,17 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 			C.NumSegments, C.Colour
 			));
 	}
+	for (auto& Arc : Arcs)
+	{
+		FQuat WorldRot = XForm.TransformRotation(Arc.Rotation.Quaternion());
+		Ret->Arcs.Add(FStevesDebugRenderSceneProxy::FDebugArc(
+			XForm.TransformPosition(Arc.Location),
+			WorldRot.GetForwardVector(), WorldRot.GetRightVector(),
+			Arc.MinAngle, Arc.MaxAngle,
+			XForm.GetMaximumAxisScale() * Arc.Radius,
+			Arc.NumSegments, Arc.Colour
+			));
+	}
 
 	return Ret;
 	
@@ -62,6 +73,11 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 	for (auto& C : Circles)
 	{
 		B = B + FBoxSphereBounds(C.Location, FVector(C.Radius), C.Radius);
+	}
+	for (auto& Arc : Arcs)
+	{
+		// Just use the entire circle for simplicity
+		B = B + FBoxSphereBounds(Arc.Location, FVector(Arc.Radius), Arc.Radius);
 	}
 
 	return B.TransformBy(LocalToWorld);
