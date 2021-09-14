@@ -11,6 +11,7 @@ UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& O
 	PrimaryComponentTick.bCanEverTick = false;
 	SetCastShadow(false);
 #if WITH_EDITORONLY_DATA
+	// Note: this makes this component invisible on level instances, not sure why
 	SetIsVisualizationComponent(true);
 #endif
 	SetHiddenInGame(true);
