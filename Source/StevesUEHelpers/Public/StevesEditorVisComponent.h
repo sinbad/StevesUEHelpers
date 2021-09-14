@@ -8,6 +8,37 @@
 
 
 USTRUCT(BlueprintType)
+struct FStevesEditorVisLine
+{
+	GENERATED_BODY()
+
+	/// Start location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector Start;
+	/// End location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector End;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere)
+	FColor Colour;
+
+	FStevesEditorVisLine(const FVector& InStart, const FVector& InEnd, 
+		const FColor& InColour)
+		: Start(InStart),
+		End(InEnd),
+		Colour(Colour)
+	{
+	}
+
+	FStevesEditorVisLine():
+		Start(FVector::ZeroVector),
+		End(FVector(100,0,0)),
+		Colour(FColor::White)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
 struct FStevesEditorVisCircle
 {
 	GENERATED_BODY()
@@ -28,13 +59,13 @@ struct FStevesEditorVisCircle
 	UPROPERTY(EditAnywhere)
 	FColor Colour;
 
-	FStevesEditorVisCircle(const FVector& Location, const FRotator& Rotation, float Radius, int NumSegments,
-		const FColor& Colour)
-		: Location(Location),
-		  Rotation(Rotation),
-		  Radius(Radius),
-		  NumSegments(NumSegments),
-		  Colour(Colour)
+	FStevesEditorVisCircle(const FVector& InLocation, const FRotator& InRotation, float InRadius, int InNumSegments,
+		const FColor& InColour)
+		: Location(InLocation),
+		  Rotation(InRotation),
+		  Radius(InRadius),
+		  NumSegments(InNumSegments),
+		  Colour(InColour)
 	{
 	}
 
@@ -58,12 +89,15 @@ struct FStevesEditorVisCircle
  * If you want to, you can add this to your Blueprints too. This component automatically marks itself as "visualisation
  * only" so shouldn't have a runtime impact.
  */
-UCLASS(ClassGroup="Debug", hidecategories=(Collision,Physics,Object,LOD,Lighting,TextureStreaming), meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup="Utility", hidecategories=(Collision,Physics,Object,LOD,Lighting,TextureStreaming), meta=(DisplayName="Steves Editor Visualisation", BlueprintSpawnableComponent))
 class STEVESUEHELPERS_API UStevesEditorVisComponent : public UPrimitiveComponent
 {
 	GENERATED_BODY()
 public:
+	
 	/// Circles to render
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisLine> Lines;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisCircle> Circles;
 

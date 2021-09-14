@@ -27,6 +27,11 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 	auto Ret = new FStevesDebugRenderSceneProxy(this);
 
 	const FTransform& XForm = GetComponentTransform();
+	for (auto& L : Lines)
+	{
+		Ret->Lines.Add(FDebugRenderSceneProxy::FDebugLine(XForm.TransformPosition(L.Start),
+		                                                  XForm.TransformPosition(L.End), L.Colour));
+	}
 	for (auto& C : Circles)
 	{
 		FQuat WorldRot = XForm.TransformRotation(C.Rotation.Quaternion());
@@ -47,6 +52,12 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 	FBoxSphereBounds B = Super::CalcBounds(LocalToWorld);
 
 	// Now we need to merge in all components
+	for (auto& L : Lines)
+	{
+		// Re-centre the origin of the line to make box extents 
+		FVector Extents = L.Start.GetAbs().ComponentMax(L.End.GetAbs());
+		B = B + FBoxSphereBounds(FVector::ZeroVector, Extents, Extents.GetMax());
+	}
 	for (auto& C : Circles)
 	{
 		B = B + FBoxSphereBounds(C.Location, FVector(C.Radius), C.Radius);
