@@ -14,6 +14,9 @@ UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& O
 	SetIsVisualizationComponent(true);
 #endif
 	SetHiddenInGame(true);
+	bVisibleInReflectionCaptures = false;
+	bVisibleInRayTracing = false;
+	bVisibleInRealTimeSkyCaptures = false;
 	AlwaysLoadOnClient = false;
 	bIsEditorOnly = true;
 	
