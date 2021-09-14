@@ -129,6 +129,38 @@ struct FStevesEditorVisArc
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FStevesEditorVisSphere
+{
+	GENERATED_BODY()
+
+	/// Location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector Location;
+	/// Sphere radius
+	UPROPERTY(EditAnywhere)
+	float Radius;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere)
+	FColor Colour;
+
+	FStevesEditorVisSphere(const FVector& InLocation, float InRadius, const FColor& InColour) :
+		Location(InLocation),
+		Radius(InRadius),
+		Colour(InColour)
+	{
+	}
+
+	FStevesEditorVisSphere():
+		Location(FVector::ZeroVector),
+		Radius(50),
+		Colour(FColor::White)
+	{
+	}
+};
+
+
+
 /**
  *
  * A component that solely exists to provide arbitrary editor visualisation when not selected.
@@ -151,9 +183,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisLine> Lines;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisLine> Arrows;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisCircle> Circles;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisArc> Arcs;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisSphere> Spheres;
 
 	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
 

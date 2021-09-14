@@ -33,6 +33,11 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 		Ret->Lines.Add(FDebugRenderSceneProxy::FDebugLine(XForm.TransformPosition(L.Start),
 		                                                  XForm.TransformPosition(L.End), L.Colour));
 	}
+	for (auto& A : Arrows)
+	{
+		Ret->ArrowLines.Add(FDebugRenderSceneProxy::FArrowLine(XForm.TransformPosition(A.Start),
+														XForm.TransformPosition(A.End), A.Colour));
+	}
 	for (auto& C : Circles)
 	{
 		FQuat WorldRot = XForm.TransformRotation(C.Rotation.Quaternion());
@@ -54,6 +59,14 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 			Arc.NumSegments, Arc.Colour
 			));
 	}
+	for (auto& S : Spheres)
+	{
+		Ret->Spheres.Add(FStevesDebugRenderSceneProxy::FSphere(
+			XForm.GetMaximumAxisScale() * S.Radius,
+			XForm.TransformPosition(S.Location),
+			S.Colour
+			));
+	}
 
 	return Ret;
 	
@@ -70,6 +83,12 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 		FVector Extents = L.Start.GetAbs().ComponentMax(L.End.GetAbs());
 		B = B + FBoxSphereBounds(FVector::ZeroVector, Extents, Extents.GetMax());
 	}
+	for (auto& A : Arrows)
+	{
+		// Re-centre the origin of the line to make box extents 
+		FVector Extents = A.Start.GetAbs().ComponentMax(A.End.GetAbs());
+		B = B + FBoxSphereBounds(FVector::ZeroVector, Extents, Extents.GetMax());
+	}
 	for (auto& C : Circles)
 	{
 		B = B + FBoxSphereBounds(C.Location, FVector(C.Radius), C.Radius);
@@ -78,6 +97,10 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 	{
 		// Just use the entire circle for simplicity
 		B = B + FBoxSphereBounds(Arc.Location, FVector(Arc.Radius), Arc.Radius);
+	}
+	for (auto& S : Spheres)
+	{
+		B = B + FBoxSphereBounds(S.Location, FVector(S.Radius), S.Radius);
 	}
 
 	return B.TransformBy(LocalToWorld);
