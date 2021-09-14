@@ -22,17 +22,17 @@ struct FStevesEditorVisLine
 	UPROPERTY(EditAnywhere)
 	FColor Colour;
 
-	FStevesEditorVisLine(const FVector& InStart, const FVector& InEnd, 
-		const FColor& InColour)
+	FStevesEditorVisLine(const FVector& InStart, const FVector& InEnd,
+	                     const FColor& InColour)
 		: Start(InStart),
-		End(InEnd),
-		Colour(Colour)
+		  End(InEnd),
+		  Colour(Colour)
 	{
 	}
 
 	FStevesEditorVisLine():
 		Start(FVector::ZeroVector),
-		End(FVector(100,0,0)),
+		End(FVector(100, 0, 0)),
 		Colour(FColor::White)
 	{
 	}
@@ -60,7 +60,7 @@ struct FStevesEditorVisCircle
 	FColor Colour;
 
 	FStevesEditorVisCircle(const FVector& InLocation, const FRotator& InRotation, float InRadius, int InNumSegments,
-		const FColor& InColour)
+	                       const FColor& InColour)
 		: Location(InLocation),
 		  Rotation(InRotation),
 		  Radius(InRadius),
@@ -159,6 +159,41 @@ struct FStevesEditorVisSphere
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FStevesEditorVisBox
+{
+	GENERATED_BODY()
+
+	/// Location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector Location;
+	/// Size of box in each axis
+	UPROPERTY(EditAnywhere)
+	FVector Size;
+	/// Rotation relative to component
+	UPROPERTY(EditAnywhere)
+	FRotator Rotation;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere)
+	FColor Colour;
+
+	FStevesEditorVisBox(const FVector& InLocation, const FVector& InSize, const FRotator& InRot,
+	                    const FColor& InColour) :
+		Location(InLocation),
+		Size(InSize),
+		Rotation(InRot),
+		Colour(InColour)
+	{
+	}
+
+	FStevesEditorVisBox():
+		Location(FVector::ZeroVector),
+		Size(FVector(50, 50, 50)),
+		Rotation(FRotator::ZeroRotator),
+		Colour(FColor::White)
+	{
+	}
+};
 
 
 /**
@@ -190,6 +225,8 @@ public:
 	TArray<FStevesEditorVisArc> Arcs;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisSphere> Spheres;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisBox> Boxes;
 
 	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
 

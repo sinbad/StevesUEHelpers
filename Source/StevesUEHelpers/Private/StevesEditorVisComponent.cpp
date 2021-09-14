@@ -67,6 +67,15 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 			S.Colour
 			));
 	}
+	for (auto& Box : Boxes)
+	{
+		FVector HalfSize = Box.Size * 0.5f;
+		FBox DBox(-HalfSize, HalfSize);
+		// Apply local rotation first then parent transform
+		FTransform CombinedXForm = FTransform(Box.Rotation, Box.Location) * XForm;
+		Ret->Boxes.Add(FStevesDebugRenderSceneProxy::FDebugBox(
+			DBox, Box.Colour, CombinedXForm));
+	}
 
 	return Ret;
 	
@@ -102,7 +111,15 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 	{
 		B = B + FBoxSphereBounds(S.Location, FVector(S.Radius), S.Radius);
 	}
-
+	for (auto& Box : Boxes)
+	{
+		FVector HalfSize = Box.Size * 0.5f;
+		FBox DBox(-HalfSize, HalfSize);
+		// Apply local rotation only, world is done later
+		FTransform BoxXForm = FTransform(Box.Rotation, Box.Location);
+		DBox = DBox.TransformBy(BoxXForm);
+		B = B + FBoxSphereBounds(DBox);
+	}
 	return B.TransformBy(LocalToWorld);
 }
 
