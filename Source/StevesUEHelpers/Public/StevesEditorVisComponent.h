@@ -26,7 +26,7 @@ struct STEVESUEHELPERS_API FStevesEditorVisLine
 	                     const FColor& InColour)
 		: Start(InStart),
 		  End(InEnd),
-		  Colour(Colour)
+		  Colour(InColour)
 	{
 	}
 
