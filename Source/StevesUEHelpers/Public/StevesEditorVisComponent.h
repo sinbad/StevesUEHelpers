@@ -8,7 +8,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FStevesEditorVisLine
+struct STEVESUEHELPERS_API FStevesEditorVisLine
 {
 	GENERATED_BODY()
 
@@ -39,7 +39,7 @@ struct FStevesEditorVisLine
 };
 
 USTRUCT(BlueprintType)
-struct FStevesEditorVisCircle
+struct STEVESUEHELPERS_API FStevesEditorVisCircle
 {
 	GENERATED_BODY()
 
@@ -79,7 +79,7 @@ struct FStevesEditorVisCircle
 };
 
 USTRUCT(BlueprintType)
-struct FStevesEditorVisArc
+struct STEVESUEHELPERS_API FStevesEditorVisArc
 {
 	GENERATED_BODY()
 
@@ -130,7 +130,7 @@ struct FStevesEditorVisArc
 };
 
 USTRUCT(BlueprintType)
-struct FStevesEditorVisSphere
+struct STEVESUEHELPERS_API FStevesEditorVisSphere
 {
 	GENERATED_BODY()
 
@@ -160,7 +160,7 @@ struct FStevesEditorVisSphere
 };
 
 USTRUCT(BlueprintType)
-struct FStevesEditorVisBox
+struct STEVESUEHELPERS_API FStevesEditorVisBox
 {
 	GENERATED_BODY()
 
