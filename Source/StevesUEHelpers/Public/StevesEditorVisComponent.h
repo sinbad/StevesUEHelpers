@@ -107,7 +107,7 @@ struct STEVESUEHELPERS_API FStevesEditorVisArc
 
 	FStevesEditorVisArc(const FVector& InLocation, const FRotator& InRotation, float InMinAngle, float InMaxAngle,
 	                    float InRadius, int InNumSegments,
-	                    const FColor& InColour, float InThickness)
+	                    const FColor& InColour)
 		: Location(InLocation),
 		  Rotation(InRotation),
 		  MinAngle(InMinAngle),
