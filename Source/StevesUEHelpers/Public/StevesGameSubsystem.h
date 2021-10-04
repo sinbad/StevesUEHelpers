@@ -6,6 +6,7 @@
 #include "PaperSprite.h"
 #include "Framework/Application/IInputProcessor.h"
 #include "StevesHelperCommon.h"
+#include "StevesTextureRenderTargetPool.h"
 #include "StevesUI/FocusSystem.h"
 #include "StevesUI/UiTheme.h"
 
@@ -14,6 +15,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 
+/// Entry point for all the top-level features of the helper system
 UCLASS(Config=Game)
 class STEVESUEHELPERS_API UStevesGameSubsystem : public UGameInstanceSubsystem
 {
@@ -109,6 +111,8 @@ protected:
     UPROPERTY(BlueprintReadWrite)
     UUiTheme* DefaultUiTheme;
 
+    TArray<FStevesTextureRenderTargetPoolPtr> TextureRenderTargetPools;
+
     void CreateInputDetector();
     void DestroyInputDetector();
     void InitTheme();
@@ -197,5 +201,15 @@ public:
      */
     static void SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterface<ISlateTextureAtlasInterface> AtlasRegion,
                           bool bMatchSize);
+
+
+
+    /**
+    * Retrieve a pool of texture render targets. If a pool doesn't exist with the given name, it can be created.
+    * @param Name Identifier for the pool. 
+    * @param bAutoCreate 
+    * @return The pool, or null if it doesn't exist and bAutoCreate is false
+    */
+    FStevesTextureRenderTargetPoolPtr GetTextureRenderTargetPool(FName Name, bool bAutoCreate = true);
 
 };
