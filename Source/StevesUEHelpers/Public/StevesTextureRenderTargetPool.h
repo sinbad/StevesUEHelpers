@@ -42,6 +42,33 @@ protected:
 	/// The name of the pool. It's possible to have more than one texture pool.
 	FName PoolName;
 
+	struct FTextureKey
+	{
+		FIntPoint Size;
+		ETextureRenderTargetFormat Format;
+
+		friend bool operator==(const FTextureKey& Lhs, const FTextureKey& RHS)
+		{
+			return Lhs.Size == RHS.Size
+				&& Lhs.Format == RHS.Format;
+		}
+
+		friend bool operator!=(const FTextureKey& Lhs, const FTextureKey& RHS)
+		{
+			return !(Lhs == RHS);
+		}
+
+		friend uint32 GetTypeHash(const FTextureKey& Key)
+		{
+			return HashCombine(GetTypeHash(Key.Size), static_cast<uint32>(Key.Format));
+		}
+
+	};
+
+	TMultiMap<FTextureKey, TSharedPtr<UTextureRenderTarget2D>> UnreservedTextures;
+	TArray<TSharedPtr<UTextureRenderTarget2D>> ReservedTextures;
+	
+
 	friend struct FStevesTextureRenderTargetReservation;
 	/// Release a reservation on a texture, allowing it back into the pool
 	/// Protected because only FStevesTextureRenderTargetReservation will need to do this.
