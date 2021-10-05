@@ -1,6 +1,7 @@
 ﻿#include "StevesTextureRenderTargetPool.h"
 
 #include "StevesUEHelpers.h"
+#include "Kismet/KismetRenderingLibrary.h"
 
 FStevesTextureRenderTargetReservation::~FStevesTextureRenderTargetReservation()
 {
@@ -68,10 +69,32 @@ FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::Reserve
 
 void FStevesTextureRenderTargetPool::RevokeReservations(const UObject* ForOwner)
 {
-	// TODO
+	for (int i = 0; i < Reservations.Num(); ++i)
+	{
+		const FReservationInfo& R = Reservations[i];
+		if (!ForOwner || R.Owner == ForOwner)
+		{
+			if (R.Texture.IsValid())
+			{
+				UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Revoked texture reservation on %s"), *R.Texture->GetName());
+				UnreservedTextures.Add(R.Key, R.Texture.Get());
+			}
+			// Can't use RemoveAtSwap because it'll change order
+			Reservations.RemoveAt(i);
+			// Adjust index backwards to compensate
+			--i;
+		}
+	}
 }
 
 void FStevesTextureRenderTargetPool::DrainPool(bool bForceAndRevokeReservations)
 {
-	// TODO
+	if (bForceAndRevokeReservations)
+		RevokeReservations();
+
+	for (auto& TexPair : UnreservedTextures)
+	{
+		UKismetRenderingLibrary::ReleaseRenderTarget2D(TexPair.Value);
+	}
+	UnreservedTextures.Empty();
 }
