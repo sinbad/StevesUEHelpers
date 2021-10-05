@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Chaos/AABB.h"
+#include "Chaos/AABB.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 typedef TSharedPtr<struct FStevesTextureRenderTargetReservation> FStevesTextureRenderTargetReservationPtr;
@@ -16,14 +18,18 @@ struct STEVESUEHELPERS_API FStevesTextureRenderTargetReservation
 public:
 	/// The texture. May be null if the pool has forcibly reclaimed the texture prematurely
 	TWeakObjectPtr<UTextureRenderTarget2D> Texture;
-	TWeakPtr<struct FStevesTextureRenderTargetPool> Owner;
-
+	TWeakPtr<struct FStevesTextureRenderTargetPool> ParentPool;
+	TWeakObjectPtr<const UObject> CurrentOwner;
+	
 	FStevesTextureRenderTargetReservation() = default;
 
 	FStevesTextureRenderTargetReservation(UTextureRenderTarget2D* InTexture,
-	                                 FStevesTextureRenderTargetPoolPtr InOwner)
+	                                      FStevesTextureRenderTargetPoolPtr InParent,
+	                                      const UObject* InOwner)
 		: Texture(InTexture),
-		  Owner(InOwner)
+		  ParentPool(InParent),
+		  CurrentOwner(InOwner)
+	
 	{
 	}
 	
@@ -34,13 +40,15 @@ public:
 /**
  * A pool of render target textures. To save pre-creating render textures as assets, and to control the re-use of
  * these textures at runtime.
+ * A pool needs to be owned by a UObject, which will in turn own the textures and so will ultimately control the
+ * ultimate lifecycle of textures if not released specifically.
  */
 struct STEVESUEHELPERS_API FStevesTextureRenderTargetPool : public TSharedFromThis<FStevesTextureRenderTargetPool>
 {
 
 protected:
 	/// The name of the pool. It's possible to have more than one texture pool.
-	FName PoolName;
+	FName Name;
 
 	struct FTextureKey
 	{
@@ -65,8 +73,24 @@ protected:
 
 	};
 
-	TMultiMap<FTextureKey, TSharedPtr<UTextureRenderTarget2D>> UnreservedTextures;
-	TArray<TSharedPtr<UTextureRenderTarget2D>> ReservedTextures;
+	TWeakObjectPtr<UObject> PoolOwner;
+	TMultiMap<FTextureKey, UTextureRenderTarget2D*> UnreservedTextures;
+
+	/// Weak reverse tracking of reservations, mostly for debugging
+	struct FReservationInfo
+	{
+		FTextureKey Key;
+		TWeakObjectPtr<const UObject> Owner;
+		TWeakObjectPtr<UTextureRenderTarget2D> Texture;
+
+		FReservationInfo(const FTextureKey& InKey, const UObject* InOwner, UTextureRenderTarget2D* InTexture)
+			: Key(InKey),
+			  Owner(InOwner),
+			  Texture(InTexture)
+		{
+		}
+	};
+	TArray<FReservationInfo> Reservations;
 	
 
 	friend struct FStevesTextureRenderTargetReservation;
@@ -75,36 +99,40 @@ protected:
 	void ReleaseTextureReservation(UTextureRenderTarget2D* Tex);	
 
 public:
-	FStevesTextureRenderTargetPool() = default;
 
-	explicit FStevesTextureRenderTargetPool(const FName& PoolName)
-		: PoolName(PoolName)
+	explicit FStevesTextureRenderTargetPool(const FName& InName, UObject* InOwner)
+		: Name(InName), PoolOwner(InOwner)
 	{
 	}
 
-	const FName& GetPoolName() const { return PoolName; }
+	const FName& GetName() const { return Name; }
 
 	/**
 	 * Reserve a texture for use as a render target. This will create a new texture target if needed. 
 	 * @param Size The dimensions of the texture
 	 * @param Format Format of the texture
+	 * @param Owner The UObject which will temporarily own this texture (mostly for debugging, this object won't in fact "own" it
+	 * as per garbage collection rules, the reference is weak
 	 * @return A shared pointer to a structure which holds the reservation for this texture. When that structure is
 	 * destroyed, it will release the texture back to the pool.
 	 */
-	FStevesTextureRenderTargetReservationPtr ReserveTexture(FIntPoint Size, ETextureRenderTargetFormat Format);
+	FStevesTextureRenderTargetReservationPtr ReserveTexture(FIntPoint Size, ETextureRenderTargetFormat Format, const UObject* Owner);
 
 	/**
-	 * Forcibly revoke all reservations in this pool. Reservations which have been made will have their weak texture
-	 * pointers invalidated.
+	 * Forcibly revoke reservations in this pool, either for all owners or for a specific owner.
+	 * Reservations which are revoked will have their weak texture pointers invalidated.
+	 * @param ForOwner If null, revoke all reservations for any owner, or if provided, just for a specific owner.
 	 */
-	void RevokeAllReservations();
+	void RevokeReservations(const UObject* ForOwner = nullptr);
+	
 	
 	/**
+	 *
 	 * Destroy previously created textures and free the memory.
-	 * @param bRevokeReservations If false, only destroys unreserved textures. If true, destroys reserved textures
+	 * @param bForceAndRevokeReservations If false, only destroys unreserved textures. If true, destroys reserved textures
 	 * as well (the weak pointer on their reservations will cease to be valid)
 	 */
-	void DrainPool(bool bRevokeReservations = false);
+	void DrainPool(bool bForceAndRevokeReservations = false);
 	
 };
 

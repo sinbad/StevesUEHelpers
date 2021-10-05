@@ -2,9 +2,10 @@
 
 FStevesTextureRenderTargetReservation::~FStevesTextureRenderTargetReservation()
 {
-	if (Owner.IsValid() && Texture.IsValid())
+	UE_LOG(LogTemp, Warning, TEXT("Releasing texture reservation"));
+	if (ParentPool.IsValid() && Texture.IsValid())
 	{
-		Owner.Pin()->ReleaseTextureReservation(Texture.Get());
+		ParentPool.Pin()->ReleaseTextureReservation(Texture.Get());
 		Texture = nullptr;
 	}
 }
@@ -15,18 +16,18 @@ void FStevesTextureRenderTargetPool::ReleaseTextureReservation(UTextureRenderTar
 }
 
 FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::ReserveTexture(FIntPoint Size,
-	ETextureRenderTargetFormat Format)
+	ETextureRenderTargetFormat Format, const UObject* Owner)
 {
 	// TODO
 	return MakeShared<FStevesTextureRenderTargetReservation>(nullptr, this->AsShared());
 }
 
-void FStevesTextureRenderTargetPool::RevokeAllReservations()
+void FStevesTextureRenderTargetPool::RevokeReservations(const UObject* ForOwner)
 {
 	// TODO
 }
 
-void FStevesTextureRenderTargetPool::DrainPool(bool bRevokeReservations)
+void FStevesTextureRenderTargetPool::DrainPool(bool bForceAndRevokeReservations)
 {
 	// TODO
 }

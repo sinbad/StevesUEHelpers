@@ -254,13 +254,13 @@ FStevesTextureRenderTargetPoolPtr UStevesGameSubsystem::GetTextureRenderTargetPo
     // On the assumption there won't be *loads* of pools, not worth a map, just iterate
     for (auto Tex : TextureRenderTargetPools)
     {
-        if (Tex->GetPoolName() == Name)
+        if (Tex->GetName() == Name)
             return Tex;
     }
 
     if (bAutoCreate)
     {
-        FStevesTextureRenderTargetPoolPtr Pool = MakeShared<FStevesTextureRenderTargetPool>(Name);
+        FStevesTextureRenderTargetPoolPtr Pool = MakeShared<FStevesTextureRenderTargetPool>(Name, this);
         TextureRenderTargetPools.Add(Pool);
         return Pool;
     }
