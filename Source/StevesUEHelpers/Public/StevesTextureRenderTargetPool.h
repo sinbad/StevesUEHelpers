@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Chaos/AABB.h"
-#include "Chaos/AABB.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 typedef TSharedPtr<struct FStevesTextureRenderTargetReservation> FStevesTextureRenderTargetReservationPtr;
