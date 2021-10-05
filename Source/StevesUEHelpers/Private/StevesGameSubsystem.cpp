@@ -249,6 +249,26 @@ void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterfac
     }
 }
 
+FStevesTextureRenderTargetPoolPtr UStevesGameSubsystem::GetTextureRenderTargetPool(FName Name, bool bAutoCreate)
+{
+    // On the assumption there won't be *loads* of pools, not worth a map, just iterate
+    for (auto Tex : TextureRenderTargetPools)
+    {
+        if (Tex->GetName() == Name)
+            return Tex;
+    }
+
+    if (bAutoCreate)
+    {
+        FStevesTextureRenderTargetPoolPtr Pool = MakeShared<FStevesTextureRenderTargetPool>(Name, this);
+        TextureRenderTargetPools.Add(Pool);
+        return Pool;
+    }
+
+    return nullptr;
+    
+}
+
 
 bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
 {
