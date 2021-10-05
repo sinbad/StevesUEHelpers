@@ -18,8 +18,28 @@ void FStevesTextureRenderTargetPool::ReleaseTextureReservation(UTextureRenderTar
 FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::ReserveTexture(FIntPoint Size,
 	ETextureRenderTargetFormat Format, const UObject* Owner)
 {
-	// TODO
-	return MakeShared<FStevesTextureRenderTargetReservation>(nullptr, this->AsShared());
+	const FTextureKey Key {Size, Format};
+	UTextureRenderTarget2D* Tex = nullptr;
+	if (auto Pooled = UnreservedTextures.Find(Key))
+	{
+		Tex = *Pooled;
+		UnreservedTextures.RemoveSingle(Key, Tex);
+	}
+	else if (Size.X > 0 && Size.Y > 0)
+	{
+		// No existing texture, so create
+		// Texture owner should be a valid UObject that will determine lifespan
+		UObject* TextureOwner = PoolOwner.IsValid() ? PoolOwner.Get() : GetTransientPackage();
+		Tex = NewObject<UTextureRenderTarget2D>(TextureOwner);
+		Tex->RenderTargetFormat = Format;
+		Tex->InitAutoFormat(Size.X, Size.Y);
+		Tex->UpdateResourceImmediate(true);
+	}
+
+	// Record reservation
+	Reservations.Add(FReservationInfo(Key, Owner, Tex));
+	
+	return MakeShared<FStevesTextureRenderTargetReservation>(Tex, this->AsShared(), Owner);
 }
 
 void FStevesTextureRenderTargetPool::RevokeReservations(const UObject* ForOwner)
