@@ -96,7 +96,7 @@ protected:
 	friend struct FStevesTextureRenderTargetReservation;
 	/// Release a reservation on a texture, allowing it back into the pool
 	/// Protected because only FStevesTextureRenderTargetReservation will need to do this.
-	void ReleaseTextureReservation(UTextureRenderTarget2D* Tex);	
+	void ReleaseReservation(UTextureRenderTarget2D* Tex);	
 
 public:
 

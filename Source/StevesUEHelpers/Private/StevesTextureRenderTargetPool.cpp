@@ -1,18 +1,39 @@
 ﻿#include "StevesTextureRenderTargetPool.h"
 
+#include "StevesUEHelpers.h"
+
 FStevesTextureRenderTargetReservation::~FStevesTextureRenderTargetReservation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Releasing texture reservation"));
+	UE_LOG(LogStevesUEHelpers, Log, TEXT("FStevesTextureRenderTargetReservation: destruction"));
 	if (ParentPool.IsValid() && Texture.IsValid())
 	{
-		ParentPool.Pin()->ReleaseTextureReservation(Texture.Get());
+		ParentPool.Pin()->ReleaseReservation(Texture.Get());
 		Texture = nullptr;
 	}
 }
 
-void FStevesTextureRenderTargetPool::ReleaseTextureReservation(UTextureRenderTarget2D* Tex)
+void FStevesTextureRenderTargetPool::ReleaseReservation(UTextureRenderTarget2D* Tex)
 {
-	// TODO
+	if (!Tex)
+	{
+		UE_LOG(LogStevesUEHelpers, Warning, TEXT("FStevesTextureRenderTargetPool: Attempted to release a null texture"));
+		return;
+	}
+	
+	for (int i = 0; i < Reservations.Num(); ++i)
+	{
+		const FReservationInfo& R = Reservations[i];
+		if (R.Texture.IsValid() && R.Texture.Get() == Tex)
+		{
+			UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Released texture reservation on %s"), *Tex->GetName());
+			UnreservedTextures.Add(R.Key, Tex);
+			Reservations.RemoveAtSwap(i);
+			return;
+		}
+	}
+
+	UE_LOG(LogStevesUEHelpers, Warning, TEXT("FStevesTextureRenderTargetPool: Attempted to release a reservation on %s that was not found"), *Tex->GetName());
+
 }
 
 FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::ReserveTexture(FIntPoint Size,
@@ -24,6 +45,7 @@ FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::Reserve
 	{
 		Tex = *Pooled;
 		UnreservedTextures.RemoveSingle(Key, Tex);
+		UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Re-used pooled texture %s"), *Tex->GetName());
 	}
 	else if (Size.X > 0 && Size.Y > 0)
 	{
@@ -34,6 +56,8 @@ FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::Reserve
 		Tex->RenderTargetFormat = Format;
 		Tex->InitAutoFormat(Size.X, Size.Y);
 		Tex->UpdateResourceImmediate(true);
+
+		UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Created new texture %s"), *Tex->GetName());
 	}
 
 	// Record reservation
