@@ -5,7 +5,7 @@
 
 FStevesTextureRenderTargetReservation::~FStevesTextureRenderTargetReservation()
 {
-	UE_LOG(LogStevesUEHelpers, Log, TEXT("FStevesTextureRenderTargetReservation: destruction"));
+	//UE_LOG(LogStevesUEHelpers, Log, TEXT("FStevesTextureRenderTargetReservation: destruction"));
 	if (ParentPool.IsValid() && Texture.IsValid())
 	{
 		ParentPool.Pin()->ReleaseReservation(Texture.Get());
