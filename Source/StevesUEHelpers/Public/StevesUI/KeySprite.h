@@ -29,5 +29,5 @@ public:
     FKey Key;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    UPaperSprite* Sprite;
+    UPaperSprite* Sprite = nullptr;
 };
