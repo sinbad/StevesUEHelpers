@@ -29,6 +29,7 @@ void FStevesTextureRenderTargetPool::ReleaseReservation(UTextureRenderTarget2D* 
 			UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Released texture reservation on %s"), *Tex->GetName());
 			UnreservedTextures.Add(R.Key, Tex);
 			Reservations.RemoveAtSwap(i);
+			ReservedTextures.Remove(Tex);
 			return;
 		}
 	}
@@ -37,8 +38,20 @@ void FStevesTextureRenderTargetPool::ReleaseReservation(UTextureRenderTarget2D* 
 
 }
 
+FStevesTextureRenderTargetPool::~FStevesTextureRenderTargetPool()
+{
+	DrainPool(true);
+}
+
+void FStevesTextureRenderTargetPool::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	// We need to hold on to the texture references
+	Collector.AddReferencedObjects(ReservedTextures);
+	Collector.AddReferencedObjects(UnreservedTextures);
+}
+
 FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::ReserveTexture(FIntPoint Size,
-	ETextureRenderTargetFormat Format, const UObject* Owner)
+                                                                                        ETextureRenderTargetFormat Format, const UObject* Owner)
 {
 	const FTextureKey Key {Size, Format};
 	UTextureRenderTarget2D* Tex = nullptr;
@@ -63,6 +76,10 @@ FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::Reserve
 
 	// Record reservation
 	Reservations.Add(FReservationInfo(Key, Owner, Tex));
+
+	// Reservation doesn't keep the texture alive; if caller doesn't hold a strong pointer to it, it'll be destroyed
+	// So we need to hold it ourselves
+	ReservedTextures.Add(Tex);
 	
 	return MakeShared<FStevesTextureRenderTargetReservation>(Tex, this->AsShared(), Owner);
 }
@@ -78,6 +95,7 @@ void FStevesTextureRenderTargetPool::RevokeReservations(const UObject* ForOwner)
 			{
 				UE_LOG(LogStevesUEHelpers, Verbose, TEXT("FStevesTextureRenderTargetPool: Revoked texture reservation on %s"), *R.Texture->GetName());
 				UnreservedTextures.Add(R.Key, R.Texture.Get());
+				ReservedTextures.Remove(R.Texture.Get());
 			}
 			// Can't use RemoveAtSwap because it'll change order
 			Reservations.RemoveAt(i);
@@ -97,4 +115,6 @@ void FStevesTextureRenderTargetPool::DrainPool(bool bForceAndRevokeReservations)
 		UKismetRenderingLibrary::ReleaseRenderTarget2D(TexPair.Value);
 	}
 	UnreservedTextures.Empty();
+	ReservedTextures.Empty();
+
 }

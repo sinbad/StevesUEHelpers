@@ -40,8 +40,9 @@ public:
  * these textures at runtime.
  * A pool needs to be owned by a UObject, which will in turn own the textures and so will ultimately control the
  * ultimate lifecycle of textures if not released specifically.
+ * See FCompElementRenderTargetPool for inspiration
  */
-struct STEVESUEHELPERS_API FStevesTextureRenderTargetPool : public TSharedFromThis<FStevesTextureRenderTargetPool>
+struct STEVESUEHELPERS_API FStevesTextureRenderTargetPool : public FGCObject, public TSharedFromThis<FStevesTextureRenderTargetPool>
 {
 
 protected:
@@ -73,6 +74,7 @@ protected:
 
 	TWeakObjectPtr<UObject> PoolOwner;
 	TMultiMap<FTextureKey, UTextureRenderTarget2D*> UnreservedTextures;
+	TSet<UTextureRenderTarget2D*> ReservedTextures;
 
 	/// Weak reverse tracking of reservations, mostly for debugging
 	struct FReservationInfo
@@ -94,8 +96,7 @@ protected:
 	friend struct FStevesTextureRenderTargetReservation;
 	/// Release a reservation on a texture, allowing it back into the pool
 	/// Protected because only FStevesTextureRenderTargetReservation will need to do this.
-	void ReleaseReservation(UTextureRenderTarget2D* Tex);	
-
+	void ReleaseReservation(UTextureRenderTarget2D* Tex);
 public:
 
 	explicit FStevesTextureRenderTargetPool(const FName& InName, UObject* InOwner)
@@ -103,8 +104,13 @@ public:
 	{
 	}
 
+	virtual ~FStevesTextureRenderTargetPool() override;
+
 	const FName& GetName() const { return Name; }
 
+	// FGCObject
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	
 	/**
 	 * Reserve a texture for use as a render target. This will create a new texture target if needed. 
 	 * @param Size The dimensions of the texture
