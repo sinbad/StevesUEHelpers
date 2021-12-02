@@ -23,6 +23,10 @@ protected:
     UPROPERTY(EditAnywhere)
     FName ActionOrAxisName;
     
+    /// Where there are multiple mappings, which to prefer 
+    UPROPERTY(EditAnywhere)
+    EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
+    
     /// If BindingType is Key, the key 
     UPROPERTY(EditAnywhere)
     FKey Key;

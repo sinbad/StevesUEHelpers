@@ -49,3 +49,15 @@ enum class EInputBindingType : uint8
     Key = 2
 };
 
+/// What order of preference should we return input images where an action/axis has multiple mappings
+UENUM(BlueprintType)
+enum class EInputImageDevicePreference : uint8
+{
+    /// For actions, use Gamepad_Keyboard_Mouse, for axes, use Gamepad_Mouse_Keyboard
+    Auto,
+    /// Gamepad first, then keyboard, then mouse - this is usually best for actions (buttons)
+    Gamepad_Keyboard_Mouse UMETA(DisplayName="Prefer Gamepad (if active), then keyboard, then mouse"),
+    /// Gamepad first, then mouse, then keyboard - this is usually best for axes
+    Gamepad_Mouse_Keyboard UMETA(DisplayName="Prefer Gamepad (if active), then mouse, then keyboard")
+};
+

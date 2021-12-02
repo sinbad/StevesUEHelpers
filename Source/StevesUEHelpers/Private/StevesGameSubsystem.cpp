@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
 #include "StevesUI/KeySprite.h"
+#include "StevesUI/StevesUI.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -126,15 +127,19 @@ FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
     return &FocusSystem;
 }
 
-UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType BindingType, FName ActionOrAxis,
-    FKey Key, int PlayerIdx, const UUiTheme* Theme)
+UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType BindingType,
+                                                        FName ActionOrAxis,
+                                                        FKey Key,
+                                                        EInputImageDevicePreference DevicePreference,
+                                                        int PlayerIdx,
+                                                        const UUiTheme* Theme)
 {
     switch(BindingType)
     {
     case EInputBindingType::Action:
-        return GetInputImageSpriteFromAction(ActionOrAxis, PlayerIdx, Theme);
+        return GetInputImageSpriteFromAction(ActionOrAxis, DevicePreference, PlayerIdx, Theme);
     case EInputBindingType::Axis:
-        return GetInputImageSpriteFromAxis(ActionOrAxis, PlayerIdx, Theme);
+        return GetInputImageSpriteFromAxis(ActionOrAxis, DevicePreference, PlayerIdx, Theme);
     case EInputBindingType::Key:
         return GetInputImageSpriteFromKey(Key, PlayerIdx, Theme);
     default:
@@ -146,48 +151,46 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSprite(EInputBindingType Bindin
 TArray<FInputActionKeyMapping> GS_TempActionMap;
 TArray<FInputAxisKeyMapping> GS_TempAxisMap;
 
-UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& Name, int PlayerIdx, const UUiTheme* Theme)
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& Name,
+                                                                  EInputImageDevicePreference DevicePreference,
+                                                                  int PlayerIdx,
+                                                                  const UUiTheme* Theme)
 {
-    
-    // Look up the key for this action
     UInputSettings* Settings = UInputSettings::GetInputSettings();
     GS_TempActionMap.Empty();
     Settings->GetActionMappingByName(Name, GS_TempActionMap);
-    const bool WantGamepad = LastInputWasGamePad(PlayerIdx);
-    for (auto && ActionMap : GS_TempActionMap)
+    
+    // For default, prefer keyboard for buttons
+    if (DevicePreference == EInputImageDevicePreference::Auto)
+        DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse;
+
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputActionKeyMapping>(GS_TempActionMap, Name, DevicePreference, LastInputWasGamePad(PlayerIdx));
+    if (Preferred)
     {
-        if (ActionMap.Key.IsGamepadKey() == WantGamepad)
-        {
-            return GetInputImageSpriteFromKey(ActionMap.Key, PlayerIdx, Theme);
-        }
-    }
-    // if we fell through, didn't find a mapping which matched our gamepad preference
-    if (GS_TempActionMap.Num())
-    {
-        return GetInputImageSpriteFromKey(GS_TempActionMap[0].Key, PlayerIdx, Theme);
+        return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);
     }
     return nullptr;
 }
 
-UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Name, int PlayerIdx, const UUiTheme* Theme)
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Name,
+                                                                EInputImageDevicePreference DevicePreference,
+                                                                int PlayerIdx,
+                                                                const UUiTheme* Theme)
 {
     // Look up the key for this axis
     UInputSettings* Settings = UInputSettings::GetInputSettings();
     GS_TempAxisMap.Empty();
     Settings->GetAxisMappingByName(Name, GS_TempAxisMap);
-    const bool WantGamepad = LastInputWasGamePad(PlayerIdx);
-    for (auto && AxisMap : GS_TempAxisMap)
+
+    // For default, prefer mouse for axes
+    if (DevicePreference == EInputImageDevicePreference::Auto)
+        DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
+
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputAxisKeyMapping>(GS_TempAxisMap, Name, DevicePreference, LastInputWasGamePad(PlayerIdx));
+    if (Preferred)
     {
-        if (AxisMap.Key.IsGamepadKey() == WantGamepad)
-        {
-            return GetInputImageSpriteFromKey(AxisMap.Key, PlayerIdx, Theme);
-        }
+        return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);
     }
-    // if we fell through, didn't find a mapping which matched our gamepad preference
-    if (GS_TempAxisMap.Num())
-    {
-        return GetInputImageSpriteFromKey(GS_TempAxisMap[0].Key, PlayerIdx, Theme);
-    }    
     return nullptr;
 }
 

@@ -122,7 +122,7 @@ public:
             if (GS)
             {
                 // Can only support default theme, no way to edit theme in decorator config 
-                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, PlayerIndex);
+                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, EInputImageDevicePreference::Auto, PlayerIndex);
                 if (Sprite && Brush.GetResourceObject() != Sprite)
                 {
                     UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
@@ -214,7 +214,7 @@ protected:
         if (GS)
         {
             // Can only support default theme, no way to edit theme in decorator config 
-            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, Params.PlayerIndex);
+            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, EInputImageDevicePreference::Auto, Params.PlayerIndex);
         }
         else
         {

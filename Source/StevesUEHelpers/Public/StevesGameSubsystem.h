@@ -161,29 +161,48 @@ public:
      * @param BindingType The type of input binding to look up 
      * @param ActionOrAxis The name of the action or axis, if BindingType is looking for that
      * @param Key The explicit key you want to display, if the BindingType is set to custom key
+     * @param DevicePreference The order of preference for images where multiple devices have mappings. In the case of multiple mappings for the same device, the first one will be used.
      * @param PlayerIndex The player index to look up the binding for 
      * @param Theme Optional explicit theme, if blank use the default theme
      * @return 
      */
     UFUNCTION(BlueprintCallable)
-    UPaperSprite* GetInputImageSprite(EInputBindingType BindingType, FName ActionOrAxis, FKey Key, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    UPaperSprite* GetInputImageSprite(EInputBindingType BindingType,
+                                      FName ActionOrAxis,
+                                      FKey Key,
+                                      EInputImageDevicePreference DevicePreference,
+                                      int PlayerIndex = 0,
+                                      const UUiTheme* Theme = nullptr);
 
     /**
     * @brief Get an input button / key image from an action
     * @param Name The name of the action
+    * @param DevicePreference The order of preference for images where multiple devices have mappings. In the case of multiple mappings for the same device, the first one will be used.
     * @param PlayerIndex The player index to look up the binding for 
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
-    UPaperSprite* GetInputImageSpriteFromAction(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    UPaperSprite* GetInputImageSpriteFromAction(const FName& Name,
+                                                EInputImageDevicePreference DevicePreference =
+                                                    EInputImageDevicePreference::Gamepad_Keyboard_Mouse,
+                                                int PlayerIndex = 0,
+                                                const UUiTheme* Theme = nullptr);
     /**
     * @brief Get an input image from an axis
     * @param Name The name of the axis
+    * @param DevicePreference The order of preference for images where multiple devices have mappings. In the case of multiple mappings for the same device, the first one will be used.
     * @param PlayerIndex The player index to look up the binding for 
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
-    UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
+    UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name,
+                                              EInputImageDevicePreference DevicePreference =
+                                                  EInputImageDevicePreference::Gamepad_Mouse_Keyboard,
+                                              int PlayerIndex = 0,
+                                              const UUiTheme* Theme = nullptr);
+
+
+    
     
     /**
     * @brief Get an input image for a specific key

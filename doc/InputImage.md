@@ -28,6 +28,16 @@ key that we'll need an image for.
 
 You can leave this blank if you set Binding Type to "Key".
 
+### Device Preference
+
+When using an Action or Axis Name, which device to prefer to show the image for
+where there are multiple mappings. The default is "Auto", which means:
+
+1. Gamepad, if the last used device was gamepad
+2. If an Action (button/key), prefer Keyboard over Mouse buttons
+3. If an Axis, prefer Mouse over Keyboard
+
+
 ### Key
 
 If you don't want the InputImage to look up an action, but want to manually specify

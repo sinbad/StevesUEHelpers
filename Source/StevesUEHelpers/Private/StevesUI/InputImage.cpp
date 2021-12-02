@@ -72,7 +72,7 @@ void UInputImage::UpdateImage()
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS)
     {
-        auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, PlayerIndex, CustomTheme);
+        auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);
         if (Sprite)
         {
             // Match size is needed incase size has changed

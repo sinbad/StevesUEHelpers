@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StevesHelperCommon.h"
 
 class UWidget;
 class SWidget;
@@ -24,3 +25,55 @@ UWidget* FindWidgetFromSlate(SWidget* SW, UWidget* Parent);
  * @param Widget A UWidget
  */
 void SetWidgetFocusProperly(UWidget* Widget);
+
+template <typename T>
+const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FName& Name,
+                                                   EInputImageDevicePreference DevicePreference,
+                                                   bool bLastInputWasGamepad)
+{
+    const T* MouseMapping = nullptr;
+    const T* KeyboardMapping = nullptr;
+    const T* GamepadMapping = nullptr;
+    for (const T& ActionMap : AllMappings)
+    {
+        // notice how we take the LAST one in the list as the final version
+        // this is because UInputSettings::GetActionMappingByName *reverses* the mapping list from Project Settings
+        if (ActionMap.Key.IsGamepadKey())
+        {
+            GamepadMapping = &ActionMap;
+        }
+        else if (ActionMap.Key.IsMouseButton())
+        {
+            MouseMapping = &ActionMap;
+        }
+        else
+        {
+            KeyboardMapping = &ActionMap;
+        }
+    }
+
+    const T* Preferred = nullptr;
+    if (GamepadMapping && bLastInputWasGamepad)
+    {
+        Preferred = GamepadMapping;
+    }
+    else
+    {
+        switch (DevicePreference)
+        {
+        // Auto should be pre-converted to another
+        case EInputImageDevicePreference::Auto:
+            UE_LOG(LogStevesUI, Error, TEXT("Device Preference should have been converted before this call"))
+            break;
+        case EInputImageDevicePreference::Gamepad_Keyboard_Mouse:
+            Preferred = KeyboardMapping ? KeyboardMapping : MouseMapping;
+            break;
+        case EInputImageDevicePreference::Gamepad_Mouse_Keyboard:
+            Preferred = MouseMapping ? MouseMapping : KeyboardMapping;
+            break;
+        default:
+            break;
+        }
+    }
+    return Preferred;
+}
