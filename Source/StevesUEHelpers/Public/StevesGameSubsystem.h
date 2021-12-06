@@ -64,8 +64,10 @@ protected:
     {
     protected:
         TArray<EInputMode> LastInputModeByPlayer;
+        TArray<EInputMode> LastButtonPressByPlayer;
         
         const EInputMode DefaultInputMode = EInputMode::Mouse;
+        const EInputMode DefaultButtonInputMode = EInputMode::Keyboard;
         const float MouseMoveThreshold = 1;
         const float GamepadAxisThreshold = 0.2;
 
@@ -74,8 +76,10 @@ protected:
         /// Whether this detector should ignore events (e.g. because the application is in the background)
         bool bIgnoreEvents = false;
 
-        // Single delegate caller, owner should propagate if they want (this isn't a UObject)
+        /// Event raised when main input mode changes for any reason 
         FInternalInputModeChanged OnInputModeChanged;
+        /// Event raised when button input mode changes only 
+        FInternalInputModeChanged OnButtonInputModeChanged;
 
 
         FInputModeDetector();
@@ -88,14 +92,18 @@ protected:
         virtual bool HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& InWheelEvent,
             const FPointerEvent* InGestureEvent) override;
 
+        /// Get the last input mode from any kind of input
         EInputMode GetLastInputMode(int PlayerIndex = 0);
+        /// Get the last input mode from button inputs (ignores axis changes, good for detecting if keyboard or mouse buttons are being used)
+        EInputMode GetLastButtonInputMode(int PlayerIndex = 0);
 
         // Needed but unused
         virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor) override {}
 
     protected:
+        static bool IsAGamepadButton(const FKey& Key);
         void ProcessKeyOrButton(int PlayerIndex, FKey Key);
-        void SetMode(int PlayerIndex, EInputMode NewMode);
+        void SetMode(int PlayerIndex, EInputMode NewMode, bool bIsButton);
     };
 
 protected:
@@ -122,6 +130,7 @@ protected:
 
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
+    void OnButtonInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
 
 
     TSoftObjectPtr<UDataTable> GetGamepadImages(int PlayerIndex, const UUiTheme* Theme);
@@ -129,17 +138,27 @@ protected:
     
 public:
 
-    /// Event raised when input mode changed between gamepad and keyboard / mouse
+    /// Event raised when main input mode changed between gamepad and keyboard / mouse (for any of axis / button events)
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnInputModeChanged;
-
+    
+    /// Event raised when the last button input changed between gamepad / keyboard / mouse
+    /// This can happen at a different time to OnInputModeChanged, e.g. if that was triggered by a mouse move, but the
+    /// last button pressed was still keyboard, you'd get this event later
+    UPROPERTY(BlueprintAssignable)
+    FOnInputModeChanged OnButtonInputModeChanged;
+    
     /// Event raised when the game window's foreground status changes
     UPROPERTY(BlueprintAssignable)
     FOnWindowForegroundChanged OnWindowForegroundChanged;
 
+    /// Gets the device where the most recent input event of any kind happened
     UFUNCTION(BlueprintCallable)
     EInputMode GetLastInputModeUsed(int PlayerIndex = 0) const { return InputDetector->GetLastInputMode(PlayerIndex); }
-	
+    /// Gets the device where the most recent button press happened
+    UFUNCTION(BlueprintCallable)
+    EInputMode GetLastInputButtonPressed(int PlayerIndex = 0) const { return InputDetector->GetLastButtonInputMode(PlayerIndex); }
+    
     UFUNCTION(BlueprintCallable)
     bool LastInputWasGamePad(int PlayerIndex = 0) const { return GetLastInputModeUsed(PlayerIndex) == EInputMode::Gamepad; }
 

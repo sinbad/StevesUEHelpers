@@ -35,6 +35,7 @@ void UStevesGameSubsystem::CreateInputDetector()
         FSlateApplication::Get().RegisterInputPreProcessor(InputDetector);
 
         InputDetector->OnInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnInputDetectorModeChanged);
+        InputDetector->OnButtonInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnButtonInputDetectorModeChanged);
     }
 
 }
@@ -122,6 +123,13 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
     OnInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 
+void UStevesGameSubsystem::OnButtonInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)
+{
+    // This is specifically for button changes; if this is a different main input mode it will also be registered in OnInputDetectorModeChanged
+    // Just relay this one
+    OnButtonInputModeChanged.Broadcast(PlayerIndex, NewMode);
+}
+
 FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
 {
     return &FocusSystem;
@@ -160,11 +168,13 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& N
     GS_TempActionMap.Empty();
     Settings->GetActionMappingByName(Name, GS_TempActionMap);
     
-    // For default, prefer keyboard for buttons
+    // For default, prefer latest press keyboard/mouse for buttons
     if (DevicePreference == EInputImageDevicePreference::Auto)
-        DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse;
+        DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
 
-    const auto Preferred = GetPreferedActionOrAxisMapping<FInputActionKeyMapping>(GS_TempActionMap, Name, DevicePreference, LastInputWasGamePad(PlayerIdx));
+    const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+    const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputActionKeyMapping>(GS_TempActionMap, Name, DevicePreference, LastInput, LastButtonInput);
     if (Preferred)
     {
         return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);
@@ -186,7 +196,9 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
     if (DevicePreference == EInputImageDevicePreference::Auto)
         DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
 
-    const auto Preferred = GetPreferedActionOrAxisMapping<FInputAxisKeyMapping>(GS_TempAxisMap, Name, DevicePreference, LastInputWasGamePad(PlayerIdx));
+    const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+    const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputAxisKeyMapping>(GS_TempAxisMap, Name, DevicePreference, LastInput, LastButtonInput);
     if (Preferred)
     {
         return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);
@@ -281,7 +293,8 @@ bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
 UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 {
     // 4 local players should be plenty usually (will expand if necessary)
-    LastInputModeByPlayer.Init(EInputMode::Mouse, 4);
+    LastInputModeByPlayer.Init(DefaultInputMode, 4);
+    LastButtonPressByPlayer.Init(DefaultButtonInputMode, 4);
 }
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
@@ -302,7 +315,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleAnalogInputEvent(FSlateAppl
     if (ShouldProcessInputEvents())
     {
         if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
-            SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad);
+            SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad, false);
     }
     
     // Don't consume
@@ -316,7 +329,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplic
         FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
         if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
         {
-            SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+            SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse, false);
         }
     }
     // Don't consume
@@ -328,7 +341,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlate
     if (ShouldProcessInputEvents())
     {
         // We don't care which button
-        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse);
+        SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse, true);
     }
     
     // Don't consume
@@ -340,7 +353,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseWheelOrGestureEvent(FS
 {
     if (ShouldProcessInputEvents())
     {
-        SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse);
+        SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse, false);
     }
     
     // Don't consume
@@ -356,38 +369,96 @@ EInputMode UStevesGameSubsystem::FInputModeDetector::GetLastInputMode(int Player
     return DefaultInputMode;
 }
 
+EInputMode UStevesGameSubsystem::FInputModeDetector::GetLastButtonInputMode(int PlayerIndex)
+{
+    if (PlayerIndex >= 0 && PlayerIndex < LastButtonPressByPlayer.Num())
+        return LastButtonPressByPlayer[PlayerIndex];
+
+    // Assume default if never told
+    return DefaultButtonInputMode;
+}
 
 void UStevesGameSubsystem::FInputModeDetector::ProcessKeyOrButton(int PlayerIndex, FKey Key)
 {
     if (Key.IsGamepadKey())
     {
-        SetMode(PlayerIndex, EInputMode::Gamepad);
+        SetMode(PlayerIndex, EInputMode::Gamepad, IsAGamepadButton(Key));
     }
     else if (Key.IsMouseButton())
     {
         // Assuming mice don't have analog buttons!
-        SetMode(PlayerIndex, EInputMode::Mouse);
+        SetMode(PlayerIndex, EInputMode::Mouse, true);
     }
     else
     {
         // We assume anything that's not mouse and not gamepad is a keyboard
         // Assuming keyboards don't have analog buttons!
-        SetMode(PlayerIndex, EInputMode::Keyboard);
+        SetMode(PlayerIndex, EInputMode::Keyboard, true);
     }
 
 }
-	
-void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMode NewMode)
+
+bool UStevesGameSubsystem::FInputModeDetector::IsAGamepadButton(const FKey& Key)
 {
+    
+    // Key.IsButtonAxis() returns true for some thumbstick movement events, because the axis type is EInputAxisType::Button for
+    // some reason. That means you get button events for thumbstick movements, which is super dumb. 
+    // See core engine InputCoreTypes.cpp for the stick axes which are defined FKeyDetails::GamepadKey | FKeyDetails::ButtonAxis
+    // This is for some kind of virtual input but it's a nasty hack, omit them
+    return Key.IsGamepadKey() &&
+        Key != EKeys::Gamepad_LeftStick_Up &&
+        Key != EKeys::Gamepad_LeftStick_Down &&
+        Key != EKeys::Gamepad_LeftStick_Left &&
+        Key != EKeys::Gamepad_LeftStick_Right &&
+        Key != EKeys::Gamepad_RightStick_Up &&
+        Key != EKeys::Gamepad_RightStick_Down &&
+        Key != EKeys::Gamepad_RightStick_Left &&
+        Key != EKeys::Gamepad_RightStick_Right;
+
+}
+
+void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMode NewMode, bool bIsButton)
+{
+    bool bButtonChanged = false;
+    bool bMainChanged = false;
+    
+    if (bIsButton)
+    {
+        if (NewMode != EInputMode::Unknown && NewMode != GetLastButtonInputMode(PlayerIndex))
+        {
+            if (PlayerIndex >= LastButtonPressByPlayer.Num())
+                LastButtonPressByPlayer.SetNum(PlayerIndex + 1);
+            
+            LastButtonPressByPlayer[PlayerIndex] = NewMode;
+
+            bButtonChanged = true;
+        }
+    }
+    // Whether it's a button or not it can affect the main input mode
     if (NewMode != EInputMode::Unknown && NewMode != GetLastInputMode(PlayerIndex))
     {
         if (PlayerIndex >= LastInputModeByPlayer.Num())
             LastInputModeByPlayer.SetNum(PlayerIndex + 1);
         
         LastInputModeByPlayer[PlayerIndex] = NewMode;
+
+        bMainChanged = true;
+    }
+
+    // Raise events at the end once all state has changed
+    if (bButtonChanged)
+    {
+        // ReSharper disable once CppExpressionWithoutSideEffects
+        OnButtonInputModeChanged.ExecuteIfBound(PlayerIndex, NewMode);
+        //UE_LOG(LogStevesUEHelpers, Display, TEXT("Button mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
+    }
+    if (bMainChanged)
+    {
+        // ReSharper disable once CppExpressionWithoutSideEffects
         OnInputModeChanged.ExecuteIfBound(PlayerIndex, NewMode);
         //UE_LOG(LogStevesUEHelpers, Display, TEXT("Input mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
     }
+
 }
 
 //PRAGMA_ENABLE_OPTIMIZATION
