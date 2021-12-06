@@ -38,9 +38,8 @@ protected:
     /// Custom theme to use for this input image set; if not supplied will use UStevesGameSubsystem::DefaultUiTheme
     UPROPERTY(EditAnywhere)   
     UUiTheme* CustomTheme;
-    
-    EInputMode CurrentInputMode;
 
+    bool bSubbedToInputEvents = false;
 public:
 
     /// Tell this image to display the bound action for the current input method
@@ -73,6 +72,9 @@ public:
     virtual void SetCustomTheme(UUiTheme* Theme);
     
     virtual void BeginDestroy() override;
+
+    virtual void SetVisibility(ESlateVisibility InVisibility) override;
+    
 protected:
 
     virtual TSharedRef<SWidget> RebuildWidget() override;

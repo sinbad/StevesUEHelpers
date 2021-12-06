@@ -10,12 +10,13 @@ TSharedRef<SWidget> UInputImage::RebuildWidget()
     auto Ret = Super::RebuildWidget();
 
     auto GS = GetStevesGameSubsystem(GetWorld());
-    if (GS)
+    if (GS && !bSubbedToInputEvents)
     {
+        bSubbedToInputEvents = true;
         GS->OnInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
-        CurrentInputMode = GS->GetLastInputModeUsed(PlayerIndex);
-        UpdateImage();
+        GS->OnButtonInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
     }
+    UpdateImage();
 
     return Ret;
 }
@@ -24,7 +25,10 @@ void UInputImage::OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode)
 {
     if (ChangedPlayerIdx == PlayerIndex)
     {
-        CurrentInputMode = InputMode;
+        // auto GS = GetStevesGameSubsystem(GetWorld());
+        // UE_LOG(LogTemp, Warning, TEXT("Updating image for input mode change: %s Button device: %s"),
+        //     *UEnum::GetValueAsString(InputMode),
+        //     *UEnum::GetValueAsString(GS->GetLastInputButtonPressed(ChangedPlayerIdx)));
         UpdateImage();
     }
 }
@@ -43,7 +47,27 @@ void UInputImage::BeginDestroy()
     if (GS)
     {
         GS->OnInputModeChanged.RemoveAll(this);
+        GS->OnButtonInputModeChanged.RemoveAll(this);
     }
+}
+
+void UInputImage::SetVisibility(ESlateVisibility InVisibility)
+{
+    Super::SetVisibility(InVisibility);
+
+    switch(InVisibility)
+    {
+    case ESlateVisibility::Collapsed:
+    case ESlateVisibility::Hidden:
+        break;
+    default:
+    case ESlateVisibility::Visible: 
+    case ESlateVisibility::HitTestInvisible:
+    case ESlateVisibility::SelfHitTestInvisible:
+        // Make sure we update when our visibility is changed
+        UpdateImage();
+        break;
+    };
 }
 
 void UInputImage::SetFromAction(FName Name)

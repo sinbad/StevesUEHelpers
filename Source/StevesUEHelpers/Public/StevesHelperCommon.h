@@ -53,11 +53,13 @@ enum class EInputBindingType : uint8
 UENUM(BlueprintType)
 enum class EInputImageDevicePreference : uint8
 {
-    /// For actions, use Gamepad_Keyboard_Mouse, for axes, use Gamepad_Mouse_Keyboard
+    /// For actions, use Gamepad_Keyboard_Mouse_Button, for axes, use Gamepad_Mouse_Keyboard
     Auto,
-    /// Gamepad first, then keyboard, then mouse - this is usually best for actions (buttons)
-    Gamepad_Keyboard_Mouse UMETA(DisplayName="Prefer Gamepad (if active), then keyboard, then mouse"),
+    /// Gamepad first, then keyboard, then mouse
+    Gamepad_Keyboard_Mouse UMETA(DisplayName="Gamepad, Keyboard, Mouse"),
     /// Gamepad first, then mouse, then keyboard - this is usually best for axes
-    Gamepad_Mouse_Keyboard UMETA(DisplayName="Prefer Gamepad (if active), then mouse, then keyboard")
+    Gamepad_Mouse_Keyboard UMETA(DisplayName="Gamepad, Mouse, Keyboard"),
+    /// Gamepad first, then whichever of mouse or keyboard last had a BUTTON pressed (ignore axes) - this is usually best for actions (buttons)
+    Gamepad_Keyboard_Mouse_Button UMETA(DisplayName="Gamepad, Most Recent Button Keyboard/Mouse")
 };
 

@@ -29,7 +29,8 @@ void SetWidgetFocusProperly(UWidget* Widget);
 template <typename T>
 const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FName& Name,
                                                    EInputImageDevicePreference DevicePreference,
-                                                   bool bLastInputWasGamepad)
+                                                   EInputMode LastInputDevice,
+                                                   EInputMode LastButtonInputDevice)
 {
     const T* MouseMapping = nullptr;
     const T* KeyboardMapping = nullptr;
@@ -53,8 +54,9 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
     }
 
     const T* Preferred = nullptr;
-    if (GamepadMapping && bLastInputWasGamepad)
+    if (GamepadMapping && LastInputDevice == EInputMode::Gamepad)
     {
+        // Always prefer gamepad if used last
         Preferred = GamepadMapping;
     }
     else
@@ -70,6 +72,11 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
             break;
         case EInputImageDevicePreference::Gamepad_Mouse_Keyboard:
             Preferred = MouseMapping ? MouseMapping : KeyboardMapping;
+            break;
+
+        case EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button:
+            // Use the latest button press
+            Preferred = (MouseMapping && LastButtonInputDevice == EInputMode::Mouse) ? MouseMapping : KeyboardMapping;
             break;
         default:
             break;
