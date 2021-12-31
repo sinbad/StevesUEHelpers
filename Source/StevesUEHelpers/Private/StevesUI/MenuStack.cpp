@@ -147,12 +147,16 @@ bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
     // This is probably OK though, no-one redefines menu controls, right?
     const FKey Key = InKeyEvent.GetKey();
     if (BackKeys.Contains(Key))
-    {
-        if (bCanBack) { 
-            // This is "Back"
-            PopMenu(true);
-            return true;
+    { 
+
+        if (bCanCloseAll == false) {
+            if (Menus.Num() == 1) {
+                return false;
+            }
         }
+        // This is "Back"
+        PopMenu(true);
+        return true; 
     }
     else if (InstantCloseKeys.Contains(Key))
     {
@@ -261,7 +265,6 @@ UMenuStack::UMenuStack()
     bEnableAutomaticFocus = true;
 
     bCanCloseAll = true;
-    bCanBack = true;
 }
 
 void UMenuStack::LastMenuClosed(bool bWasCancel)
