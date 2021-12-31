@@ -148,15 +148,19 @@ bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
     const FKey Key = InKeyEvent.GetKey();
     if (BackKeys.Contains(Key))
     {
-        // This is "Back"
-        PopMenu(true);
-        return true;
+        if (bCanBack) { 
+            // This is "Back"
+            PopMenu(true);
+            return true;
+        }
     }
     else if (InstantCloseKeys.Contains(Key))
     {
-        // Shortcut to exit all menus
-        CloseAll(true);
-        return true;
+        if (bCanCloseAll) { 
+            // Shortcut to exit all menus
+            CloseAll(true);
+            return true;
+        }
     }
 
     return false;
@@ -255,6 +259,9 @@ UMenuStack::UMenuStack()
 {
     // Default to enabling automatic focus for menus (can still be overridden in serialized properties)
     bEnableAutomaticFocus = true;
+
+    bCanCloseAll = true;
+    bCanBack = true;
 }
 
 void UMenuStack::LastMenuClosed(bool bWasCancel)

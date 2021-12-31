@@ -37,6 +37,9 @@ protected:
     
     TArray<UMenuBase*> Menus;
 
+    bool bCanCloseAll;
+    bool bCanBack;
+
     virtual void FirstMenuOpened();
     virtual void LastMenuClosed(bool bWasCancel);
 
@@ -131,4 +134,9 @@ public:
 
 
     UMenuStack();
+
+    UFUNCTION(BlueprintCallable)
+        void SetCanCloseAll(bool x) { bCanCloseAll = x; }
+    UFUNCTION(BlueprintCallable)
+        void SetCanBack(bool x) { bCanBack = x; }
 };
