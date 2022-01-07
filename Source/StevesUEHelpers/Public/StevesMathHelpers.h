@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /// Helper maths routines that UE4 is missing, all static
-class StevesMathHelpers
+class STEVESUEHELPERS_API StevesMathHelpers
 {
 public:
 

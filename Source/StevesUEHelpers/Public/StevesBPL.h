@@ -7,6 +7,7 @@
 #include "StevesMathHelpers.h"
 #include "StevesBPL.generated.h"
 
+class UPanelWidget;
 class UWidget;
 /**
  * Blueprint library exposing various things in a Blueprint-friendly way e.g. using by-value FVectors so they can
@@ -43,4 +44,14 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|UI")
 	static void SetWidgetFocus(UWidget* Widget);
+
+	/**
+	 * Insert a child widget at a specific index
+	 * @param Parent The container widget
+	 * @param Child The child widget to add
+	 * @param AtIndex The index at which the new child should exist
+	 */
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|UI")
+	static void InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
+	
 };
