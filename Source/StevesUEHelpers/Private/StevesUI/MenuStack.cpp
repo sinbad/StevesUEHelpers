@@ -48,7 +48,8 @@ void UMenuStack::SavePreviousInputMousePauseState()
     }
     else
     {
-#if ENGINE_MINOR_VERSION >= 26		
+        
+#if (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 26) || ENGINE_MAJOR_VERSION >= 5			
 		const auto CaptureMode = GVC->GetMouseCaptureMode();
 #else
 		const auto CaptureMode = GVC->CaptureMouseOnClick();
