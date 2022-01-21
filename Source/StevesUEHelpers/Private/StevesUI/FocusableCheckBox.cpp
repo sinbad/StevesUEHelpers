@@ -24,14 +24,20 @@ TSharedRef<SWidget> UFocusableCheckBox::RebuildWidget()
         MyCheckbox->SetContent(GetContentSlot()->Content ? GetContentSlot()->Content->TakeWidget() : SNullWidget::NullWidget);
     }
 
+    RefreshFocussedStyle();
+
+    
+    return MyCheckbox.ToSharedRef();
+   
+}
+
+void UFocusableCheckBox::RefreshFocussedStyle_Implementation()
+{
     // Copy Widget style but make normal same as hovered    
     FocussedStyle = WidgetStyle;
     FocussedStyle.UncheckedImage = FocussedStyle.UncheckedHoveredImage;
     FocussedStyle.CheckedImage = FocussedStyle.CheckedHoveredImage;
     FocussedStyle.UndeterminedImage = FocussedStyle.UndeterminedHoveredImage;
-    
-    return MyCheckbox.ToSharedRef();
-   
 }
 
 void UFocusableCheckBox::SlateHandleFocusReceived()

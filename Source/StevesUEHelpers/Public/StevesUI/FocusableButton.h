@@ -51,4 +51,11 @@ protected:
     void SlateHandleUnhovered();
 
     virtual TSharedRef<SWidget> RebuildWidget() override;
+
+    
+    /// Update the focussed style based on changes made to the default widget style.
+    /// Call this if you make runtime changes to the base style of this button.
+    /// Needed because we can't override SetStyle
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    void RefreshFocussedStyle();
 };

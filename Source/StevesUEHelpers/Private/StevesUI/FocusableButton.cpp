@@ -31,11 +31,16 @@ TSharedRef<SWidget> UFocusableButton::RebuildWidget()
         Cast<UButtonSlot>(GetContentSlot())->BuildSlot(MyButton.ToSharedRef());
     }
 
+    RefreshFocussedStyle();
+
+    return MyButton.ToSharedRef();    
+}
+
+void UFocusableButton::RefreshFocussedStyle_Implementation()
+{
     // Copy Widget style but make normal same as hovered    
     FocussedStyle = WidgetStyle;
     FocussedStyle.Normal = FocussedStyle.Hovered;
-	
-    return MyButton.ToSharedRef();    
 }
 
 void UFocusableButton::SlateHandleFocusReceived()
