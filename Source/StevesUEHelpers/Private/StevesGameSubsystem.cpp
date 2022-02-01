@@ -36,6 +36,7 @@ void UStevesGameSubsystem::CreateInputDetector()
 
         InputDetector->OnInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnInputDetectorModeChanged);
         InputDetector->OnButtonInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnButtonInputDetectorModeChanged);
+        InputDetector->OnAxisInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnAxisInputDetectorModeChanged);
     }
 
 }
@@ -128,6 +129,13 @@ void UStevesGameSubsystem::OnButtonInputDetectorModeChanged(int PlayerIndex, EIn
     // This is specifically for button changes; if this is a different main input mode it will also be registered in OnInputDetectorModeChanged
     // Just relay this one
     OnButtonInputModeChanged.Broadcast(PlayerIndex, NewMode);
+}
+
+void UStevesGameSubsystem::OnAxisInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)
+{
+    // This is specifically for button changes; if this is a different main input mode it will also be registered in OnInputDetectorModeChanged
+    // Just relay this one
+    OnAxisInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 
 FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
@@ -295,6 +303,7 @@ UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
     // 4 local players should be plenty usually (will expand if necessary)
     LastInputModeByPlayer.Init(DefaultInputMode, 4);
     LastButtonPressByPlayer.Init(DefaultButtonInputMode, 4);
+    LastAxisMoveByPlayer.Init(DefaultAxisInputMode, 4);
 }
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
@@ -378,6 +387,15 @@ EInputMode UStevesGameSubsystem::FInputModeDetector::GetLastButtonInputMode(int 
     return DefaultButtonInputMode;
 }
 
+EInputMode UStevesGameSubsystem::FInputModeDetector::GetLastAxisInputMode(int PlayerIndex)
+{
+    if (PlayerIndex >= 0 && PlayerIndex < LastAxisMoveByPlayer.Num())
+        return LastAxisMoveByPlayer[PlayerIndex];
+
+    // Assume default if never told
+    return DefaultAxisInputMode;
+}
+
 void UStevesGameSubsystem::FInputModeDetector::ProcessKeyOrButton(int PlayerIndex, FKey Key)
 {
     if (Key.IsGamepadKey())
@@ -420,6 +438,7 @@ bool UStevesGameSubsystem::FInputModeDetector::IsAGamepadButton(const FKey& Key)
 void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMode NewMode, bool bIsButton)
 {
     bool bButtonChanged = false;
+    bool bAxisChanged = false;
     bool bMainChanged = false;
     
     if (bIsButton)
@@ -433,6 +452,19 @@ void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMo
 
             bButtonChanged = true;
         }
+    }
+    else
+    {
+        if (NewMode != EInputMode::Unknown && NewMode != GetLastAxisInputMode(PlayerIndex))
+        {
+            if (PlayerIndex >= LastAxisMoveByPlayer.Num())
+                LastAxisMoveByPlayer.SetNum(PlayerIndex + 1);
+            
+            LastAxisMoveByPlayer[PlayerIndex] = NewMode;
+
+            bAxisChanged = true;
+        }
+        
     }
     // Whether it's a button or not it can affect the main input mode
     if (NewMode != EInputMode::Unknown && NewMode != GetLastInputMode(PlayerIndex))
@@ -451,6 +483,12 @@ void UStevesGameSubsystem::FInputModeDetector::SetMode(int PlayerIndex, EInputMo
         // ReSharper disable once CppExpressionWithoutSideEffects
         OnButtonInputModeChanged.ExecuteIfBound(PlayerIndex, NewMode);
         //UE_LOG(LogStevesUEHelpers, Display, TEXT("Button mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
+    }
+    if (bAxisChanged)
+    {
+        // ReSharper disable once CppExpressionWithoutSideEffects
+        OnAxisInputModeChanged.ExecuteIfBound(PlayerIndex, NewMode);
+        //UE_LOG(LogStevesUEHelpers, Display, TEXT("Axis mode for player %d changed: %s"), PlayerIndex, *UEnum::GetValueAsString(NewMode));
     }
     if (bMainChanged)
     {

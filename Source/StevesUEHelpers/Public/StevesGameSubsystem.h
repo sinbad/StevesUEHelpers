@@ -65,9 +65,11 @@ protected:
     protected:
         TArray<EInputMode> LastInputModeByPlayer;
         TArray<EInputMode> LastButtonPressByPlayer;
+        TArray<EInputMode> LastAxisMoveByPlayer;
         
         const EInputMode DefaultInputMode = EInputMode::Mouse;
         const EInputMode DefaultButtonInputMode = EInputMode::Keyboard;
+        const EInputMode DefaultAxisInputMode = EInputMode::Mouse;
         const float MouseMoveThreshold = 1;
         const float GamepadAxisThreshold = 0.2;
 
@@ -80,6 +82,8 @@ protected:
         FInternalInputModeChanged OnInputModeChanged;
         /// Event raised when button input mode changes only 
         FInternalInputModeChanged OnButtonInputModeChanged;
+        /// Event raised when axis input mode changes only 
+        FInternalInputModeChanged OnAxisInputModeChanged;
 
 
         FInputModeDetector();
@@ -96,6 +100,8 @@ protected:
         EInputMode GetLastInputMode(int PlayerIndex = 0);
         /// Get the last input mode from button inputs (ignores axis changes, good for detecting if keyboard or mouse buttons are being used)
         EInputMode GetLastButtonInputMode(int PlayerIndex = 0);
+        /// Get the last input mode from axis movement (ignores button presses, good for detecting if keyboard or mouse axes are being used for motion)
+        EInputMode GetLastAxisInputMode(int PlayerIndex = 0);
 
         // Needed but unused
         virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor) override {}
@@ -131,6 +137,7 @@ protected:
     // Called by detector
     void OnInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
     void OnButtonInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
+    void OnAxisInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode);
 
 
     TSoftObjectPtr<UDataTable> GetGamepadImages(int PlayerIndex, const UUiTheme* Theme);
@@ -147,6 +154,12 @@ public:
     /// last button pressed was still keyboard, you'd get this event later
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnButtonInputModeChanged;
+    
+    /// Event raised when the last axis input changed between gamepad / keyboard / mouse
+    /// This can happen at a different time to OnInputModeChanged, e.g. if that was triggered by a button press, but the
+    /// last axis moved was still mouse, you'd get this event later
+    UPROPERTY(BlueprintAssignable)
+    FOnInputModeChanged OnAxisInputModeChanged;
     
     /// Event raised when the game window's foreground status changes
     UPROPERTY(BlueprintAssignable)
