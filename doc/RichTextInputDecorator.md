@@ -81,6 +81,21 @@ derive the width from that based on the aspect ratio.
 It's generally best just to set the height and not the width as well, since 
 setting both can cause the image to be distorted if it's not the same aspect ratio.
 
+### Device Preference
+
+For the `action` and `axis` types, which device to prefer to show the image for
+can be specified with the `prefer="x"` attribute. The default is `prefer="auto"`, which means:
+
+1. Gamepad, if the last used device was gamepad
+2. If an Action (button/key), prefer Keyboard over Mouse buttons
+3. If an Axis, prefer Mouse over Keyboard
+
+Alternatives are:
+
+* `prefer="gkm"`: prefer Gamepad, then Keyboard, then Mouse
+* `prefer="gmk"`: prefer Gamepad, then Mouse, then Keyboard
+* `prefer="gmkbutton"`: prefer Gamepad, then whichever of Mouse ot Keyboard last had a button pressed
+
 ## See Also
 
  * [Input Image](InputImage.md)

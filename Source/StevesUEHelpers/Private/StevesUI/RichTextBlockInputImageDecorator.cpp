@@ -20,6 +20,9 @@ struct FRichTextInputImageParams
     FKey Key;
     /// Player index, if binding type is action or axis
     int PlayerIndex;
+    /// Where there are multiple mappings, which to prefer 
+    EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
+
     /// Initial Sprite to use
     UPaperSprite* InitialSprite;
     /// Parent decorator, for looking up things later
@@ -37,6 +40,8 @@ protected:
     FKey Key;
     /// Player index, if binding type is action or axis
     int PlayerIndex = 0;
+    /// Where there are multiple mappings, which to prefer 
+    EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
     /// Parent decorator, for looking up things later
     URichTextBlockInputImageDecorator* Decorator = nullptr;
 
@@ -59,6 +64,7 @@ public:
     {
         BindingType = InParams.BindingType;
         ActionOrAxisName = InParams.ActionOrAxisName;
+        DevicePreference = InParams.DevicePreference;
         Key = InParams.Key;
         PlayerIndex = InParams.PlayerIndex;
         Decorator = InParams.Decorator;
@@ -122,7 +128,7 @@ public:
             if (GS)
             {
                 // Can only support default theme, no way to edit theme in decorator config 
-                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, EInputImageDevicePreference::Auto, PlayerIndex);
+                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex);
                 if (Sprite && Brush.GetResourceObject() != Sprite)
                 {
                     UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
@@ -207,6 +213,26 @@ protected:
             Params.ActionOrAxisName = **AxisStr;        
         }
 
+        if (const FString* PreferStr = RunInfo.MetaData.Find(TEXT("prefer")))
+        {
+            if (PreferStr->Equals("auto", ESearchCase::IgnoreCase))
+            {
+                Params.DevicePreference = EInputImageDevicePreference::Auto;
+            }
+            else if (PreferStr->Equals("gkm", ESearchCase::IgnoreCase))
+            {
+                Params.DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse;
+            }
+            else if (PreferStr->Equals("gmk", ESearchCase::IgnoreCase))
+            {
+                Params.DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
+            }
+            else if (PreferStr->Equals("gmkbutton", ESearchCase::IgnoreCase))
+            {
+                Params.DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
+            }
+        }
+
         // Look up the initial sprite here
         // The Slate widget can't do it in Construct because World pointer doesn't work (thread issues?)
         // Also annoying: can't keep Brush on this class because this method is const. UGH
@@ -214,7 +240,7 @@ protected:
         if (GS)
         {
             // Can only support default theme, no way to edit theme in decorator config 
-            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, EInputImageDevicePreference::Auto, Params.PlayerIndex);
+            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, Params.DevicePreference, Params.PlayerIndex);
         }
         else
         {
