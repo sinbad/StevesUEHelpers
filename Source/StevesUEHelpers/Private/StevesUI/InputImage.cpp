@@ -15,6 +15,7 @@ TSharedRef<SWidget> UInputImage::RebuildWidget()
         bSubbedToInputEvents = true;
         GS->OnInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnButtonInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
+        GS->OnAxisInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
     }
     UpdateImage();
 
@@ -25,11 +26,12 @@ void UInputImage::OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode)
 {
     if (ChangedPlayerIdx == PlayerIndex)
     {
+        // Delay update, in case multiple received in short succession
+        MarkImageDirty();
         // auto GS = GetStevesGameSubsystem(GetWorld());
         // UE_LOG(LogTemp, Warning, TEXT("Updating image for input mode change: %s Button device: %s"),
         //     *UEnum::GetValueAsString(InputMode),
         //     *UEnum::GetValueAsString(GS->GetLastInputButtonPressed(ChangedPlayerIdx)));
-        UpdateImage();
     }
 }
 
@@ -48,6 +50,7 @@ void UInputImage::BeginDestroy()
     {
         GS->OnInputModeChanged.RemoveAll(this);
         GS->OnButtonInputModeChanged.RemoveAll(this);
+        GS->OnAxisInputModeChanged.RemoveAll(this);
     }
 }
 
@@ -104,4 +107,15 @@ void UInputImage::UpdateImage()
             SetBrushFromAtlasInterface(Sprite, true);
         }
     }
+    DelayedUpdateImageTimer.Invalidate();
+}
+
+void UInputImage::MarkImageDirty()
+{
+    if (!DelayedUpdateImageTimer.IsValid())
+    {
+        // Delayed update
+        GetWorld()->GetTimerManager().SetTimer(DelayedUpdateImageTimer, this, &UInputImage::UpdateImage, 0.5f);
+    }
+
 }

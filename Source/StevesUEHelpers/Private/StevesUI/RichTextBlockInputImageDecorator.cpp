@@ -154,7 +154,7 @@ public:
                 }
                 
             }
-            TimeUntilNextSpriteCheck = 0.25f;
+            TimeUntilNextSpriteCheck = 0.5f;
         }
     }
 };

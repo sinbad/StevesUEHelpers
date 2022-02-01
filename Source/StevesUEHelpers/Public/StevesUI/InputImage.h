@@ -40,6 +40,8 @@ protected:
     UUiTheme* CustomTheme;
 
     bool bSubbedToInputEvents = false;
+
+    FTimerHandle DelayedUpdateImageTimer;
 public:
 
     /// Tell this image to display the bound action for the current input method
@@ -78,6 +80,7 @@ public:
 protected:
 
     virtual TSharedRef<SWidget> RebuildWidget() override;
+    virtual void MarkImageDirty();
     virtual void UpdateImage();
         
     UFUNCTION()
