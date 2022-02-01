@@ -171,6 +171,9 @@ public:
     /// Gets the device where the most recent button press happened
     UFUNCTION(BlueprintCallable)
     EInputMode GetLastInputButtonPressed(int PlayerIndex = 0) const { return InputDetector->GetLastButtonInputMode(PlayerIndex); }
+    /// Gets the device where the most recent axis move happened
+    UFUNCTION(BlueprintCallable)
+    EInputMode GetLastInputAxisMoved(int PlayerIndex = 0) const { return InputDetector->GetLastAxisInputMode(PlayerIndex); }
     
     UFUNCTION(BlueprintCallable)
     bool LastInputWasGamePad(int PlayerIndex = 0) const { return GetLastInputModeUsed(PlayerIndex) == EInputMode::Gamepad; }
