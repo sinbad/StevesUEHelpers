@@ -231,6 +231,10 @@ protected:
             {
                 Params.DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
             }
+            else if (PreferStr->Equals("gmkaxis", ESearchCase::IgnoreCase))
+            {
+                Params.DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Axis;
+            }
         }
 
         // Look up the initial sprite here

@@ -60,6 +60,8 @@ enum class EInputImageDevicePreference : uint8
     /// Gamepad first, then mouse, then keyboard - this is usually best for axes
     Gamepad_Mouse_Keyboard UMETA(DisplayName="Gamepad, Mouse, Keyboard"),
     /// Gamepad first, then whichever of mouse or keyboard last had a BUTTON pressed (ignore axes) - this is usually best for actions (buttons)
-    Gamepad_Keyboard_Mouse_Button UMETA(DisplayName="Gamepad, Most Recent Button Keyboard/Mouse")
+    Gamepad_Keyboard_Mouse_Button UMETA(DisplayName="Gamepad, Most Recent Button Keyboard/Mouse"),
+    /// Gamepad first, then whichever of mouse or keyboard last had an AXIS moved (ignore buttons) - this is usually best for directionals
+    Gamepad_Keyboard_Mouse_Axis UMETA(DisplayName="Gamepad, Most Recent Axis Keyboard/Mouse")
 };
 

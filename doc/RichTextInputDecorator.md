@@ -94,7 +94,8 @@ Alternatives are:
 
 * `prefer="gkm"`: prefer Gamepad, then Keyboard, then Mouse
 * `prefer="gmk"`: prefer Gamepad, then Mouse, then Keyboard
-* `prefer="gmkbutton"`: prefer Gamepad, then whichever of Mouse ot Keyboard last had a button pressed
+* `prefer="gmkbutton"`: prefer Gamepad, then whichever of Mouse or Keyboard last had a button pressed
+* `prefer="gmkaxis"`: prefer Gamepad, then whichever of Mouse or Keyboard last had an axis moved
 
 ## See Also
 

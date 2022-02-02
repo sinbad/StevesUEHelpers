@@ -182,7 +182,8 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAction(const FName& N
 
     const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
     const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
-    const auto Preferred = GetPreferedActionOrAxisMapping<FInputActionKeyMapping>(GS_TempActionMap, Name, DevicePreference, LastInput, LastButtonInput);
+    const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputActionKeyMapping>(GS_TempActionMap, Name, DevicePreference, LastInput, LastButtonInput, LastAxisInput);
     if (Preferred)
     {
         return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);
@@ -206,7 +207,8 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
 
     const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
     const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
-    const auto Preferred = GetPreferedActionOrAxisMapping<FInputAxisKeyMapping>(GS_TempAxisMap, Name, DevicePreference, LastInput, LastButtonInput);
+    const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+    const auto Preferred = GetPreferedActionOrAxisMapping<FInputAxisKeyMapping>(GS_TempAxisMap, Name, DevicePreference, LastInput, LastButtonInput, LastAxisInput);
     if (Preferred)
     {
         return GetInputImageSpriteFromKey(Preferred->Key, PlayerIdx, Theme);

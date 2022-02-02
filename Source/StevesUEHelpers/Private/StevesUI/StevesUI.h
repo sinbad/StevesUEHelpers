@@ -30,7 +30,8 @@ template <typename T>
 const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FName& Name,
                                                    EInputImageDevicePreference DevicePreference,
                                                    EInputMode LastInputDevice,
-                                                   EInputMode LastButtonInputDevice)
+                                                   EInputMode LastButtonInputDevice,
+                                                   EInputMode LastAxisInputDevice)
 {
     const T* MouseMapping = nullptr;
     const T* KeyboardMapping = nullptr;
@@ -43,7 +44,7 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
         {
             GamepadMapping = &ActionMap;
         }
-        else if (ActionMap.Key.IsMouseButton())
+        else if (ActionMap.Key.IsMouseButton()) // registers true for mouse axes too
         {
             MouseMapping = &ActionMap;
         }
@@ -77,6 +78,10 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
         case EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button:
             // Use the latest button press
             Preferred = (MouseMapping && LastButtonInputDevice == EInputMode::Mouse) ? MouseMapping : KeyboardMapping;
+            break;
+        case EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Axis:
+            // Use the latest button press
+            Preferred = (MouseMapping && LastAxisInputDevice == EInputMode::Mouse) ? MouseMapping : KeyboardMapping;
             break;
         default:
             break;
