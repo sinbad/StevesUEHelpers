@@ -52,6 +52,8 @@ protected:
     UFUNCTION()
     void InputModeChanged(int PlayerIndex, EInputMode NewMode);
 
+    FDateTime TimeFirstOpen;
+
 public:
     /// Input keys which go back a level in the menu stack (default Esc and B gamepad button)
     /// Clear this list if you don't want this behaviour
@@ -98,6 +100,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
     EGamePauseChange GamePauseSettingOnClose = EGamePauseChange::DoNotChange;
 
+    /// Minimum amount of time a menu should be open before responding to instant close key (prevent fast close because of leaked input)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Behaviour")
+    float MinTimeOpen = 0.5f;
+    
     /// Push a new menu level by class. This will instantiate the new menu, display it, and inform the previous menu that it's
     /// been superceded. Use the returned instance if you want to cache it
     UFUNCTION(BlueprintCallable)
@@ -131,4 +137,6 @@ public:
 
 
     UMenuStack();
+
+    
 };

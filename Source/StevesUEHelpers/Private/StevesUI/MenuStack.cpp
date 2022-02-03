@@ -6,7 +6,6 @@
 #include "StevesUI/MenuBase.h"
 #include "Kismet/GameplayStatics.h"
 
-
 void UMenuStack::NativeConstruct()
 {
     Super::NativeConstruct();
@@ -156,8 +155,15 @@ bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
     else if (InstantCloseKeys.Contains(Key))
     {
         // Shortcut to exit all menus
-        CloseAll(true);
-        return true;
+        // Make sure we're open long enough
+        FDateTime CurrTime = FDateTime::Now();
+        FTimespan Diff = CurrTime - TimeFirstOpen;
+        if (Diff.GetTicks() > (int64)(MinTimeOpen * ETimespan::TicksPerSecond))
+        {
+            CloseAll(true);
+            return true;
+        }
+        
     }
 
     return false;
@@ -236,7 +242,8 @@ void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
 
 void UMenuStack::FirstMenuOpened()
 {
-    // Nothing to do now but keep for future use
+    // Don't use world time (even real time) since map can change while open
+    TimeFirstOpen = FDateTime::Now();
 }
 
 void UMenuStack::RemoveFromParent()
