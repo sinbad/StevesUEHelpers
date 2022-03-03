@@ -50,7 +50,7 @@ to set this is by editing your DefaultGame.ini:
 
 ```
 [/Script/StevesUEHelpers.StevesGameSubsystem]
-DefaultUiThemePath="/Game/Path/To/YourUiThemeName.UiTheme"
+DefaultUiThemePath="/Game/Path/To/DefaultUiTheme.DefaultUiTheme"
 ```
 
 That ".UiTheme" postfix is required, it's how UE knows what the type is.
