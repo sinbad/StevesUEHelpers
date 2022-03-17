@@ -15,20 +15,26 @@
 void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
+
+#if !UE_SERVER
     CreateInputDetector();
     InitTheme();
     InitForegroundCheck();
+#endif
 }
 
 void UStevesGameSubsystem::Deinitialize()
 {
     Super::Deinitialize();
+#if !UE_SERVER
     DestroyInputDetector();
+#endif
 }
 
 
 void UStevesGameSubsystem::CreateInputDetector()
 {
+#if !UE_SERVER
     if (!InputDetector.IsValid())
     {
         InputDetector = MakeShareable(new FInputModeDetector());
@@ -38,16 +44,18 @@ void UStevesGameSubsystem::CreateInputDetector()
         InputDetector->OnButtonInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnButtonInputDetectorModeChanged);
         InputDetector->OnAxisInputModeChanged.BindUObject(this, &UStevesGameSubsystem::OnAxisInputDetectorModeChanged);
     }
-
+#endif
 }
 
 void UStevesGameSubsystem::DestroyInputDetector()
 {
+#if !UE_SERVER
     if (InputDetector.IsValid())
     {
         FSlateApplication::Get().UnregisterInputPreProcessor(InputDetector);
         InputDetector.Reset();
     }
+#endif
 }
 
 void UStevesGameSubsystem::InitTheme()
