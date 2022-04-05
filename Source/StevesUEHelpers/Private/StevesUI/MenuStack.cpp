@@ -181,7 +181,7 @@ void UMenuStack::InputModeChanged(int PlayerIndex, EInputMode NewMode)
 
 UMenuBase* UMenuStack::PushMenuByClass(TSubclassOf<UMenuBase> MenuClass)
 {
-    const FName Name = MakeUniqueObjectName(this->GetOuter(), MenuClass, MenuClass->GetFName());
+    const FName Name = MakeUniqueObjectName(this->GetOuter(), MenuClass);
     TSubclassOf<UUserWidget> BaseClass = MenuClass;
     const auto NewMenu = Cast<UMenuBase>(CreateWidgetInstance(*this, BaseClass, Name));
     PushMenuByObject(NewMenu);
