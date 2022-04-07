@@ -70,6 +70,33 @@ public:
 		FColor Color;
 	};
 
+	/// Replacement for FWireCylinder because that's garbage and doesn't reflect the component transform
+	struct FDebugCylinder
+	{
+		FDebugCylinder(const FVector &InCentre, const FVector& InX, const FVector& InY, const FVector& InZ, const float InRadius, const float InHalfHeight, int InNumSegments, const FColor &InColor) :
+			Centre(InCentre),
+			X(InX), Y(InY), Z(InZ),
+			Radius(InRadius),
+			HalfHeight(InHalfHeight),
+			NumSegments(InNumSegments),
+			Color(InColor)
+		{
+		}
+
+		FVector Centre;
+		FVector X;
+		FVector Y;
+		FVector Z;
+		float Radius;
+		float HalfHeight;
+		int NumSegments;
+		FColor Color;
+	};
+	
+
 	TArray<FDebugCircle> Circles;
 	TArray<FDebugArc> Arcs;
+	TArray<FDebugCylinder> CylindersImproved; // Because we need our own
+	TArray<FCapsule> CapsulesImproved; // Because we need our own
+
 };

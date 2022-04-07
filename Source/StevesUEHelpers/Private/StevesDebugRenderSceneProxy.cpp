@@ -33,6 +33,33 @@ void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSc
 					C.Radius, C.NumSegments,
 					C.Color, SDPG_Foreground);	
 			}
+			// Draw Cylinders (properly! superclass ignores transforms)
+			for (const auto& C : CylindersImproved)
+			{
+				::DrawWireCylinder(PDI,
+				                   C.Centre,
+				                   C.X,
+				                   C.Y,
+				                   C.Z,
+				                   C.Color,
+				                   C.Radius,
+				                   C.HalfHeight,
+				                   C.NumSegments,
+				                   SDPG_Foreground);
+			}
+			for (const auto& C : CapsulesImproved)
+			{
+				::DrawWireCapsule(PDI,
+								   C.Location,
+								   C.X,
+								   C.Y,
+								   C.Z,
+								   C.Color,
+								   C.Radius,
+								   C.HalfHeight,
+								   16,
+								   SDPG_Foreground);
+			}
 		}
 	}
 }

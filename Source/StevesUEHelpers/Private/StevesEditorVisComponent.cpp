@@ -76,6 +76,34 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 		Ret->Boxes.Add(FStevesDebugRenderSceneProxy::FDebugBox(
 			DBox, Box.Colour, CombinedXForm));
 	}
+	for (auto& Cylinder : Cylinders)
+	{
+		// Apply local rotation first then parent transform
+		const FTransform CombinedXForm = FTransform(Cylinder.Rotation, Cylinder.Location) * XForm;
+		const float HalfH = Cylinder.Height * 0.5f * CombinedXForm.GetScale3D().Z;
+		const float R = Cylinder.Radius * CombinedXForm.GetScale3D().Z;
+		const FVector Centre = CombinedXForm.TransformPosition(FVector::ZeroVector);
+		const FVector LocalX = CombinedXForm.TransformVectorNoScale(FVector::ForwardVector);
+		const FVector LocalY = CombinedXForm.TransformVectorNoScale(FVector::RightVector);
+		const FVector LocalZ = CombinedXForm.TransformVectorNoScale(FVector::UpVector);
+		Ret->CylindersImproved.Add(FStevesDebugRenderSceneProxy::FDebugCylinder(
+			Centre, LocalX, LocalY, LocalZ, R, HalfH, 16, Cylinder.Colour));
+	}
+	for (auto& Capsule : Capsules)
+	{
+		// Apply local rotation first then parent transform
+		const FTransform CombinedXForm = FTransform(Capsule.Rotation, Capsule.Location) * XForm;
+		const float HalfH = Capsule.Height * 0.5f * CombinedXForm.GetScale3D().Z;
+		const float R = Capsule.Radius * CombinedXForm.GetScale3D().Z;
+		const FVector Position = CombinedXForm.TransformPosition(FVector::ZeroVector);
+		const FVector LocalX = CombinedXForm.TransformVectorNoScale(FVector::ForwardVector);
+		const FVector LocalY = CombinedXForm.TransformVectorNoScale(FVector::RightVector);
+		const FVector LocalZ = CombinedXForm.TransformVectorNoScale(FVector::UpVector);
+		Ret->CapsulesImproved.Add(FStevesDebugRenderSceneProxy::FCapsule(
+			Position, R,
+			LocalX, LocalY, LocalZ,
+			HalfH, Capsule.Colour));
+	}
 
 	return Ret;
 	
@@ -118,6 +146,24 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 		// Apply local rotation only, world is done later
 		FTransform BoxXForm = FTransform(Box.Rotation, Box.Location);
 		DBox = DBox.TransformBy(BoxXForm);
+		B = B + FBoxSphereBounds(DBox);
+	}
+	for (auto& Cylinder : Cylinders)
+	{
+		FVector HalfSize = FVector(Cylinder.Radius, Cylinder.Radius, Cylinder.Height * 0.5f);
+		FBox DBox(-HalfSize, HalfSize);
+		// Apply local rotation only, world is done later
+		FTransform XForm = FTransform(Cylinder.Rotation, Cylinder.Location);
+		DBox = DBox.TransformBy(XForm);
+		B = B + FBoxSphereBounds(DBox);
+	}
+	for (auto& Capsule : Capsules)
+	{
+		FVector HalfSize = FVector(Capsule.Radius, Capsule.Radius, Capsule.Height * 0.5f + Capsule.Radius * 2.f);
+		FBox DBox(-HalfSize, HalfSize);
+		// Apply local rotation only, world is done later
+		FTransform XForm = FTransform(Capsule.Rotation, Capsule.Location);
+		DBox = DBox.TransformBy(XForm);
 		B = B + FBoxSphereBounds(DBox);
 	}
 	return B.TransformBy(LocalToWorld);

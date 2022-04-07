@@ -195,7 +195,53 @@ struct STEVESUEHELPERS_API FStevesEditorVisBox
 	}
 };
 
+USTRUCT(BlueprintType)
+struct STEVESUEHELPERS_API FStevesEditorVisCylinder
+{
+	GENERATED_BODY()
 
+	/// Location relative to component
+	UPROPERTY(EditAnywhere)
+	FVector Location;
+	/// Height of cylinder
+	UPROPERTY(EditAnywhere)
+	float Height;
+	/// Radius of cylinder
+	UPROPERTY(EditAnywhere)
+	float Radius;
+	/// Rotation relative to component
+	UPROPERTY(EditAnywhere)
+	FRotator Rotation;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere)
+	FColor Colour;
+
+	FStevesEditorVisCylinder(const FVector& InLocation, float InHeight, float InRadius, const FRotator& InRot,
+						const FColor& InColour) :
+		Location(InLocation),
+		Height(InHeight),
+		Radius(InRadius),
+		Rotation(InRot),
+		Colour(InColour)
+	{
+	}
+
+	FStevesEditorVisCylinder():
+		Location(FVector::ZeroVector),
+		Height(50),
+		Radius(10),
+		Rotation(FRotator::ZeroRotator),
+		Colour(FColor::White)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct STEVESUEHELPERS_API FStevesEditorVisCapsule : public FStevesEditorVisCylinder
+{
+	GENERATED_BODY()
+
+};
 /**
  *
  * A component that solely exists to provide arbitrary editor visualisation when not selected.
@@ -227,6 +273,10 @@ public:
 	TArray<FStevesEditorVisSphere> Spheres;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisBox> Boxes;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisCylinder> Cylinders;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisCapsule> Capsules;
 
 	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
 
