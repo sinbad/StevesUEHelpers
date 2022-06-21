@@ -77,11 +77,11 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
 
         case EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button:
             // Use the latest button press
-            Preferred = (MouseMapping && LastButtonInputDevice == EInputMode::Mouse) ? MouseMapping : KeyboardMapping;
+            Preferred = (MouseMapping && (LastButtonInputDevice == EInputMode::Mouse || !KeyboardMapping)) ? MouseMapping : KeyboardMapping;
             break;
         case EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Axis:
             // Use the latest button press
-            Preferred = (MouseMapping && LastAxisInputDevice == EInputMode::Mouse) ? MouseMapping : KeyboardMapping;
+            Preferred = (MouseMapping && (LastAxisInputDevice == EInputMode::Mouse || !KeyboardMapping)) ? MouseMapping : KeyboardMapping;
             break;
         default:
             break;
