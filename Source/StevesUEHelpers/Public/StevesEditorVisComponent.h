@@ -13,13 +13,13 @@ struct STEVESUEHELPERS_API FStevesEditorVisLine
 	GENERATED_BODY()
 
 	/// Start location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Start;
 	/// End location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector End;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisLine(const FVector& InStart, const FVector& InEnd,
@@ -44,19 +44,19 @@ struct STEVESUEHELPERS_API FStevesEditorVisCircle
 	GENERATED_BODY()
 
 	/// Location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	/// Rotation relative to component; circles will be rendered in the X/Y plane
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation;
 	/// Circle radius
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Radius;
 	/// The number of line segments to render the circle with
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int NumSegments;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisCircle(const FVector& InLocation, const FRotator& InRotation, float InRadius, int InNumSegments,
@@ -84,25 +84,25 @@ struct STEVESUEHELPERS_API FStevesEditorVisArc
 	GENERATED_BODY()
 
 	/// Location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	/// Rotation relative to component; arcs will be rendered in the X/Y plane
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation;
 	/// Minimum angle to render arc from 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinAngle;
 	/// Maximum angle to render arc to 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxAngle;
 	/// Circle radius
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Radius;
 	/// The number of line segments to render the circle with
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int NumSegments;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisArc(const FVector& InLocation, const FRotator& InRotation, float InMinAngle, float InMaxAngle,
@@ -135,13 +135,13 @@ struct STEVESUEHELPERS_API FStevesEditorVisSphere
 	GENERATED_BODY()
 
 	/// Location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	/// Sphere radius
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Radius;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisSphere(const FVector& InLocation, float InRadius, const FColor& InColour) :
@@ -165,16 +165,16 @@ struct STEVESUEHELPERS_API FStevesEditorVisBox
 	GENERATED_BODY()
 
 	/// Location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	/// Size of box in each axis
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Size;
 	/// Rotation relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisBox(const FVector& InLocation, const FVector& InSize, const FRotator& InRot,
@@ -201,19 +201,19 @@ struct STEVESUEHELPERS_API FStevesEditorVisCylinder
 	GENERATED_BODY()
 
 	/// Location relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	/// Height of cylinder
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Height;
 	/// Radius of cylinder
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Radius;
 	/// Rotation relative to component
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation;
 	/// The colour of the line render 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
 
 	FStevesEditorVisCylinder(const FVector& InLocation, float InHeight, float InRadius, const FRotator& InRot,
