@@ -111,7 +111,7 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 		if (IsValid(Mesh.Mesh))
 		{
 			const FTransform CombinedXForm = FTransform(Mesh.Rotation, Mesh.Location, Mesh.Scale) * XForm;
-			const FStaticMeshLODResources& Lod = Mesh.Mesh->GetLODForExport(0);
+			const FStaticMeshLODResources& Lod = Mesh.Mesh->GetLODForExport(Mesh.bUseLowestLOD ? Mesh.Mesh->GetNumLODs() - 1 : 0);
 			TArray<FDynamicMeshVertex> Vertices;
 			TArray<uint32> Indices;
 

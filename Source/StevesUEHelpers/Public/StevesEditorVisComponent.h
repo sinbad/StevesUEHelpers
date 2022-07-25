@@ -263,17 +263,22 @@ struct STEVESUEHELPERS_API FStevesEditorVisMesh
 	/// The colour of the line render 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Colour;
+	/// Whether to use the lowest detail LOD for vis 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bUseLowestLOD = true;
 
 	FStevesEditorVisMesh(UStaticMesh* InMesh,
 	                     const FVector& InLocation,
 	                     const FVector& InScale,
 	                     const FRotator& InRot,
-	                     const FColor& InColour) :
+	                     const FColor& InColour,
+	                     bool InUseLowestLOD = true) :
 		Mesh(InMesh),
 		Location(InLocation),
 		Scale(InScale),
 		Rotation(InRot),
-		Colour(InColour)
+		Colour(InColour),
+		bUseLowestLOD(InUseLowestLOD)
 	{
 	}
 
