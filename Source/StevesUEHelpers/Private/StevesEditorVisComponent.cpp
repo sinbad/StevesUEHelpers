@@ -2,6 +2,7 @@
 
 
 #include "StevesEditorVisComponent.h"
+#include "StaticMeshResources.h"
 #include "StevesDebugRenderSceneProxy.h"
 
 UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer)
@@ -104,6 +105,31 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 			LocalX, LocalY, LocalZ,
 			HalfH, Capsule.Colour));
 	}
+	for (auto& Mesh : Meshes)
+	{
+		// Apply local rotation first then parent transform
+		if (IsValid(Mesh.Mesh))
+		{
+			const FTransform CombinedXForm = FTransform(Mesh.Rotation, Mesh.Location, Mesh.Scale) * XForm;
+			const FStaticMeshLODResources& Lod = Mesh.Mesh->GetLODForExport(0);
+			TArray<FDynamicMeshVertex> Vertices;
+			TArray<uint32> Indices;
+
+			Lod.IndexBuffer.GetCopy(Indices);
+			auto& PosBuffer = Lod.VertexBuffers.PositionVertexBuffer;
+			uint32 NumVerts = PosBuffer.GetNumVertices();
+			Vertices.Reserve(NumVerts);
+			for (uint32 i = 0; i < NumVerts; ++i)
+			{
+				Vertices.Add(FDynamicMeshVertex(PosBuffer.VertexPosition(i)));
+			}
+			
+			Ret->MeshesImproved.Add(FStevesDebugRenderSceneProxy::FDebugMesh(CombinedXForm.ToMatrixWithScale(), Vertices, Indices, Mesh.Colour));
+			
+		}
+		
+		
+	}
 
 	return Ret;
 	
@@ -165,6 +191,15 @@ FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalTo
 		FTransform XForm = FTransform(Capsule.Rotation, Capsule.Location);
 		DBox = DBox.TransformBy(XForm);
 		B = B + FBoxSphereBounds(DBox);
+	}
+	for (auto& Mesh : Meshes)
+	{
+		if (IsValid(Mesh.Mesh))
+		{
+			const FTransform XForm = FTransform(Mesh.Rotation, Mesh.Location, Mesh.Scale);
+			B = B + Mesh.Mesh->GetBounds().TransformBy(XForm);
+		}
+		
 	}
 	return B.TransformBy(LocalToWorld);
 }

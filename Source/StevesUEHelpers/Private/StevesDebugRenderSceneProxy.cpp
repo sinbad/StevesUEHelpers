@@ -9,7 +9,6 @@ void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSc
 {
 	FDebugRenderSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
 
-
 	for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
 	{
 		if (VisibilityMap & (1 << ViewIndex))
@@ -60,6 +59,24 @@ void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSc
 								   16,
 								   SDPG_Foreground);
 			}
+
+			
+			for (const auto& Mesh : MeshesImproved)
+			{
+				FDynamicMeshBuilder MeshBuilder(View->GetFeatureLevel());
+				MeshBuilder.AddVertices(Mesh.Vertices);
+				MeshBuilder.AddTriangles(Mesh.Indices);
+
+				// Parent caches these (only within this function) but let's assume that's not worth it. Will people really
+				// have lots of meshes with a shared colour in this single context to make it worth it?
+				const auto MatRenderProxy = new(FMemStack::Get()) FColoredMaterialRenderProxy(GEngine->WireframeMaterial->GetRenderProxy(), Mesh.Color);
+				FDynamicMeshBuilderSettings Settings;
+				Settings.bWireframe = true;
+				Settings.bUseSelectionOutline = false;
+				Settings.bUseWireframeSelectionColoring = true;
+				MeshBuilder.GetMesh(Mesh.LocalToWorld, MatRenderProxy, SDPG_World, Settings, nullptr, ViewIndex, Collector);
+			}
+			
 		}
 	}
 }

@@ -242,6 +242,50 @@ struct STEVESUEHELPERS_API FStevesEditorVisCapsule : public FStevesEditorVisCyli
 	GENERATED_BODY()
 
 };
+
+USTRUCT(BlueprintType)
+struct STEVESUEHELPERS_API FStevesEditorVisMesh
+{
+	GENERATED_BODY()
+
+	/// The mesh do display
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMesh* Mesh;
+	/// Location relative to component
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Location;
+	/// Scale of the mesh compared to component scale
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Scale;
+	/// Rotation relative to component
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator Rotation;
+	/// The colour of the line render 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FColor Colour;
+
+	FStevesEditorVisMesh(UStaticMesh* InMesh,
+	                     const FVector& InLocation,
+	                     const FVector& InScale,
+	                     const FRotator& InRot,
+	                     const FColor& InColour) :
+		Mesh(InMesh),
+		Location(InLocation),
+		Scale(InScale),
+		Rotation(InRot),
+		Colour(InColour)
+	{
+	}
+
+	FStevesEditorVisMesh() : Mesh(nullptr),
+	                         Location(FVector::ZeroVector),
+	                         Scale(FVector::OneVector),
+	                         Rotation(FRotator::ZeroRotator),
+	                         Colour(FColor::White)
+	{
+	}
+};
+
 /**
  *
  * A component that solely exists to provide arbitrary editor visualisation when not selected.
@@ -277,6 +321,8 @@ public:
 	TArray<FStevesEditorVisCylinder> Cylinders;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStevesEditorVisCapsule> Capsules;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStevesEditorVisMesh> Meshes;
 
 	UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer);
 

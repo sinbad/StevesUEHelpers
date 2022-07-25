@@ -92,11 +92,30 @@ public:
 		int NumSegments;
 		FColor Color;
 	};
-	
+
+	struct FDebugMesh
+	{
+		FDebugMesh(const FMatrix& InLocalToWorld,
+			const TArray<FDynamicMeshVertex>& InVertices,
+			const TArray<uint32>& InIndices,
+			const FColor& InColor)
+			: LocalToWorld(InLocalToWorld),
+			  Vertices(InVertices),
+			  Indices(InIndices),
+			  Color(InColor)
+		{
+		}
+
+		FMatrix LocalToWorld;
+		TArray<FDynamicMeshVertex>	Vertices;
+		TArray <uint32> Indices;
+		FColor Color;
+	};
 
 	TArray<FDebugCircle> Circles;
 	TArray<FDebugArc> Arcs;
 	TArray<FDebugCylinder> CylindersImproved; // Because we need our own
 	TArray<FCapsule> CapsulesImproved; // Because we need our own
+	TArray<FDebugMesh> MeshesImproved; // Because we need our own
 
 };
