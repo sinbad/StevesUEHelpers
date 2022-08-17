@@ -1,0 +1,314 @@
+﻿// Original Copyright (c) Sam Bloomberg https://github.com/redxdev/UnrealRichTextDialogueBox (MIT License)
+
+#include "StevesUI/TypewriterTextWidget.h"
+#include "Engine/Font.h"
+#include "Styling/SlateStyle.h"
+#include "Widgets/Text/SRichTextBlock.h"
+
+//PRAGMA_DISABLE_OPTIMIZATION
+
+TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
+{
+	// Copied from URichTextBlock::RebuildWidget
+	UpdateStyleData();
+
+	TArray< TSharedRef< class ITextDecorator > > CreatedDecorators;
+	CreateDecorators(CreatedDecorators);
+
+	TextMarshaller = FRichTextLayoutMarshaller::Create(CreateMarkupParser(), CreateMarkupWriter(), CreatedDecorators, StyleInstance.Get());
+
+	MyRichTextBlock =
+		SNew(SRichTextBlock)
+		.TextStyle(bOverrideDefaultStyle ? &DefaultTextStyleOverride : &DefaultTextStyle)
+		.Marshaller(TextMarshaller)
+		.CreateSlateTextLayout(
+			FCreateSlateTextLayout::CreateWeakLambda(this, [this] (SWidget* InOwner, const FTextBlockStyle& InDefaultTextStyle) mutable
+			{
+				TextLayout = FSlateTextLayout::Create(InOwner, InDefaultTextStyle);
+				return StaticCastSharedPtr<FSlateTextLayout>(TextLayout).ToSharedRef();
+			}));
+
+	return MyRichTextBlock.ToSharedRef();
+}
+
+UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bHasFinishedPlaying = true;
+}
+
+void UTypewriterTextWidget::SetText(const FText& InText)
+{
+	if (IsValid(LineText))
+	{
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		TimerManager.ClearTimer(LetterTimer);
+		
+		LineText->SetText(InText);
+	}
+}
+
+FText UTypewriterTextWidget::GetText() const
+{
+	if (IsValid(LineText))
+	{
+		return LineText->GetText();
+	}
+
+	return FText();
+}
+
+void UTypewriterTextWidget::PlayLine(const FText& InLine)
+{
+	check(GetWorld());
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearTimer(LetterTimer);
+
+	CurrentLine = InLine;
+	CurrentLetterIndex = 0;
+	CachedLetterIndex = 0;
+	CurrentSegmentIndex = 0;
+	MaxLetterIndex = 0;
+	NumberOfLines = 0;
+	CombinedTextHeight = 0;
+	Segments.Empty();
+	CachedSegmentText.Empty();
+
+	if (CurrentLine.IsEmpty())
+	{
+		if (IsValid(LineText))
+		{
+			LineText->SetText(FText::GetEmpty());
+		}
+
+		bHasFinishedPlaying = true;
+		OnTypewriterLineFinished.Broadcast(this);
+		OnLineFinishedPlaying();
+
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		if (IsValid(LineText))
+		{
+			LineText->SetText(FText::GetEmpty());
+		}
+
+		bHasFinishedPlaying = false;
+
+		FTimerDelegate Delegate;
+		Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
+
+		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime, true);
+
+		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+}
+
+void UTypewriterTextWidget::SkipToLineEnd()
+{
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearTimer(LetterTimer);
+
+	CurrentLetterIndex = MaxLetterIndex - 1;
+	if (IsValid(LineText))
+	{
+		LineText->SetText(FText::FromString(CalculateSegments()));
+	}
+
+	bHasFinishedPlaying = true;
+	OnTypewriterLineFinished.Broadcast(this);
+	OnLineFinishedPlaying();
+}
+
+void UTypewriterTextWidget::PlayNextLetter()
+{
+	if (Segments.Num() == 0)
+	{
+		CalculateWrappedString();
+	}
+
+	FString WrappedString = CalculateSegments();
+
+	// TODO: How do we keep indexing of text i18n-friendly?
+	if (CurrentLetterIndex < MaxLetterIndex)
+	{
+		if (IsValid(LineText))
+		{
+			LineText->SetText(FText::FromString(WrappedString));
+		}
+
+		OnPlayLetter();
+		++CurrentLetterIndex;
+	}
+	else
+	{
+		if (IsValid(LineText))
+		{
+			LineText->SetText(FText::FromString(CalculateSegments()));
+		}
+
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		TimerManager.ClearTimer(LetterTimer);
+
+		FTimerDelegate Delegate;
+		Delegate.BindUObject(this, &ThisClass::SkipToLineEnd);
+
+		TimerManager.SetTimer(LetterTimer, Delegate, EndHoldTime, false);
+	}
+}
+
+void UTypewriterTextWidget::CalculateWrappedString()
+{
+	// Rich Text views give you:
+	// - A blank block at the start for some reason
+	// - One block per line (newline characters stripped)
+	//   - Split for different runs (decorators)
+	// - The newlines we add are the only newlines in the output so that's the number of lines
+	// If we've got here, that means the text isn't empty so 1 line at least
+	NumberOfLines = 1;
+	if (IsValid(LineText) && LineText->GetTextLayout().IsValid())
+	{
+		TSharedPtr<FSlateTextLayout> Layout = LineText->GetTextLayout();
+		TSharedPtr<FRichTextLayoutMarshaller> Marshaller = LineText->GetTextMarshaller();
+
+		const FGeometry& TextBoxGeometry = LineText->GetCachedGeometry();
+		const FVector2D TextBoxSize = TextBoxGeometry.GetLocalSize();
+
+		Layout->SetWrappingWidth(TextBoxSize.X);
+		Marshaller->SetText(CurrentLine.ToString(), *Layout.Get());
+		Layout->UpdateIfNeeded();
+
+		bool bHasWrittenText = false;
+		auto Views = Layout->GetLineViews();
+		for (int v = 0; v < Views.Num(); ++v)
+		{
+			const FTextLayout::FLineView& View = Views[v];
+
+			for (int b = 0; b < View.Blocks.Num(); ++b)
+			{
+				TSharedRef<ILayoutBlock> Block = View.Blocks[b];
+				TSharedRef<IRun> Run = Block->GetRun();
+
+				FTypewriterTextSegment Segment;
+				Run->AppendTextTo(Segment.Text, Block->GetTextRange());
+
+				// HACK: For some reason image decorators (and possibly other decorators that don't
+				// have actual text inside them) result in the run containing a zero width space instead of
+				// nothing. This messes up our checks for whether the text is empty or not, which doesn't
+				// have an effect on image decorators but might cause issues for other custom ones.
+				// Instead of emptying text, which might have some unknown effect, just mark it as empty 
+				const bool bTextIsEmpty = Segment.Text.IsEmpty() ||
+					(Segment.Text.Len() == 1 && Segment.Text[0] == 0x200B);
+				const int TextLen = bTextIsEmpty ? 0 : Segment.Text.Len();
+				const bool bRunIsEmpty = Segment.RunInfo.Name.IsEmpty();
+
+				Segment.RunInfo = Run->GetRunInfo();
+				Segments.Add(Segment);
+
+				// A segment with a named run should still take up time for the typewriter effect.
+				MaxLetterIndex += FMath::Max(TextLen, Segment.RunInfo.Name.IsEmpty() ? 0 : 1);
+
+				if (!bTextIsEmpty || !bRunIsEmpty)
+				{
+					bHasWrittenText = true;
+				}
+			}
+
+			if (bHasWrittenText)
+			{
+				CombinedTextHeight += View.TextHeight;
+			}
+			// Add check for an unnecessary newline after ever line even if there's nothing else to do, otherwise
+			// we end up inserting a newline after a simple single line of text
+			const bool bHasMoreText = v < (Views.Num() - 1);
+			if (bHasWrittenText && bHasMoreText)
+			{
+				Segments.Add(FTypewriterTextSegment{TEXT("\n")});
+				++NumberOfLines;
+				++MaxLetterIndex;
+			}
+		}
+
+		Layout->SetWrappingWidth(0);
+
+		// Set the desired vertical size so that we're already the size we need to accommodate all lines
+		// Without this, a flexible box size will grow as lines are added
+		FVector2D Sz = GetMinimumDesiredSize();
+		Sz.Y = CombinedTextHeight;
+		SetMinimumDesiredSize(Sz);
+		
+		LineText->SetText(LineText->GetText());
+	}
+	else
+	{
+		Segments.Add(FTypewriterTextSegment{CurrentLine.ToString()});
+		MaxLetterIndex = Segments[0].Text.Len();
+	}
+
+}
+
+FString UTypewriterTextWidget::CalculateSegments()
+{
+	FString Result = CachedSegmentText;
+
+	int32 Idx = CachedLetterIndex;
+	while (Idx <= CurrentLetterIndex && CurrentSegmentIndex < Segments.Num())
+	{
+		const FTypewriterTextSegment& Segment = Segments[CurrentSegmentIndex];
+		if (!Segment.RunInfo.Name.IsEmpty())
+		{
+			Result += FString::Printf(TEXT("<%s"), *Segment.RunInfo.Name);
+
+			if (Segment.RunInfo.MetaData.Num() > 0)
+			{
+				for (const TTuple<FString, FString>& MetaData : Segment.RunInfo.MetaData)
+				{
+					Result += FString::Printf(TEXT(" %s=\"%s\""), *MetaData.Key, *MetaData.Value);
+				}
+			}
+
+			if (Segment.Text.IsEmpty())
+			{
+				Result += TEXT("/>");
+				++Idx; // This still takes up an index for the typewriter effect.
+			}
+			else
+			{
+				Result += TEXT(">");
+			}
+		}
+
+		bool bIsSegmentComplete = true;
+		if (!Segment.Text.IsEmpty())
+		{
+			int32 LettersLeft = CurrentLetterIndex - Idx + 1;
+			bIsSegmentComplete = LettersLeft >= Segment.Text.Len();
+			LettersLeft = FMath::Min(LettersLeft, Segment.Text.Len());
+			Idx += LettersLeft;
+
+			Result += Segment.Text.Mid(0, LettersLeft);
+
+			if (!Segment.RunInfo.Name.IsEmpty())
+			{
+				Result += TEXT("</>");
+			}
+		}
+
+		if (bIsSegmentComplete)
+		{
+			CachedLetterIndex = Idx;
+			CachedSegmentText = Result;
+			++CurrentSegmentIndex;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return Result;
+}
+
+//PRAGMA_ENABLE_OPTIMIZATION

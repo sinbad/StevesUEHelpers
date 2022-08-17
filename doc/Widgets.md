@@ -24,6 +24,13 @@ Several custom widgets are supplied to assist with some common challenges:
   the input control which is bound to that input action right now. 
   Again this dynamically switches as input method changes.
 
+* [Typewriter Rich Text Widget](TypewriterText.md)
+
+  A widget that allows you to use the "typewriter effect" to display text
+  (displaying one character at a time). Pre-calculates line breaks so text
+  doesn't try to fit in then jump down, and pre-calculates desired height so
+  your flexible boxes are always the right size *before* the text is played.
+
 * [Menu System](Menus.md)
 
   A couple of classes to make it  easy to create multi-level on-screen menus 
