@@ -49,7 +49,11 @@ void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSc
 			for (const auto& C : CapsulesImproved)
 			{
 				::DrawWireCapsule(PDI,
+#if ENGINE_MAJOR_VERSION >= 5					
+								   C.Base,
+#else
 								   C.Location,
+#endif
 								   C.X,
 								   C.Y,
 								   C.Z,
