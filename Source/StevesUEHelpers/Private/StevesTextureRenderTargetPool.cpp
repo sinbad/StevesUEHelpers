@@ -50,6 +50,13 @@ void FStevesTextureRenderTargetPool::AddReferencedObjects(FReferenceCollector& C
 	Collector.AddReferencedObjects(UnreservedTextures);
 }
 
+#if ENGINE_MAJOR_VERSION >= 5
+FString FStevesTextureRenderTargetPool::GetReferencerName() const
+{
+	return "FStevesTextureRenderTargetPool";
+}
+#endif
+
 FStevesTextureRenderTargetReservationPtr FStevesTextureRenderTargetPool::ReserveTexture(FIntPoint Size,
                                                                                         ETextureRenderTargetFormat Format, const UObject* Owner)
 {

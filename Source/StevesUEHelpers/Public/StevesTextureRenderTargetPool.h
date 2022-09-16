@@ -110,7 +110,11 @@ public:
 
 	// FGCObject
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
-	
+
+#if ENGINE_MAJOR_VERSION >= 5
+	// FGCObject
+	virtual FString GetReferencerName() const override;
+#endif
 	/**
 	 * Reserve a texture for use as a render target. This will create a new texture target if needed. 
 	 * @param Size The dimensions of the texture
