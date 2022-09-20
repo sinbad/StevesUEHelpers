@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a helper plugin library for [Unreal Engine 4](https://www.unrealengine.com) 
+This is a helper plugin library for [Unreal Engine](https://www.unrealengine.com) (version 4.26+ / 5.0+)
 which makes a bunch of things better:
 
 * [New Widgets](doc/Widgets.md)
