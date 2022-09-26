@@ -45,6 +45,8 @@ void UTypewriterTextWidget::SetText(const FText& InText)
 		TimerManager.ClearTimer(LetterTimer);
 		
 		LineText->SetText(InText);
+
+		bHasFinishedPlaying = true;
 	}
 }
 
