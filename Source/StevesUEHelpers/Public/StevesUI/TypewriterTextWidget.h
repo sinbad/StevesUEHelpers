@@ -78,7 +78,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
-	void PlayLine(const FText& InLine);
+	void PlayLine(const FText& InLine, float Speed = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void GetCurrentLine(FText& OutLine) const { OutLine = CurrentLine; }

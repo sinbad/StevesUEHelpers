@@ -60,7 +60,7 @@ FText UTypewriterTextWidget::GetText() const
 	return FText();
 }
 
-void UTypewriterTextWidget::PlayLine(const FText& InLine)
+void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 {
 	check(GetWorld());
 
@@ -102,7 +102,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine)
 		FTimerDelegate Delegate;
 		Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
 
-		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime, true);
+		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/Speed, true);
 
 		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
