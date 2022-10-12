@@ -36,6 +36,8 @@ public:
 		return TextMarshaller;
 	}
 
+	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
+	
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 

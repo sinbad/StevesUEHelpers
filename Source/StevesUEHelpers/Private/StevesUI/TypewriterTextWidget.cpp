@@ -7,6 +7,14 @@
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
+void URichTextBlockForTypewriter::ReleaseSlateResources(bool bReleaseChildren)
+{
+	Super::ReleaseSlateResources(bReleaseChildren);
+
+	TextLayout.Reset();
+	TextMarshaller.Reset();
+}
+
 TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
 {
 	// Copied from URichTextBlock::RebuildWidget
