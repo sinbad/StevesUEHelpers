@@ -10,7 +10,7 @@
 /// A special widget containing an image which populates itself based on an input action / axis and can dynamically
 /// change based on the active input method.
 UCLASS()
-class STEVESUEHELPERS_API UInputImage : public UImage
+class STEVESUEHELPERS_API UInputImage : public UImage, public FTickableGameObject
 {
     GENERATED_BODY()
 
@@ -39,9 +39,13 @@ protected:
     UPROPERTY(EditAnywhere)   
     UUiTheme* CustomTheme;
 
-    bool bSubbedToInputEvents = false;
+    UPROPERTY(EditAnywhere)   
+    bool bUpdateWhilePaused = true;
 
-    FTimerHandle DelayedUpdateImageTimer;
+    bool bSubbedToInputEvents = false;
+    bool bIsDirty = true;
+    float DelayUpdate = 0;
+
 public:
 
     /// Tell this image to display the bound action for the current input method
@@ -76,6 +80,16 @@ public:
     virtual void BeginDestroy() override;
 
     virtual void SetVisibility(ESlateVisibility InVisibility) override;
+
+    // FTickableGameObject begin
+    virtual void Tick(float DeltaTime) override;
+    virtual TStatId GetStatId() const override;
+    virtual bool IsTickableWhenPaused() const override;
+    virtual bool IsTickableInEditor() const override;
+    virtual bool IsTickable() const override;
+    virtual ETickableTickType GetTickableTickType() const override;
+    // FTickableGameObject end
+    
     
 protected:
 

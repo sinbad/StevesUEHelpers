@@ -107,15 +107,50 @@ void UInputImage::UpdateImage()
             SetBrushFromAtlasInterface(Sprite, true);
         }
     }
-    DelayedUpdateImageTimer.Invalidate();
+    bIsDirty = false;
+    DelayUpdate = 0;
 }
 
 void UInputImage::MarkImageDirty()
 {
-    if (!DelayedUpdateImageTimer.IsValid())
-    {
-        // Delayed update
-        GetWorld()->GetTimerManager().SetTimer(DelayedUpdateImageTimer, this, &UInputImage::UpdateImage, 0.5f);
-    }
-
+    bIsDirty = true;
+    DelayUpdate = 0.5f;
 }
+
+// Tickables
+// We need a tick rather than FTimer because timers won't run when game is paused, and UIs are useful while paused! 
+ETickableTickType UInputImage::GetTickableTickType() const
+{
+    return ETickableTickType::Conditional;
+}
+bool UInputImage::IsTickableWhenPaused() const
+{
+    // UIs need to update while game is paused
+    return true;
+}
+bool UInputImage::IsTickableInEditor() const
+{
+    return false;
+}
+
+bool UInputImage::IsTickable() const
+{
+    // Only need to tick while dirty
+    return bIsDirty;
+}
+
+void UInputImage::Tick(float DeltaTime)
+{
+    DelayUpdate -= DeltaTime;
+    if (DelayUpdate <= 0)
+    {
+        UpdateImage();
+    }
+}
+
+TStatId UInputImage::GetStatId() const
+{
+    RETURN_QUICK_DECLARE_CYCLE_STAT( UInputImage, STATGROUP_Tickables );
+}
+
+// Tickables
