@@ -39,9 +39,6 @@ protected:
     UPROPERTY(EditAnywhere)   
     UUiTheme* CustomTheme;
 
-    UPROPERTY(EditAnywhere)   
-    bool bUpdateWhilePaused = true;
-
     bool bSubbedToInputEvents = false;
     bool bIsDirty = true;
     float DelayUpdate = 0;
