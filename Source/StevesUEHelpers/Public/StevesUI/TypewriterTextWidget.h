@@ -61,14 +61,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	URichTextBlockForTypewriter* LineText;
 
-	// The amount of time between printing individual letters (for the "typewriter" effect).
+	/// The amount of time between printing individual letters (for the "typewriter" effect).
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float LetterPlayTime = 0.025f;
 
-	// The amount of time to wait after finishing the line before actually marking it completed.
-	// This helps prevent accidentally progressing dialogue on short lines.
+	/// The amount of time to wait after finishing the line before actually marking it completed.
+	/// This helps prevent accidentally progressing dialogue on short lines.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float EndHoldTime = 0.15f;
+
+	/// How long to pause at sentence terminators ('.', '!', '?') before proceeding (ignored if at end of text)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	float PauseTimeAtSentenceTerminators = 0.5f;
 
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable)
@@ -100,6 +104,7 @@ protected:
 
 private:
 	void PlayNextLetter();
+	static bool IsSentenceTerminator(TCHAR Letter);
 
 	void CalculateWrappedString();
 	FString CalculateSegments();
@@ -130,4 +135,6 @@ private:
 	uint32 bHasFinishedPlaying : 1;
 
 	FTimerHandle LetterTimer;
+	float CurrentPlaySpeed = 1;
+	float PauseTime = 0;
 };

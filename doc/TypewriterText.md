@@ -14,6 +14,7 @@ skip to the end of the text if needed.
   height container, the height is correct before anything is played
 * Supports decorators like inline images
 * Respects explicit line breaks in your text
+* Pauses on sentence terminators within a multi-sentence block (configurable)
 
 ## Usage
 

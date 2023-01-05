@@ -82,6 +82,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 	MaxLetterIndex = 0;
 	NumberOfLines = 0;
 	CombinedTextHeight = 0;
+	CurrentPlaySpeed = Speed;
 	Segments.Empty();
 	CachedSegmentText.Empty();
 
@@ -110,7 +111,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 		FTimerDelegate Delegate;
 		Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
 
-		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/Speed, true);
+		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/CurrentPlaySpeed, true);
 
 		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
@@ -137,6 +138,14 @@ void UTypewriterTextWidget::PlayNextLetter()
 	if (Segments.Num() == 0)
 	{
 		CalculateWrappedString();
+	}
+
+	// Incorporate pauses as a multiple of play timer (may not be exact but close enough)
+	if (PauseTime > 0)
+	{
+		PauseTime -= LetterPlayTime/CurrentPlaySpeed;
+		if (PauseTime > 0)
+			return;
 	}
 
 	FString WrappedString = CalculateSegments();
@@ -167,6 +176,11 @@ void UTypewriterTextWidget::PlayNextLetter()
 
 		TimerManager.SetTimer(LetterTimer, Delegate, EndHoldTime, false);
 	}
+}
+
+bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter)
+{
+	return Letter == '.' || Letter == '!' || Letter == '?';
 }
 
 void UTypewriterTextWidget::CalculateWrappedString()
@@ -299,6 +313,16 @@ FString UTypewriterTextWidget::CalculateSegments()
 			Idx += LettersLeft;
 
 			Result += Segment.Text.Mid(0, LettersLeft);
+
+			// Add pause for sentence ends
+			if (Result.Len() > 0 &&
+				IsSentenceTerminator(Result[Result.Len() - 1]) &&
+				CurrentLetterIndex < MaxLetterIndex - 1) // Don't pause on the last letter, that's the end pause's job
+			{
+				// Look ahead to make sure we only pause on LAST sentence terminator in a chain of them
+				if (LettersLeft == Segment.Text.Len() || !IsSentenceTerminator(Segment.Text[LettersLeft]))
+					PauseTime = PauseTimeAtSentenceTerminators;
+			}
 
 			if (!Segment.RunInfo.Name.IsEmpty())
 			{
