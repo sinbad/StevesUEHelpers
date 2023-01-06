@@ -108,6 +108,9 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 
 		bHasFinishedPlaying = false;
 
+		LineText->SetText(FText());
+		CalculateWrappedString();
+		
 		FTimerDelegate Delegate;
 		Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
 
@@ -135,11 +138,6 @@ void UTypewriterTextWidget::SkipToLineEnd()
 
 void UTypewriterTextWidget::PlayNextLetter()
 {
-	if (Segments.Num() == 0)
-	{
-		CalculateWrappedString();
-	}
-
 	// Incorporate pauses as a multiple of play timer (may not be exact but close enough)
 	if (PauseTime > 0)
 	{
@@ -200,9 +198,10 @@ void UTypewriterTextWidget::CalculateWrappedString()
 		const FGeometry& TextBoxGeometry = LineText->GetCachedGeometry();
 		const FVector2D TextBoxSize = TextBoxGeometry.GetLocalSize();
 
+		Layout->ClearLines();
 		Layout->SetWrappingWidth(TextBoxSize.X);
 		Marshaller->SetText(CurrentLine.ToString(), *Layout.Get());
-		Layout->UpdateIfNeeded();
+		Layout->UpdateLayout();
 
 		bool bHasWrittenText = false;
 		auto Views = Layout->GetLineViews();
