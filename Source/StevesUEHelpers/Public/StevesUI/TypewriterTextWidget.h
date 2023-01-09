@@ -65,6 +65,7 @@ public:
 	FOnTypewriterLetterAdded OnTypewriterLetterAdded;
 
 	/// Event called when the "run name" of the text changes aka the rich text style markup. Also called when reverts to default.
+	UPROPERTY(BlueprintAssignable)
 	FOnTypewriterRunNameChanged OnTypewriterRunNameChanged;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
