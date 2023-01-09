@@ -18,6 +18,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLineFinished, class UTypewriterTextWidget*, Widget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLetterAdded, class UTypewriterTextWidget*, Widget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterRunNameChanged, class UTypewriterTextWidget*, Widget, const FString&, NewRunName);
 /**
  * A text block that exposes more information about text layout for typewriter widget.
  */
@@ -62,6 +63,9 @@ public:
 	/// Event called when one or more new letters have been displayed
 	UPROPERTY(BlueprintAssignable)
 	FOnTypewriterLetterAdded OnTypewriterLetterAdded;
+
+	/// Event called when the "run name" of the text changes aka the rich text style markup. Also called when reverts to default.
+	FOnTypewriterRunNameChanged OnTypewriterRunNameChanged;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	URichTextBlockForTypewriter* LineText;

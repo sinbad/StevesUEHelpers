@@ -147,10 +147,17 @@ void UTypewriterTextWidget::PlayNextLetter()
 			return;
 	}
 
-	FString WrappedString = CalculateSegments(&CurrentRunName);
+	FString NewRunName;
+	const FString WrappedString = CalculateSegments(&NewRunName);
 	if (IsValid(LineText))
 	{
 		LineText->SetText(FText::FromString(WrappedString));
+	}
+
+	if (NewRunName != CurrentRunName)
+	{
+		CurrentRunName = NewRunName;
+		OnTypewriterRunNameChanged.Broadcast(this, NewRunName);
 	}
 
 	// TODO: How do we keep indexing of text i18n-friendly?
