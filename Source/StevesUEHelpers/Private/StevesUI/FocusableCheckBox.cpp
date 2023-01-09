@@ -6,11 +6,11 @@ TSharedRef<SWidget> UFocusableCheckBox::RebuildWidget()
 {
     MyCheckbox = SNew(SFocusableCheckBox)
         .OnCheckStateChanged( BIND_UOBJECT_DELEGATE(FOnCheckStateChanged, SlateOnCheckStateChangedCallback) )
-        .Style(&WidgetStyle)
+        .Style(&GetWidgetStyle())
         .HAlign( HorizontalAlignment )
-        .ClickMethod(ClickMethod)
-        .TouchMethod(TouchMethod)
-        .PressMethod(PressMethod)
+        .ClickMethod(GetClickMethod())
+        .TouchMethod(GetTouchMethod())
+        .PressMethod(GetPressMethod())
         .IsFocusable(IsFocusable)
         // Our new events
         .OnHovered(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleHovered))
@@ -34,7 +34,7 @@ TSharedRef<SWidget> UFocusableCheckBox::RebuildWidget()
 void UFocusableCheckBox::RefreshFocussedStyle_Implementation()
 {
     // Copy Widget style but make normal same as hovered    
-    FocussedStyle = WidgetStyle;
+    FocussedStyle = GetWidgetStyle();
     FocussedStyle.UncheckedImage = FocussedStyle.UncheckedHoveredImage;
     FocussedStyle.CheckedImage = FocussedStyle.CheckedHoveredImage;
     FocussedStyle.UndeterminedImage = FocussedStyle.UndeterminedHoveredImage;
@@ -65,7 +65,7 @@ void UFocusableCheckBox::UndoFocusStyle()
 {
     if (MyCheckbox.IsValid())
     {
-        MyCheckbox->SetStyle(&WidgetStyle);
+        MyCheckbox->SetStyle(&GetWidgetStyle());
     }
 }
 
