@@ -76,6 +76,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 	TimerManager.ClearTimer(LetterTimer);
 
 	CurrentLine = InLine;
+	CurrentRunName = "";
 	CurrentLetterIndex = 0;
 	CachedLetterIndex = 0;
 	CurrentSegmentIndex = 0;
@@ -128,7 +129,7 @@ void UTypewriterTextWidget::SkipToLineEnd()
 	CurrentLetterIndex = MaxLetterIndex - 1;
 	if (IsValid(LineText))
 	{
-		LineText->SetText(FText::FromString(CalculateSegments()));
+		LineText->SetText(FText::FromString(CalculateSegments(nullptr)));
 	}
 
 	bHasFinishedPlaying = true;
@@ -146,26 +147,21 @@ void UTypewriterTextWidget::PlayNextLetter()
 			return;
 	}
 
-	FString WrappedString = CalculateSegments();
+	FString WrappedString = CalculateSegments(&CurrentRunName);
+	if (IsValid(LineText))
+	{
+		LineText->SetText(FText::FromString(WrappedString));
+	}
 
 	// TODO: How do we keep indexing of text i18n-friendly?
 	if (CurrentLetterIndex < MaxLetterIndex)
 	{
-		if (IsValid(LineText))
-		{
-			LineText->SetText(FText::FromString(WrappedString));
-		}
-
 		OnPlayLetter();
+		OnTypewriterLetterAdded.Broadcast(this);
 		++CurrentLetterIndex;
 	}
 	else
 	{
-		if (IsValid(LineText))
-		{
-			LineText->SetText(FText::FromString(CalculateSegments()));
-		}
-
 		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 		TimerManager.ClearTimer(LetterTimer);
 
@@ -272,7 +268,7 @@ void UTypewriterTextWidget::CalculateWrappedString()
 
 }
 
-FString UTypewriterTextWidget::CalculateSegments()
+FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 {
 	FString Result = CachedSegmentText;
 
@@ -338,6 +334,18 @@ FString UTypewriterTextWidget::CalculateSegments()
 		else
 		{
 			break;
+		}
+	}
+
+	if (OutCurrentRunName)
+	{
+		if (CurrentSegmentIndex < Segments.Num())
+		{
+			*OutCurrentRunName = Segments[CurrentSegmentIndex].RunInfo.Name;
+		}
+		else
+		{
+			*OutCurrentRunName = "";
 		}
 	}
 

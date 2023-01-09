@@ -17,6 +17,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLineFinished, class UTypewriterTextWidget*, Widget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLetterAdded, class UTypewriterTextWidget*, Widget);
 /**
  * A text block that exposes more information about text layout for typewriter widget.
  */
@@ -58,6 +59,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTypewriterLineFinished OnTypewriterLineFinished;
 
+	/// Event called when one or more new letters have been displayed
+	UPROPERTY(BlueprintAssignable)
+	FOnTypewriterLetterAdded OnTypewriterLetterAdded;
+	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	URichTextBlockForTypewriter* LineText;
 
@@ -95,22 +100,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void SkipToLineEnd();
 
+	/// Get the name of the current rich text run, if any
+	const FString& GetCurrentRunName() const { return CurrentRunName; }
+
 protected:
+	/// Called when on or more letters are added, if subclasses want to override
 	UFUNCTION(BlueprintImplementableEvent, Category = "Typewriter")
 	void OnPlayLetter();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Typewriter")
 	void OnLineFinishedPlaying();
 
+	/// Name of the current rich text run, if any
+	/// Can be used to identify the style of the most recently played letter
+	UPROPERTY(BlueprintReadOnly, Category = "Typewriter")
+	FString CurrentRunName;
+
+
 private:
 	void PlayNextLetter();
 	static bool IsSentenceTerminator(TCHAR Letter);
 
 	void CalculateWrappedString();
-	FString CalculateSegments();
+	FString CalculateSegments(FString* OutCurrentRunName);
 
 	UPROPERTY()
 	FText CurrentLine;
+
+	
 
 	struct FTypewriterTextSegment
 	{
