@@ -160,11 +160,12 @@ void UTypewriterTextWidget::PlayNextLetter()
 		OnTypewriterRunNameChanged.Broadcast(this, NewRunName);
 	}
 
+	OnPlayLetter();
+	OnTypewriterLetterAdded.Broadcast(this, WrappedString.Right(1));
+
 	// TODO: How do we keep indexing of text i18n-friendly?
 	if (CurrentLetterIndex < MaxLetterIndex)
 	{
-		OnPlayLetter();
-		OnTypewriterLetterAdded.Broadcast(this);
 		++CurrentLetterIndex;
 	}
 	else

@@ -17,7 +17,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLineFinished, class UTypewriterTextWidget*, Widget);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLetterAdded, class UTypewriterTextWidget*, Widget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterLetterAdded, class UTypewriterTextWidget*, Widget, const FString&, Char);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterRunNameChanged, class UTypewriterTextWidget*, Widget, const FString&, NewRunName);
 /**
  * A text block that exposes more information about text layout for typewriter widget.
