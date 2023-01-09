@@ -331,6 +331,11 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 			{
 				Result += TEXT("</>");
 			}
+			if (OutCurrentRunName)
+			{
+				*OutCurrentRunName = Segment.RunInfo.Name;
+			}
+			
 		}
 
 		if (bIsSegmentComplete)
@@ -344,19 +349,7 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 			break;
 		}
 	}
-
-	if (OutCurrentRunName)
-	{
-		if (CurrentSegmentIndex < Segments.Num())
-		{
-			*OutCurrentRunName = Segments[CurrentSegmentIndex].RunInfo.Name;
-		}
-		else
-		{
-			*OutCurrentRunName = "";
-		}
-	}
-
+	
 	return Result;
 }
 
