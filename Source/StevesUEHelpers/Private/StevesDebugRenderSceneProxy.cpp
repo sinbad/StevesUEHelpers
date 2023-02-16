@@ -73,7 +73,7 @@ void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSc
 
 				// Parent caches these (only within this function) but let's assume that's not worth it. Will people really
 				// have lots of meshes with a shared colour in this single context to make it worth it?
-				const auto MatRenderProxy = new(FMemStack::Get()) FColoredMaterialRenderProxy(GEngine->WireframeMaterial->GetRenderProxy(), Mesh.Color);
+				const auto MatRenderProxy = new FColoredMaterialRenderProxy(GEngine->WireframeMaterial->GetRenderProxy(), Mesh.Color);
 				FDynamicMeshBuilderSettings Settings;
 				Settings.bWireframe = true;
 				Settings.bUseSelectionOutline = false;
