@@ -114,10 +114,12 @@ void UInputImage::UpdateImage()
     if (GS)
     {
         UPaperSprite* Sprite = nullptr;
-        if (BindingType == EInputBindingType::EnhancedInputAction)
+        if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
         {
-            auto IA = InputAction.LoadSynchronous();
-            Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme);
+            if (auto IA = InputAction.LoadSynchronous())
+            {
+                Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme);
+            }
         }
         else
         {

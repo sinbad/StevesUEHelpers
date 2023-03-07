@@ -1,7 +1,9 @@
 #include "StevesGameSubsystem.h"
 
+#include "EngineUtils.h"
 #include "EnhancedInputSubsystems.h"
 #include "StevesGameViewportClientBase.h"
+#include "StevesPluginSettings.h"
 #include "StevesUEHelpers.h"
 #include "Engine/AssetManager.h"
 #include "Engine/GameInstance.h"
@@ -70,6 +72,39 @@ void UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()
     };
     FTimerHandle TempHandle;
     GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05, false);
+}
+
+TSoftObjectPtr<UInputAction> UStevesGameSubsystem::FindEnhancedInputAction(const FString& Name)
+{
+    if (FAssetRegistryModule* AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+    {
+        IAssetRegistry& AssetRegistry = AssetRegistryModule->Get();
+        if (auto Settings = GetDefault<UStevesPluginSettings>())
+        {
+            for (const auto& Dir : Settings->EnhancedInputActionSearchDirectories)
+            {
+                if (!FPackageName::IsValidPath(Dir.Path))
+                {
+                    continue;
+                }
+
+                TArray<FAssetData> Assets;
+                FString Package = FPaths::Combine(Dir.Path, Name);
+                if (AssetRegistry.GetAssetsByPackageName(FName(*Package), Assets, true))
+                {
+                    for (const FAssetData& Asset : Assets)
+                    {
+                        if (Asset.GetClass() == UInputAction::StaticClass())
+                        {
+                            return TSoftObjectPtr<UInputAction>(Asset.GetSoftObjectPath());
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    return nullptr;
 }
 
 void UStevesGameSubsystem::InitTheme()

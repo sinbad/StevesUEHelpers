@@ -225,7 +225,11 @@ public:
      * @param Theme Optional explicit theme, if blank use the default theme
      * @return 
      */
-    UPaperSprite* GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action, EInputImageDevicePreference DevicePreference, int PlayerIdx, APlayerController* PC, UUiTheme* Theme);
+    UPaperSprite* GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action,
+                                                             EInputImageDevicePreference DevicePreference,
+                                                             int PlayerIdx,
+                                                             APlayerController* PC,
+                                                             UUiTheme* Theme = nullptr);
     
     /**
     * @brief Get an input button / key image from an action
@@ -291,5 +295,9 @@ public:
      * This call is however slightly delayed before being acted upon, because EI defers the rebuild of mappings until the next tick.
      */
     void NotifyEnhancedInputMappingsChanged();
+
+    /** Attempt to find an enhanced input action by name in the configured folders.
+     */
+    TSoftObjectPtr<UInputAction> FindEnhancedInputAction(const FString& Name);
 
 };
