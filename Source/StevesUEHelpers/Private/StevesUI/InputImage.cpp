@@ -12,11 +12,12 @@ TSharedRef<SWidget> UInputImage::RebuildWidget()
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS && !bSubbedToInputEvents)
     {
-        bSubbedToInputEvents = true;
         GS->OnInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnButtonInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnAxisInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
     }
+    
+    bSubbedToInputEvents = true;
     UpdateImage();
 
     return Ret;
@@ -94,12 +95,29 @@ void UInputImage::SetFromKey(FKey K)
     UpdateImage();
 }
 
+void UInputImage::SetFromInputAction(UInputAction* Action)
+{
+    BindingType = EInputBindingType::EnhancedInputAction;
+    InputAction = Action;
+    UpdateImage();
+}
+
 void UInputImage::UpdateImage()
 {
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS)
     {
-        auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);
+        UPaperSprite* Sprite = nullptr;
+        if (BindingType == EInputBindingType::EnhancedInputAction)
+        {
+            auto IA = InputAction.LoadSynchronous();
+            Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme);
+        }
+        else
+        {
+            Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);    
+        }
+        
         if (Sprite)
         {
             // Match size is needed incase size has changed

@@ -41,12 +41,14 @@ enum class EGamePauseChange : uint8
 UENUM(BlueprintType)
 enum class EInputBindingType : uint8
 {
-    /// A button action, will be looked up based on input mappings
+    /// A legacy button action, will be looked up based on input mappings
     Action = 0,
-    /// An axis action, will be looked up based on input mappings
+    /// An legacy axis action, will be looked up based on input mappings
     Axis = 1,
     /// A manually specified FKey (which can be key, button, axis)
-    Key = 2
+    Key = 2,
+    /// An EnhancedInput action
+    EnhancedInputAction = 3
 };
 
 /// What order of preference should we return input images where an action/axis has multiple mappings

@@ -1,4 +1,6 @@
 #include "StevesGameSubsystem.h"
+
+#include "EnhancedInputSubsystems.h"
 #include "StevesGameViewportClientBase.h"
 #include "StevesUEHelpers.h"
 #include "Engine/AssetManager.h"
@@ -223,6 +225,42 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
     }
     return nullptr;
 }
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action,
+    EInputImageDevicePreference DevicePreference,
+    int PlayerIdx,
+    APlayerController* PC,
+    UUiTheme* Theme)
+{
+    
+    if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+    {
+        const TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+
+        // For default, prefer mouse for axes
+        if (DevicePreference == EInputImageDevicePreference::Auto)
+        {
+            if (Action->ValueType == EInputActionValueType::Boolean)
+            {
+                DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
+            }
+            else
+            {
+                DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
+            }
+        }
+        const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+        const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+        const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+        if (const FKey* PreferredKey = GetPreferedKeyMapping(Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput))
+        {
+            return GetInputImageSpriteFromKey(*PreferredKey, PlayerIdx, Theme);
+        }
+    }
+
+    return nullptr;
+}
+
 
 TSoftObjectPtr<UDataTable> UStevesGameSubsystem::GetGamepadImages(int PlayerIndex, const UUiTheme* Theme)
 {
