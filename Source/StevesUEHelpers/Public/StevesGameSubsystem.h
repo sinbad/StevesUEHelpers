@@ -14,6 +14,7 @@
 #include "StevesGameSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnhancedInputMappingsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 
 /// Entry point for all the top-level features of the helper system
@@ -160,6 +161,12 @@ public:
     /// last axis moved was still mouse, you'd get this event later
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnAxisInputModeChanged;
+
+    /// Event raised justr after the Enhanced Input mappings have changed
+    /// Right now, this has to be user-triggered via NotifyEnhancedInputMappingsChanged, because the Enhanced Input
+    /// plugin provides NO events to monitor it (sigh)
+    UPROPERTY(BlueprintAssignable)
+    FOnEnhancedInputMappingsChanged OnEnhancedInputMappingsChanged;
     
     /// Event raised when the game window's foreground status changes
     UPROPERTY(BlueprintAssignable)
@@ -276,5 +283,13 @@ public:
     * @return The pool, or null if it doesn't exist and bAutoCreate is false
     */
     FStevesTextureRenderTargetPoolPtr GetTextureRenderTargetPool(FName Name, bool bAutoCreate = true);
+
+    /**
+     * Notify this subsystem that changes have been made to the Enhanced Input mappings, e.g. adding or removing a context.
+     * Unfortunately, the Enhanced Input plugin currently provides NO WAY for us to monitor context changes automatically,
+     * so we need the user to tell us when they make a change.
+     * This call is however slightly delayed before being acted upon, because EI defers the rebuild of mappings until the next tick.
+     */
+    void NotifyEnhancedInputMappingsChanged();
 
 };

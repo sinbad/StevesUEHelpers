@@ -22,6 +22,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     CreateInputDetector();
     InitTheme();
     InitForegroundCheck();
+    NotifyEnhancedInputMappingsChanged();
 #endif
 }
 
@@ -58,6 +59,17 @@ void UStevesGameSubsystem::DestroyInputDetector()
         InputDetector.Reset();
     }
 #endif
+}
+
+void UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()
+{
+    // delay to ensure there's a tick in between which updates the mappings, it's not synchronous
+    auto DelayedFunc = [this]()
+    {
+        OnEnhancedInputMappingsChanged.Broadcast();
+    };
+    FTimerHandle TempHandle;
+    GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05, false);
 }
 
 void UStevesGameSubsystem::InitTheme()

@@ -46,6 +46,8 @@ protected:
     bool bSubbedToInputEvents = false;
     bool bIsDirty = true;
     float DelayUpdate = 0;
+    bool bHiddenBecauseBlank;
+    ESlateVisibility OldVisibility;
 
 public:
 
@@ -104,5 +106,7 @@ protected:
         
     UFUNCTION()
     void OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode);
+    UFUNCTION()
+    void OnEnhancedInputMappingsChanged();
     
 };
