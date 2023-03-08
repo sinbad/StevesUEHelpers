@@ -26,6 +26,13 @@ InputImage requires a [UiTheme](UiTheme.md) to operate, which links to the image
 
 Pick an Enhanced Input action from the asset browser interface.
 
+> Note: at the time of writing, **Enhanced Input** exposes *no* events for us to
+> be notified of mapping changes. Therefore, if you have persistent UI up which
+> might be affected by a mapping change, you must call 
+> `UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()` after you have
+> made changes to mappings. You don't have to do it the first time if you add 
+> mappings in `BeginPlay`.
+
 ### Action or Axis Name
 
 The name of the input action or axis that should be looked up to determine the

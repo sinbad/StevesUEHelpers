@@ -294,6 +294,7 @@ public:
      * so we need the user to tell us when they make a change.
      * This call is however slightly delayed before being acted upon, because EI defers the rebuild of mappings until the next tick.
      */
+    UFUNCTION(BlueprintCallable)
     void NotifyEnhancedInputMappingsChanged();
 
     /** Attempt to find an enhanced input action by name in the configured folders.
