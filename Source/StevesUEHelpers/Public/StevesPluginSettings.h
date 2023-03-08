@@ -15,7 +15,7 @@ class STEVESUEHELPERS_API UStevesPluginSettings
 
 public:
 	/// Which directories to search for Enhanced Input Actions when referenced just by name in e.g. Rich Text Decorator
-	UPROPERTY(config, EditAnywhere, Category = StevesUEHelpers, meta = (DisplayName = "Directories to search for Enhanced Input Actions", RelativeToGameContentDir))
+	UPROPERTY(config, EditAnywhere, Category = StevesUEHelpers, meta = (DisplayName = "Directories to search for Enhanced Input Actions", RelativeToGameContentDir, LongPackageName))
 	TArray<FDirectoryPath> EnhancedInputActionSearchDirectories;
 
 	UStevesPluginSettings() {} 
