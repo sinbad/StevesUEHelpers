@@ -16,7 +16,9 @@ TSharedRef<SWidget> UInputImage::RebuildWidget()
         GS->OnInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnButtonInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnAxisInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
+        GS->OnEnhancedInputMappingsChanged.AddUniqueDynamic(this, &UInputImage::OnEnhancedInputMappingsChanged);
     }
+    
     UpdateImage();
 
     return Ret;
@@ -33,6 +35,11 @@ void UInputImage::OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode)
         //     *UEnum::GetValueAsString(InputMode),
         //     *UEnum::GetValueAsString(GS->GetLastInputButtonPressed(ChangedPlayerIdx)));
     }
+}
+
+void UInputImage::OnEnhancedInputMappingsChanged()
+{
+    MarkImageDirty();
 }
 
 void UInputImage::SetCustomTheme(UUiTheme* Theme)
@@ -94,17 +101,50 @@ void UInputImage::SetFromKey(FKey K)
     UpdateImage();
 }
 
+void UInputImage::SetFromInputAction(UInputAction* Action)
+{
+    BindingType = EInputBindingType::EnhancedInputAction;
+    InputAction = Action;
+    UpdateImage();
+}
+
 void UInputImage::UpdateImage()
 {
     auto GS = GetStevesGameSubsystem(GetWorld());
     if (GS)
     {
-        auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);
+        UPaperSprite* Sprite = nullptr;
+        if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
+        {
+            if (auto IA = InputAction.LoadSynchronous())
+            {
+                Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme);
+            }
+        }
+        else
+        {
+            Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);    
+        }
+        
         if (Sprite)
         {
+            if (bHiddenBecauseBlank)
+            {
+                SetVisibility(OldVisibility);
+                bHiddenBecauseBlank = false;
+            }
             // Match size is needed incase size has changed
             // Need to make it update region in case inside a scale box or something else that needs to adjust
             SetBrushFromAtlasInterface(Sprite, true);
+        }
+        else
+        {
+            if (IsVisible())
+            {
+                bHiddenBecauseBlank = true;
+                OldVisibility = GetVisibility();
+                SetVisibility(ESlateVisibility::Hidden);
+            }
         }
     }
     bIsDirty = false;
@@ -114,7 +154,7 @@ void UInputImage::UpdateImage()
 void UInputImage::MarkImageDirty()
 {
     bIsDirty = true;
-    DelayUpdate = 0.5f;
+    DelayUpdate = 0.1f;
 }
 
 // Tickables

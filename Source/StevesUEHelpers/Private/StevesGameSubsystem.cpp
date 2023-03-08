@@ -1,5 +1,9 @@
 #include "StevesGameSubsystem.h"
+
+#include "EngineUtils.h"
+#include "EnhancedInputSubsystems.h"
 #include "StevesGameViewportClientBase.h"
+#include "StevesPluginSettings.h"
 #include "StevesUEHelpers.h"
 #include "Engine/AssetManager.h"
 #include "Engine/GameInstance.h"
@@ -20,6 +24,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     CreateInputDetector();
     InitTheme();
     InitForegroundCheck();
+    NotifyEnhancedInputMappingsChanged();
 #endif
 }
 
@@ -56,6 +61,50 @@ void UStevesGameSubsystem::DestroyInputDetector()
         InputDetector.Reset();
     }
 #endif
+}
+
+void UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()
+{
+    // delay to ensure there's a tick in between which updates the mappings, it's not synchronous
+    auto DelayedFunc = [this]()
+    {
+        OnEnhancedInputMappingsChanged.Broadcast();
+    };
+    FTimerHandle TempHandle;
+    GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05, false);
+}
+
+TSoftObjectPtr<UInputAction> UStevesGameSubsystem::FindEnhancedInputAction(const FString& Name)
+{
+    if (FAssetRegistryModule* AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+    {
+        IAssetRegistry& AssetRegistry = AssetRegistryModule->Get();
+        if (auto Settings = GetDefault<UStevesPluginSettings>())
+        {
+            for (const auto& Dir : Settings->EnhancedInputActionSearchDirectories)
+            {
+                if (!FPackageName::IsValidPath(Dir.Path))
+                {
+                    continue;
+                }
+
+                TArray<FAssetData> Assets;
+                FString Package = FPaths::Combine(Dir.Path, Name);
+                if (AssetRegistry.GetAssetsByPackageName(FName(*Package), Assets, true))
+                {
+                    for (const FAssetData& Asset : Assets)
+                    {
+                        if (Asset.GetClass() == UInputAction::StaticClass())
+                        {
+                            return TSoftObjectPtr<UInputAction>(Asset.GetSoftObjectPath());
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    return nullptr;
 }
 
 void UStevesGameSubsystem::InitTheme()
@@ -223,6 +272,42 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
     }
     return nullptr;
 }
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action,
+    EInputImageDevicePreference DevicePreference,
+    int PlayerIdx,
+    APlayerController* PC,
+    UUiTheme* Theme)
+{
+    
+    if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+    {
+        const TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+
+        // For default, prefer mouse for axes
+        if (DevicePreference == EInputImageDevicePreference::Auto)
+        {
+            if (Action->ValueType == EInputActionValueType::Boolean)
+            {
+                DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
+            }
+            else
+            {
+                DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
+            }
+        }
+        const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+        const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+        const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+        if (const FKey* PreferredKey = GetPreferedKeyMapping(Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput))
+        {
+            return GetInputImageSpriteFromKey(*PreferredKey, PlayerIdx, Theme);
+        }
+    }
+
+    return nullptr;
+}
+
 
 TSoftObjectPtr<UDataTable> UStevesGameSubsystem::GetGamepadImages(int PlayerIndex, const UUiTheme* Theme)
 {

@@ -33,13 +33,21 @@ related to input controls. There are various options:
 
 ## Adding input images to rich text
 
-### Input Actions
+### Enhanced Input Actions
+
+`<input eaction="IA_MyAction"/>`
+
+This displays the image for a bound Enhanced Input action. The name of the action
+should match the action name, which is relative to one of the directories
+you specify in Project Settings > Plugins > StevesUEHelpers.
+
+### Legacy Input Actions
 
 `<input action="TheActionName"/>`
 
 This displays the image for a bound action input, as configured in project settings.
 
-### Input Axes
+### Legacy Input Axes
 
 `<input axis="TheAxisName"/>`
 

@@ -4,6 +4,7 @@
 #include "StevesHelperCommon.h"
 #include "StevesUEHelpers.h"
 #include "Fonts/FontMeasure.h"
+#include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/Images/SImage.h"
@@ -18,6 +19,8 @@ struct FRichTextInputImageParams
     FName ActionOrAxisName;
     /// If BindingType is Key, the key 
     FKey Key;
+    /// If binding type is EnhancedInputAction, a reference to an enhanced input action
+    TSoftObjectPtr<UInputAction> InputAction;
     /// Player index, if binding type is action or axis
     int PlayerIndex;
     /// Where there are multiple mappings, which to prefer 
@@ -38,6 +41,8 @@ protected:
     FName ActionOrAxisName;
     /// If BindingType is Key, the key 
     FKey Key;
+    /// If binding type is EnhancedInputAction, a reference to an enhanced input action
+    TSoftObjectPtr<UInputAction> InputAction;
     /// Player index, if binding type is action or axis
     int PlayerIndex = 0;
     /// Where there are multiple mappings, which to prefer 
@@ -66,6 +71,7 @@ public:
         ActionOrAxisName = InParams.ActionOrAxisName;
         DevicePreference = InParams.DevicePreference;
         Key = InParams.Key;
+        InputAction = InParams.InputAction;
         PlayerIndex = InParams.PlayerIndex;
         Decorator = InParams.Decorator;
         RequestedWidth = Width;
@@ -77,7 +83,7 @@ public:
         // We will need to do the work to update the brush from the main thread later
 
         // We can use static methods though
-        if (InParams.InitialSprite)
+        if (IsValid(InParams.InitialSprite))
             UStevesGameSubsystem::SetBrushFromAtlas(&Brush, InParams.InitialSprite, true);
         TimeUntilNextSpriteCheck = 0.25f;
 
@@ -128,7 +134,19 @@ public:
             if (GS)
             {
                 // Can only support default theme, no way to edit theme in decorator config 
-                auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex);
+                UPaperSprite* Sprite = nullptr;
+                if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
+                {
+                    if (auto IA = InputAction.LoadSynchronous())
+                    {
+                        auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), PlayerIndex);
+                        Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, PC);
+                    }
+                }
+                else
+                {
+                    Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex);    
+                }
                 if (Sprite && Brush.GetResourceObject() != Sprite)
                 {
                     UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
@@ -175,7 +193,8 @@ public:
         {
             return RunParseResult.MetaData.Contains(TEXT("key")) ||
                 RunParseResult.MetaData.Contains(TEXT("action")) ||
-                RunParseResult.MetaData.Contains(TEXT("axis"));
+                RunParseResult.MetaData.Contains(TEXT("axis")) ||
+                    RunParseResult.MetaData.Contains(TEXT("eaction"));
         }
 
         return false;
@@ -190,6 +209,8 @@ protected:
         Params.BindingType = EInputBindingType::Key;
         Params.Key = EKeys::AnyKey;
         Params.Decorator = Decorator;
+        
+        auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
         
         if (const FString* PlayerStr = RunInfo.MetaData.Find(TEXT("player")))
         {
@@ -211,6 +232,15 @@ protected:
         {
             Params.BindingType = EInputBindingType::Axis;
             Params.ActionOrAxisName = **AxisStr;        
+        }
+        else if (const FString* EInputStr = RunInfo.MetaData.Find(TEXT("eaction")))
+        {
+            Params.BindingType = EInputBindingType::EnhancedInputAction;
+            // Try to find the input action
+            if (GS)
+            {
+                Params.InputAction = GS->FindEnhancedInputAction(*EInputStr);
+            }
         }
 
         if (const FString* PreferStr = RunInfo.MetaData.Find(TEXT("prefer")))
@@ -240,11 +270,21 @@ protected:
         // Look up the initial sprite here
         // The Slate widget can't do it in Construct because World pointer doesn't work (thread issues?)
         // Also annoying: can't keep Brush on this class because this method is const. UGH
-        auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
         if (GS)
         {
-            // Can only support default theme, no way to edit theme in decorator config 
-            Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, Params.DevicePreference, Params.PlayerIndex);
+            if (Params.BindingType == EInputBindingType::EnhancedInputAction && !Params.InputAction.IsNull())
+            {
+                if (auto IA = Params.InputAction.LoadSynchronous())
+                {
+                    auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), Params.PlayerIndex);
+                    Params.InitialSprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, Params.DevicePreference, Params.PlayerIndex, PC);
+                }
+            }
+            else
+            {
+                // Can only support default theme, no way to edit theme in decorator config 
+                Params.InitialSprite = GS->GetInputImageSprite(Params.BindingType, Params.ActionOrAxisName, Params.Key, Params.DevicePreference, Params.PlayerIndex);
+            }
         }
         else
         {

@@ -25,10 +25,11 @@ public class StevesUEHelpers : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"InputCore",
+				"EnhancedInput",
 				"Slate",
 				"SlateCore",
 				"UMG",
-				"Paper2D"
+				"Paper2D", 
 			}
 			);
 			

@@ -22,6 +22,10 @@ protected:
     /// If BindingType is Action/Axis, the name of it 
     UPROPERTY(EditAnywhere)
     FName ActionOrAxisName;
+
+    /// If binding type is EnhancedInputAction, a reference to an enhanced input action
+    UPROPERTY(EditAnywhere) // can't be inside  #if
+    TSoftObjectPtr<UInputAction> InputAction;
     
     /// Where there are multiple mappings, which to prefer 
     UPROPERTY(EditAnywhere)
@@ -42,6 +46,8 @@ protected:
     bool bSubbedToInputEvents = false;
     bool bIsDirty = true;
     float DelayUpdate = 0;
+    bool bHiddenBecauseBlank;
+    ESlateVisibility OldVisibility;
 
 public:
 
@@ -57,6 +63,10 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void SetFromKey(FKey K);
 
+    /// Tell this image to display Enhanced InputAction
+    UFUNCTION(BlueprintCallable)
+    virtual void SetFromInputAction(UInputAction* Action);
+    
     /// Get the binding type that we'll use to populate the image
     UFUNCTION(BlueprintCallable)
     virtual EInputBindingType GetBindingType() const { return BindingType; }
@@ -96,5 +106,7 @@ protected:
         
     UFUNCTION()
     void OnInputModeChanged(int ChangedPlayerIdx, EInputMode InputMode);
+    UFUNCTION()
+    void OnEnhancedInputMappingsChanged();
     
 };

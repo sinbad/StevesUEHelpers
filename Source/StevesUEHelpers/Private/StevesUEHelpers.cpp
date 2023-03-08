@@ -1,5 +1,9 @@
 #include "StevesUEHelpers.h"
 
+#include "ISettingsModule.h"
+#include "ISettingsSection.h"
+#include "StevesPluginSettings.h"
+
 #define LOCTEXT_NAMESPACE "FStevesUEHelpers"
 
 DEFINE_LOG_CATEGORY(LogStevesUEHelpers)
@@ -8,6 +12,19 @@ void FStevesUEHelpers::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	UE_LOG(LogStevesUEHelpers, Log, TEXT("Steve's UE Helpers Module Started"))
+
+	// register settings
+	ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+
+	if (SettingsModule)
+	{
+		ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Plugins", "StevesUEHelpers",
+			LOCTEXT("StevesUEHelpersSettingsName", "StevesUEHelpers"),
+			LOCTEXT("StevesUEHelpersSettingsDescription", "Configure the helpers plug-in."),
+			GetMutableDefault<UStevesPluginSettings>()
+		);
+	}
+	
 }
 
 void FStevesUEHelpers::ShutdownModule()

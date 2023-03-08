@@ -89,3 +89,10 @@ const T* GetPreferedActionOrAxisMapping(const TArray<T>& AllMappings, const FNam
     }
     return Preferred;
 }
+
+
+const FKey* GetPreferedKeyMapping(const TArray<FKey>& AllKeys,
+                                  EInputImageDevicePreference DevicePreference,
+                                  EInputMode LastInputDevice,
+                                  EInputMode LastButtonInputDevice,
+                                  EInputMode LastAxisInputDevice);

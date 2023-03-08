@@ -17,9 +17,14 @@ InputImage requires a [UiTheme](UiTheme.md) to operate, which links to the image
 ### Binding Type
 
 
-* "Action" if the image should display the current mapping for an input action
-* "Axis" to look up an input axis
+* "Enhanced Input Action" to specify an [Enhanced Input](https://docs.unrealengine.com/5.1/en-US/enhanced-input-in-unreal-engine/) action
+* "Action" if the image should display the current mapping for a legacy input action
+* "Axis" to look up a legacy input axis
 * "Key" to manually specify a key (which can be gamepad or mouse too)
+
+### Enhanced Input Action
+
+Pick an Enhanced Input action from the asset browser interface.
 
 ### Action or Axis Name
 
