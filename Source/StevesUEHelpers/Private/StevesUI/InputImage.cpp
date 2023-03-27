@@ -130,7 +130,8 @@ void UInputImage::UpdateImage()
         {
             if (bHiddenBecauseBlank)
             {
-                SetVisibility(OldVisibility);
+                // Use Internal so as not to recurse back here
+                SetVisibilityInternal(OldVisibility);
                 bHiddenBecauseBlank = false;
             }
             // Match size is needed incase size has changed
@@ -143,7 +144,8 @@ void UInputImage::UpdateImage()
             {
                 bHiddenBecauseBlank = true;
                 OldVisibility = GetVisibility();
-                SetVisibility(ESlateVisibility::Hidden);
+                // Use Internal so as not to recurse back here
+                SetVisibilityInternal(ESlateVisibility::Hidden);
             }
         }
     }
