@@ -42,7 +42,6 @@ TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
 UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	bHasMoreLineParts = false;
 	bHasFinishedPlaying = true;
 }
 
@@ -55,7 +54,6 @@ void UTypewriterTextWidget::SetText(const FText& InText)
 		
 		LineText->SetText(InText);
 
-		bHasMoreLineParts = false;
 		bHasFinishedPlaying = true;
 	}
 }
@@ -102,7 +100,6 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 			LineText->SetText(FText::GetEmpty());
 		}
 
-		bHasMoreLineParts = false;
 		bHasFinishedPlaying = true;
 		OnTypewriterLineFinished.Broadcast(this);
 		OnLineFinishedPlaying();
@@ -165,7 +162,7 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 
 				CalculateWrappedString(shortenedString);
 
-				RemainingLinePart.RightInline(count);
+				RemainingLinePart.RightChopInline(count);
 				bHasMoreLineParts = true;
 			}
 		}
@@ -190,16 +187,9 @@ void UTypewriterTextWidget::SkipToLineEnd()
 		LineText->SetText(FText::FromString(CalculateSegments(nullptr)));
 	}
 
-	if (bHasMoreLineParts)
-	{
-		OnTypewriterLinePartFinished.Broadcast(this);
-	}
-	else
-	{
-		bHasFinishedPlaying = true;
-		OnTypewriterLineFinished.Broadcast(this);
-		OnLineFinishedPlaying();
-	}
+	bHasFinishedPlaying = true;
+	OnTypewriterLineFinished.Broadcast(this);
+	OnLineFinishedPlaying();
 }
 
 void UTypewriterTextWidget::PlayNextLetter()
