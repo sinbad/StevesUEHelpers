@@ -126,7 +126,7 @@ private:
 	void PlayNextLetter();
 	static bool IsSentenceTerminator(TCHAR Letter);
 
-	void CalculateWrappedString();
+	void CalculateWrappedString(const FString& CurrentLineString);
 	FString CalculateSegments(FString* OutCurrentRunName);
 
 	UPROPERTY()
