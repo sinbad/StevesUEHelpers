@@ -153,6 +153,11 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 				CachedSegmentText.Empty();
 
 				CalculateWrappedString(shortenedString);
+
+				// TODO Jonas: Play remaining line after the shortened string.
+				// If this is done purely in the typewriter then advancing the dialog would
+				// skip over all but the last part of the text. Alternatively advancing has
+				// to get rerouted to trigger a dialogue action only for the last part.
 			}
 		}
 		
