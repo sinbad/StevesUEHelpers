@@ -56,6 +56,10 @@ class STEVESUEHELPERS_API UTypewriterTextWidget : public UUserWidget
 public:
 	UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer);
 
+	/// Event called when a line part has finished playing, whether on its own or when skipped to end
+	UPROPERTY(BlueprintAssignable)
+	FOnTypewriterLineFinished OnTypewriterLinePartFinished;
+
 	/// Event called when a line has finished playing, whether on its own or when skipped to end
 	UPROPERTY(BlueprintAssignable)
 	FOnTypewriterLineFinished OnTypewriterLineFinished;
@@ -103,6 +107,9 @@ public:
 	bool HasFinishedPlayingLine() const { return bHasFinishedPlaying; }
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	void PlayNextLinePart(float Speed = 1.0f);
+
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void SkipToLineEnd();
 
 	/// Get the name of the current rich text run, if any
@@ -132,7 +139,7 @@ private:
 	UPROPERTY()
 	FText CurrentLine;
 
-	
+	FString RemainingLinePart;
 
 	struct FTypewriterTextSegment
 	{
@@ -155,6 +162,7 @@ private:
 	float CombinedTextHeight = 0;
 
 	uint32 bHasFinishedPlaying : 1;
+	uint32 bHasMoreLineParts : 1;
 
 	FTimerHandle LetterTimer;
 	float CurrentPlaySpeed = 1;

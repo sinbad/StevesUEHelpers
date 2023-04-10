@@ -42,6 +42,7 @@ TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
 UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bHasMoreLineParts = false;
 	bHasFinishedPlaying = true;
 }
 
@@ -54,6 +55,7 @@ void UTypewriterTextWidget::SetText(const FText& InText)
 		
 		LineText->SetText(InText);
 
+		bHasMoreLineParts = false;
 		bHasFinishedPlaying = true;
 	}
 }
@@ -70,12 +72,18 @@ FText UTypewriterTextWidget::GetText() const
 
 void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 {
+	CurrentLine = InLine;
+	RemainingLinePart = CurrentLine.ToString();
+	PlayNextLinePart(Speed);
+}
+
+void UTypewriterTextWidget::PlayNextLinePart(float Speed)
+{
 	check(GetWorld());
 
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.ClearTimer(LetterTimer);
 
-	CurrentLine = InLine;
 	CurrentRunName = "";
 	CurrentLetterIndex = 0;
 	CachedLetterIndex = 0;
@@ -87,13 +95,14 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 	Segments.Empty();
 	CachedSegmentText.Empty();
 
-	if (CurrentLine.IsEmpty())
+	if (RemainingLinePart.IsEmpty())
 	{
 		if (IsValid(LineText))
 		{
 			LineText->SetText(FText::GetEmpty());
 		}
 
+		bHasMoreLineParts = false;
 		bHasFinishedPlaying = true;
 		OnTypewriterLineFinished.Broadcast(this);
 		OnLineFinishedPlaying();
@@ -107,11 +116,12 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 			LineText->SetText(FText::GetEmpty());
 		}
 
+		bHasMoreLineParts = false;
 		bHasFinishedPlaying = false;
 
 		LineText->SetText(FText());
 
-		const FString& currentLineString = CurrentLine.ToString();
+		const FString& currentLineString = RemainingLinePart;
 		CalculateWrappedString(currentLineString);
 
 		int maxLines = 3;
@@ -139,7 +149,8 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 			int lastTerminator = currentLineString.FindLastCharByPredicate(IsSentenceTerminator, numLetters);
 			if (lastTerminator != INDEX_NONE)
 			{
-				const FString& shortenedString = currentLineString.Left(lastTerminator + 1);
+				int count = lastTerminator + 1;
+				const FString& shortenedString = currentLineString.Left(count);
 
 				CurrentRunName = "";
 				CurrentLetterIndex = 0;
@@ -154,10 +165,8 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 
 				CalculateWrappedString(shortenedString);
 
-				// TODO Jonas: Play remaining line after the shortened string.
-				// If this is done purely in the typewriter then advancing the dialog would
-				// skip over all but the last part of the text. Alternatively advancing has
-				// to get rerouted to trigger a dialogue action only for the last part.
+				RemainingLinePart.RightInline(count);
+				bHasMoreLineParts = true;
 			}
 		}
 		
@@ -181,9 +190,16 @@ void UTypewriterTextWidget::SkipToLineEnd()
 		LineText->SetText(FText::FromString(CalculateSegments(nullptr)));
 	}
 
-	bHasFinishedPlaying = true;
-	OnTypewriterLineFinished.Broadcast(this);
-	OnLineFinishedPlaying();
+	if (bHasMoreLineParts)
+	{
+		OnTypewriterLinePartFinished.Broadcast(this);
+	}
+	else
+	{
+		bHasFinishedPlaying = true;
+		OnTypewriterLineFinished.Broadcast(this);
+		OnLineFinishedPlaying();
+	}
 }
 
 void UTypewriterTextWidget::PlayNextLetter()
