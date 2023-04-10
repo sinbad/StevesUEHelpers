@@ -118,9 +118,9 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 
 		LineText->SetText(FText());
 
-		const FString& currentLineString = RemainingLinePart;
-		CalculateWrappedString(currentLineString);
+		CalculateWrappedString(RemainingLinePart);
 
+		// TODO Jonas: Promote maxLines to variable. Might want maxLines = 1 for text before choices.
 		int maxLines = 3;
 		if (NumberOfLines > maxLines)
 		{
@@ -129,6 +129,7 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 			for (int i = 0; i < Segments.Num(); i++)
 			{
 				const auto& segment = Segments[i];
+				// TODO Jonas: Mark line break segments in CalculateWrappedString instead.
 				if (segment.Text.Equals(FString(TEXT("\n"))))
 				{
 					currentLine++;
@@ -143,12 +144,14 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 				}
 			}
 
-			int lastTerminator = currentLineString.FindLastCharByPredicate(IsSentenceTerminator, numLetters);
+			// TODO Jonas: Find lesser terminators like commas or spaces if no sentence terminator can be found.
+			int lastTerminator = RemainingLinePart.FindLastCharByPredicate(IsSentenceTerminator, numLetters);
 			if (lastTerminator != INDEX_NONE)
 			{
 				int count = lastTerminator + 1;
-				const FString& shortenedString = currentLineString.Left(count);
+				const FString& shortenedString = RemainingLinePart.Left(count);
 
+				// TODO Jonas: Clean up
 				CurrentRunName = "";
 				CurrentLetterIndex = 0;
 				CachedLetterIndex = 0;
