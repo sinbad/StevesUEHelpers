@@ -138,6 +138,8 @@ void UTypewriterTextWidget::StartPlayLine()
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	bFirstPlayLine = false;
+
+	PlayNextLetter();
 	
 }
 
