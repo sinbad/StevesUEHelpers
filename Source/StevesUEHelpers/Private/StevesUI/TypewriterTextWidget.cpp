@@ -109,8 +109,6 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 
 		bHasFinishedPlaying = false;
 
-		LineText->SetText(FText());
-
 		if (bFirstPlayLine)
 		{
 			// Delay the very first PlayLine after construction, CalculateWrappedString is not reliable until a couple
