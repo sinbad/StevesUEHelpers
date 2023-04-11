@@ -110,15 +110,37 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 		bHasFinishedPlaying = false;
 
 		LineText->SetText(FText());
-		CalculateWrappedString();
-		
-		FTimerDelegate Delegate;
-		Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
 
-		TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/CurrentPlaySpeed, true);
-
-		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		if (bFirstPlayLine)
+		{
+			// Delay the very first PlayLine after construction, CalculateWrappedString is not reliable until a couple
+			// of UI geometry updates. At first the geometry is 0, then it's just wrong, and then finally it settles.
+			FTimerHandle TempHandle;
+			FTimerDelegate DelayDelegate;
+			DelayDelegate.BindUObject(this, &ThisClass::StartPlayLine);
+			TimerManager.SetTimer(TempHandle, DelayDelegate, 0.2f, false);
+		}
+		else
+		{
+			StartPlayLine();
+		}
 	}
+}
+
+void UTypewriterTextWidget::StartPlayLine()
+{
+	CalculateWrappedString();
+		
+	FTimerDelegate Delegate;
+	Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/CurrentPlaySpeed, true);
+
+	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	bFirstPlayLine = false;
+	
 }
 
 void UTypewriterTextWidget::SkipToLineEnd()
@@ -135,6 +157,13 @@ void UTypewriterTextWidget::SkipToLineEnd()
 	bHasFinishedPlaying = true;
 	OnTypewriterLineFinished.Broadcast(this);
 	OnLineFinishedPlaying();
+}
+
+void UTypewriterTextWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	bFirstPlayLine = true;
 }
 
 void UTypewriterTextWidget::PlayNextLetter()

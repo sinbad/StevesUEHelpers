@@ -109,6 +109,8 @@ public:
 	const FString& GetCurrentRunName() const { return CurrentRunName; }
 
 protected:
+	virtual void NativeConstruct() override;
+
 	/// Called when on or more letters are added, if subclasses want to override
 	UFUNCTION(BlueprintImplementableEvent, Category = "Typewriter")
 	void OnPlayLetter();
@@ -128,6 +130,7 @@ private:
 
 	void CalculateWrappedString();
 	FString CalculateSegments(FString* OutCurrentRunName);
+	void StartPlayLine();
 
 	UPROPERTY()
 	FText CurrentLine;
@@ -159,4 +162,5 @@ private:
 	FTimerHandle LetterTimer;
 	float CurrentPlaySpeed = 1;
 	float PauseTime = 0;
+	bool bFirstPlayLine = true;
 };
