@@ -84,7 +84,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float PauseTimeAtSentenceTerminators = 0.5f;
 
-	/// How many lines of text at most to print at once. (disabled by default)
+	/// If set > 0, splits a single PlayLine into multiple segments of this number of lines maximum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	int MaxNumberOfLines = 0;
 
@@ -96,19 +96,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FText GetText() const;
 
-
+	 
+	/**
+	 * Play a line of text.
+	 * Note: if, when line splits are calculated, this line exceeds MaxNumberOfLines, then only this number of lines
+	 * will be played by this call. In that case, HasMoreLineParts() will return true, and you will need to call
+	 * PlayNextLinePart() to play the remainder of the line.
+	 * @param InLine The input line 
+	 * @param Speed 
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void PlayLine(const FText& InLine, float Speed = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void GetCurrentLine(FText& OutLine) const { OutLine = CurrentLine; }
 
+	/// Return whether the entire line has finished playing
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	bool HasFinishedPlayingLine() const { return bHasFinishedPlaying; }
 
+	/// Returns whether the number of lines exceeded MaxNumberOfLines and there are still parts to play.
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	bool HasMoreLineParts() const { return bHasMoreLineParts; }
 
+	/// If HasMoreLineParts() is true, play the next part of the line originally requested by PlayLine
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void PlayNextLinePart(float Speed = 1.0f);
 
