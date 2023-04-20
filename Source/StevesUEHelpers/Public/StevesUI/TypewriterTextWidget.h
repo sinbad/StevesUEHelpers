@@ -84,6 +84,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float PauseTimeAtSentenceTerminators = 0.5f;
 
+	/// How many lines of text at most to print at once.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	int MaxNumberOfLines = 3;
+
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable)
 	void SetText(const FText& InText);
@@ -134,7 +138,7 @@ private:
 	static bool IsClauseTerminator(TCHAR Letter);
 	static int FindLastTerminator(const FString& CurrentLineString, int Count);
 
-	int CalculateMaxLength(int MaxNumberOfLines);
+	int CalculateMaxLength();
 	void CalculateWrappedString(const FString& CurrentLineString);
 	FString CalculateSegments(FString* OutCurrentRunName);
 

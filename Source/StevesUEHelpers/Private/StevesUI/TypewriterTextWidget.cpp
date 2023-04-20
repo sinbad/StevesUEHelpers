@@ -120,11 +120,9 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 
 		CalculateWrappedString(RemainingLinePart);
 
-		// TODO Jonas: Promote MaxLines to variable. Might want MaxLines = 1 for text before choices.
-		int MaxLines = 3;
-		if (NumberOfLines > MaxLines)
+		if (NumberOfLines > MaxNumberOfLines)
 		{
-			int MaxLength = CalculateMaxLength(MaxLines);
+			int MaxLength = CalculateMaxLength();
 			int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
 			int Length = TerminatorIndex + 1;
 			const FString& FirstLinePart = RemainingLinePart.Left(Length);
@@ -236,14 +234,13 @@ int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, 
 	return (Count - 1);
 }
 
-int UTypewriterTextWidget::CalculateMaxLength(int MaxNumberOfLines)
+int UTypewriterTextWidget::CalculateMaxLength()
 {
 	int MaxLength = 0;
 	int CurrentNumberOfLines = 1;
 	for (int i = 0; i < Segments.Num(); i++)
 	{
 		const FTypewriterTextSegment& Segment = Segments[i];
-		// TODO Jonas: Mark line break segments as such in CalculateWrappedString instead.
 		if (Segment.Text.Equals(FString(TEXT("\n"))))
 		{
 			CurrentNumberOfLines++;
