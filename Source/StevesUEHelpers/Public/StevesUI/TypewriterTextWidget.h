@@ -131,7 +131,9 @@ protected:
 private:
 	void PlayNextLetter();
 	static bool IsSentenceTerminator(TCHAR Letter);
+	static int FindLastTerminator(const FString& CurrentLineString, int Count);
 
+	int CalculateMaxLength(int MaxNumberOfLines);
 	void CalculateWrappedString(const FString& CurrentLineString);
 	FString CalculateSegments(FString* OutCurrentRunName);
 

@@ -120,54 +120,19 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 
 		CalculateWrappedString(RemainingLinePart);
 
-		// TODO Jonas: Promote maxLines to variable. Might want maxLines = 1 for text before choices.
-		int maxLines = 3;
-		if (NumberOfLines > maxLines)
+		// TODO Jonas: Promote MaxLines to variable. Might want MaxLines = 1 for text before choices.
+		int MaxLines = 3;
+		if (NumberOfLines > MaxLines)
 		{
-			int numLetters = 0;
-			int currentLine = 1;
-			for (int i = 0; i < Segments.Num(); i++)
-			{
-				const auto& segment = Segments[i];
-				// TODO Jonas: Mark line break segments in CalculateWrappedString instead.
-				if (segment.Text.Equals(FString(TEXT("\n"))))
-				{
-					currentLine++;
-					if (currentLine > maxLines)
-					{
-						break;
-					}
-				}
-				else
-				{
-					numLetters += segment.Text.Len();
-				}
-			}
+			int MaxLength = CalculateMaxLength(MaxLines);
+			int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
+			int Length = TerminatorIndex + 1;
+			const FString& FirstLinePart = RemainingLinePart.Left(Length);
 
-			// TODO Jonas: Find lesser terminators like commas or spaces if no sentence terminator can be found.
-			int lastTerminator = RemainingLinePart.FindLastCharByPredicate(IsSentenceTerminator, numLetters);
-			if (lastTerminator != INDEX_NONE)
-			{
-				int count = lastTerminator + 1;
-				const FString& shortenedString = RemainingLinePart.Left(count);
+			CalculateWrappedString(FirstLinePart);
 
-				// TODO Jonas: Clean up
-				CurrentRunName = "";
-				CurrentLetterIndex = 0;
-				CachedLetterIndex = 0;
-				CurrentSegmentIndex = 0;
-				MaxLetterIndex = 0;
-				NumberOfLines = 0;
-				CombinedTextHeight = 0;
-				CurrentPlaySpeed = Speed;
-				Segments.Empty();
-				CachedSegmentText.Empty();
-
-				CalculateWrappedString(shortenedString);
-
-				RemainingLinePart.RightChopInline(count);
-				bHasMoreLineParts = true;
-			}
+			RemainingLinePart.RightChopInline(Length);
+			bHasMoreLineParts = true;
 		}
 		
 		FTimerDelegate Delegate;
@@ -243,6 +208,43 @@ bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter)
 	return Letter == '.' || Letter == '!' || Letter == '?';
 }
 
+int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count)
+{
+	// TODO Jonas: Find lesser terminators like commas or spaces if no sentence terminator can be found.
+	int TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsSentenceTerminator, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	return Count;
+}
+
+int UTypewriterTextWidget::CalculateMaxLength(int MaxNumberOfLines)
+{
+	int MaxLength = 0;
+	int CurrentNumberOfLines = 1;
+	for (int i = 0; i < Segments.Num(); i++)
+	{
+		const FTypewriterTextSegment& Segment = Segments[i];
+		// TODO Jonas: Mark line break segments as such in CalculateWrappedString instead.
+		if (Segment.Text.Equals(FString(TEXT("\n"))))
+		{
+			CurrentNumberOfLines++;
+			if (CurrentNumberOfLines > MaxNumberOfLines)
+			{
+				break;
+			}
+		}
+		else
+		{
+			MaxLength += Segment.Text.Len();
+		}
+	}
+
+	return MaxLength;
+}
+
 void UTypewriterTextWidget::CalculateWrappedString(const FString& CurrentLineString)
 {
 	// Rich Text views give you:
@@ -252,6 +254,9 @@ void UTypewriterTextWidget::CalculateWrappedString(const FString& CurrentLineStr
 	// - The newlines we add are the only newlines in the output so that's the number of lines
 	// If we've got here, that means the text isn't empty so 1 line at least
 	NumberOfLines = 1;
+	MaxLetterIndex = 0;
+	CombinedTextHeight = 0;
+	Segments.Empty();
 	if (IsValid(LineText) && LineText->GetTextLayout().IsValid())
 	{
 		TSharedPtr<FSlateTextLayout> Layout = LineText->GetTextLayout();
