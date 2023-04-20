@@ -208,16 +208,32 @@ bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter)
 	return Letter == '.' || Letter == '!' || Letter == '?';
 }
 
+bool UTypewriterTextWidget::IsClauseTerminator(TCHAR Letter)
+{
+	return Letter == ',' || Letter == ';';
+}
+
 int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count)
 {
-	// TODO Jonas: Find lesser terminators like commas or spaces if no sentence terminator can be found.
 	int TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsSentenceTerminator, Count);
 	if (TerminatorIndex != INDEX_NONE)
 	{
 		return TerminatorIndex;
 	}
 
-	return Count;
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsClauseTerminator, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(FText::IsWhitespace, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	return (Count - 1);
 }
 
 int UTypewriterTextWidget::CalculateMaxLength(int MaxNumberOfLines)
