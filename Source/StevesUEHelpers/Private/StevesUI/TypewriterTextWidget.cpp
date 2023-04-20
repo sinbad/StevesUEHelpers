@@ -272,7 +272,7 @@ int UTypewriterTextWidget::CalculateMaxLength()
 		if (Segment.Text.Equals(FString(TEXT("\n"))))
 		{
 			CurrentNumberOfLines++;
-			if (CurrentNumberOfLines > MaxNumberOfLines)
+			if (MaxNumberOfLines > 0 && CurrentNumberOfLines > MaxNumberOfLines)
 			{
 				break;
 			}
