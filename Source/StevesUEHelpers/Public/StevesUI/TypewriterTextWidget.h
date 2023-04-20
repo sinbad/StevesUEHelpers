@@ -84,6 +84,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float PauseTimeAtSentenceTerminators = 0.5f;
 
+	/// How many lines of text at most to print at once.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	int MaxNumberOfLines = 3;
+
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable)
 	void SetText(const FText& InText);
@@ -101,6 +105,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	bool HasFinishedPlayingLine() const { return bHasFinishedPlaying; }
+
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	bool HasMoreLineParts() const { return bHasMoreLineParts; }
+
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	void PlayNextLinePart(float Speed = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void SkipToLineEnd();
@@ -127,15 +137,18 @@ protected:
 private:
 	void PlayNextLetter();
 	static bool IsSentenceTerminator(TCHAR Letter);
+	static bool IsClauseTerminator(TCHAR Letter);
+	static int FindLastTerminator(const FString& CurrentLineString, int Count);
 
-	void CalculateWrappedString();
+	int CalculateMaxLength();
+	void CalculateWrappedString(const FString& CurrentLineString);
 	FString CalculateSegments(FString* OutCurrentRunName);
 	void StartPlayLine();
 
 	UPROPERTY()
 	FText CurrentLine;
 
-	
+	FString RemainingLinePart;
 
 	struct FTypewriterTextSegment
 	{
@@ -158,6 +171,7 @@ private:
 	float CombinedTextHeight = 0;
 
 	uint32 bHasFinishedPlaying : 1;
+	uint32 bHasMoreLineParts : 1;
 
 	FTimerHandle LetterTimer;
 	float CurrentPlaySpeed = 1;
