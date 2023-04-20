@@ -134,20 +134,20 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 
 void UTypewriterTextWidget::StartPlayLine()
 {
-		CalculateWrappedString(RemainingLinePart);
+	CalculateWrappedString(RemainingLinePart);
 
-		if (NumberOfLines > MaxNumberOfLines)
-		{
-			int MaxLength = CalculateMaxLength();
-			int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
-			int Length = TerminatorIndex + 1;
-			const FString& FirstLinePart = RemainingLinePart.Left(Length);
+	if (NumberOfLines > MaxNumberOfLines)
+	{
+		int MaxLength = CalculateMaxLength();
+		int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
+		int Length = TerminatorIndex + 1;
+		const FString& FirstLinePart = RemainingLinePart.Left(Length);
 
-			CalculateWrappedString(FirstLinePart);
+		CalculateWrappedString(FirstLinePart);
 
-			RemainingLinePart.RightChopInline(Length);
-			bHasMoreLineParts = true;
-		}
+		RemainingLinePart.RightChopInline(Length);
+		bHasMoreLineParts = true;
+	}
 		
 	FTimerDelegate Delegate;
 	Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
