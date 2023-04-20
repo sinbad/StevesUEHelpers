@@ -70,12 +70,18 @@ FText UTypewriterTextWidget::GetText() const
 
 void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 {
+	CurrentLine = InLine;
+	RemainingLinePart = CurrentLine.ToString();
+	PlayNextLinePart(Speed);
+}
+
+void UTypewriterTextWidget::PlayNextLinePart(float Speed)
+{
 	check(GetWorld());
 
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.ClearTimer(LetterTimer);
 
-	CurrentLine = InLine;
 	CurrentRunName = "";
 	CurrentLetterIndex = 0;
 	CachedLetterIndex = 0;
@@ -87,7 +93,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 	Segments.Empty();
 	CachedSegmentText.Empty();
 
-	if (CurrentLine.IsEmpty())
+	if (RemainingLinePart.IsEmpty())
 	{
 		if (IsValid(LineText))
 		{
@@ -107,6 +113,7 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 			LineText->SetText(FText::GetEmpty());
 		}
 
+		bHasMoreLineParts = false;
 		bHasFinishedPlaying = false;
 
 		if (bFirstPlayLine)
@@ -127,7 +134,20 @@ void UTypewriterTextWidget::PlayLine(const FText& InLine, float Speed)
 
 void UTypewriterTextWidget::StartPlayLine()
 {
-	CalculateWrappedString();
+	CalculateWrappedString(RemainingLinePart);
+
+	if (MaxNumberOfLines > 0 && NumberOfLines > MaxNumberOfLines)
+	{
+		int MaxLength = CalculateMaxLength();
+		int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
+		int Length = TerminatorIndex + 1;
+		const FString& FirstLinePart = RemainingLinePart.Left(Length);
+
+		CalculateWrappedString(FirstLinePart);
+
+		RemainingLinePart.RightChopInline(Length);
+		bHasMoreLineParts = true;
+	}
 		
 	FTimerDelegate Delegate;
 	Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
@@ -214,7 +234,56 @@ bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter)
 	return Letter == '.' || Letter == '!' || Letter == '?';
 }
 
-void UTypewriterTextWidget::CalculateWrappedString()
+bool UTypewriterTextWidget::IsClauseTerminator(TCHAR Letter)
+{
+	return Letter == ',' || Letter == ';';
+}
+
+int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count)
+{
+	int TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsSentenceTerminator, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsClauseTerminator, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(FText::IsWhitespace, Count);
+	if (TerminatorIndex != INDEX_NONE)
+	{
+		return TerminatorIndex;
+	}
+
+	return (Count - 1);
+}
+
+int UTypewriterTextWidget::CalculateMaxLength()
+{
+	int MaxLength = 0;
+	int CurrentNumberOfLines = 1;
+	for (int i = 0; i < Segments.Num(); i++)
+	{
+		const FTypewriterTextSegment& Segment = Segments[i];
+		MaxLength += Segment.Text.Len();
+		if (Segment.Text.Equals(FString(TEXT("\n"))))
+		{
+			CurrentNumberOfLines++;
+			if (MaxNumberOfLines > 0 && CurrentNumberOfLines > MaxNumberOfLines)
+			{
+				break;
+			}
+		}
+	}
+
+	return MaxLength;
+}
+
+void UTypewriterTextWidget::CalculateWrappedString(const FString& CurrentLineString)
 {
 	// Rich Text views give you:
 	// - A blank block at the start for some reason
@@ -223,6 +292,9 @@ void UTypewriterTextWidget::CalculateWrappedString()
 	// - The newlines we add are the only newlines in the output so that's the number of lines
 	// If we've got here, that means the text isn't empty so 1 line at least
 	NumberOfLines = 1;
+	MaxLetterIndex = 0;
+	CombinedTextHeight = 0;
+	Segments.Empty();
 	if (IsValid(LineText) && LineText->GetTextLayout().IsValid())
 	{
 		TSharedPtr<FSlateTextLayout> Layout = LineText->GetTextLayout();
@@ -233,7 +305,7 @@ void UTypewriterTextWidget::CalculateWrappedString()
 
 		Layout->ClearLines();
 		Layout->SetWrappingWidth(TextBoxSize.X);
-		Marshaller->SetText(CurrentLine.ToString(), *Layout.Get());
+		Marshaller->SetText(CurrentLineString, *Layout.Get());
 		Layout->UpdateLayout();
 
 		bool bHasWrittenText = false;
@@ -299,7 +371,7 @@ void UTypewriterTextWidget::CalculateWrappedString()
 	}
 	else
 	{
-		Segments.Add(FTypewriterTextSegment{CurrentLine.ToString()});
+		Segments.Add(FTypewriterTextSegment{CurrentLineString});
 		MaxLetterIndex = Segments[0].Text.Len();
 	}
 
