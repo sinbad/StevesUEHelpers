@@ -84,9 +84,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float PauseTimeAtSentenceTerminators = 0.5f;
 
-	/// How many lines of text at most to print at once.
+	/// How many lines of text at most to print at once. (disabled by default)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
-	int MaxNumberOfLines = 3;
+	int MaxNumberOfLines = 0;
 
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable)

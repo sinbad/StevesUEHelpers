@@ -136,7 +136,7 @@ void UTypewriterTextWidget::StartPlayLine()
 {
 	CalculateWrappedString(RemainingLinePart);
 
-	if (NumberOfLines > MaxNumberOfLines)
+	if (MaxNumberOfLines > 0 && NumberOfLines > MaxNumberOfLines)
 	{
 		int MaxLength = CalculateMaxLength();
 		int TerminatorIndex = FindLastTerminator(RemainingLinePart, MaxLength);
