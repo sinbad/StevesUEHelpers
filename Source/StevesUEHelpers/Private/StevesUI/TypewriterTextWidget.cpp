@@ -269,6 +269,7 @@ int UTypewriterTextWidget::CalculateMaxLength()
 	for (int i = 0; i < Segments.Num(); i++)
 	{
 		const FTypewriterTextSegment& Segment = Segments[i];
+		MaxLength += Segment.Text.Len();
 		if (Segment.Text.Equals(FString(TEXT("\n"))))
 		{
 			CurrentNumberOfLines++;
@@ -276,10 +277,6 @@ int UTypewriterTextWidget::CalculateMaxLength()
 			{
 				break;
 			}
-		}
-		else
-		{
-			MaxLength += Segment.Text.Len();
 		}
 	}
 
