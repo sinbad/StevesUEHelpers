@@ -19,7 +19,7 @@
 		{
 			"Name" : "StevesUEHelpers",
 			"Type" : "Runtime",
-			"LoadingPhase" : "Default"
+			"LoadingPhase" : "PreDefault"
 		}
 	],
 	"Plugins": [                       

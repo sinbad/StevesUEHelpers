@@ -64,6 +64,19 @@ public class YourProject : ModuleRules
 
 ```
 
+It's also worth adding `StevesUEHelpers` to your own .uproject as a plugin reference:
+
+```
+"Plugins": [
+		...
+		{
+			"Name": "StevesUEHelpers",
+			"Enabled": true
+		},
+		...
+
+```
+
 After adding this you should right-click your .uproject file and "Generate Visual
 Studio Project Files". 
 
