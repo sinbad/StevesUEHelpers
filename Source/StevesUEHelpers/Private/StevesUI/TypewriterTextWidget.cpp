@@ -229,25 +229,27 @@ void UTypewriterTextWidget::PlayNextLetter()
 	}
 }
 
-bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter)
+bool UTypewriterTextWidget::IsSentenceTerminator(TCHAR Letter) const
 {
-	return Letter == '.' || Letter == '!' || Letter == '?';
+	int32 Unused;
+	return SentenceTerminators.FindChar(Letter, Unused);
 }
 
-bool UTypewriterTextWidget::IsClauseTerminator(TCHAR Letter)
+bool UTypewriterTextWidget::IsClauseTerminator(TCHAR Letter) const
 {
-	return Letter == ',' || Letter == ';';
+	int32 Unused;
+	return ClauseTerminators.FindChar(Letter, Unused);
 }
 
-int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count)
+int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count) const
 {
-	int TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsSentenceTerminator, Count);
+	int TerminatorIndex = CurrentLineString.FindLastCharByPredicate([this](TCHAR Char) { return IsSentenceTerminator(Char); }, Count);
 	if (TerminatorIndex != INDEX_NONE)
 	{
 		return TerminatorIndex;
 	}
 
-	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(IsClauseTerminator, Count);
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate([this](TCHAR Char) { return IsClauseTerminator(Char); }, Count);
 	if (TerminatorIndex != INDEX_NONE)
 	{
 		return TerminatorIndex;

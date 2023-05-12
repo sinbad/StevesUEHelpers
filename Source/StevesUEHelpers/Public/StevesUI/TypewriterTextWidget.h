@@ -84,6 +84,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	float PauseTimeAtSentenceTerminators = 0.5f;
 
+	/// Characters which will terminate a sentence, which will potentially pause
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	FString SentenceTerminators = ".!?";
+
+	/// Characters which terminate a clause, which is a preferred place to split an overly long line
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	FString ClauseTerminators = ",;:";
+	
 	/// If set > 0, splits a single PlayLine into multiple segments of this number of lines maximum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	int MaxNumberOfLines = 0;
@@ -147,9 +155,9 @@ protected:
 
 private:
 	void PlayNextLetter();
-	static bool IsSentenceTerminator(TCHAR Letter);
-	static bool IsClauseTerminator(TCHAR Letter);
-	static int FindLastTerminator(const FString& CurrentLineString, int Count);
+	bool IsSentenceTerminator(TCHAR Letter) const;
+	bool IsClauseTerminator(TCHAR Letter) const;
+	int FindLastTerminator(const FString& CurrentLineString, int Count) const;
 
 	int CalculateMaxLength();
 	void CalculateWrappedString(const FString& CurrentLineString);
