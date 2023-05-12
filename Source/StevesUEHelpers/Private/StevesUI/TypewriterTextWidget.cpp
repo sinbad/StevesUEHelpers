@@ -429,7 +429,7 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 				// and also optionally not if there isn't whitespace after (e.g. to not pause on ".txt")
 				if (LettersLeft < Segment.Text.Len())
 				{
-					if (IsSentenceTerminator(Segment.Text[LettersLeft]) ||
+					if (!IsSentenceTerminator(Segment.Text[LettersLeft]) &&
 						(!bPauseOnlyIfWhitespaceFollowsSentenceTerminator || FText::IsWhitespace(Segment.Text[LettersLeft])))
 					{
 						PauseTime = PauseTimeAtSentenceTerminators;
