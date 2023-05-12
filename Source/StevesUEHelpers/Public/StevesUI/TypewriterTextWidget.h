@@ -91,6 +91,11 @@ public:
 	/// Characters which terminate a clause, which is a preferred place to split an overly long line
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	FString ClauseTerminators = ",;:";
+
+	/// If true (default), only pauses at sentence terminators if there's whitespace following them.
+	/// This prevents pausing on strings like ".txt"
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	bool bPauseOnlyIfWhitespaceFollowsSentenceTerminator = true;
 	
 	/// If set > 0, splits a single PlayLine into multiple segments of this number of lines maximum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")

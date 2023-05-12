@@ -425,9 +425,16 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 				IsSentenceTerminator(Result[Result.Len() - 1]) &&
 				CurrentLetterIndex < MaxLetterIndex - 1) // Don't pause on the last letter, that's the end pause's job
 			{
-				// Look ahead to make sure we only pause on LAST sentence terminator in a chain of them
-				if (LettersLeft == Segment.Text.Len() || !IsSentenceTerminator(Segment.Text[LettersLeft]))
-					PauseTime = PauseTimeAtSentenceTerminators;
+				// Look ahead to make sure we only pause on LAST sentence terminator in a chain of them,
+				// and also optionally not if there isn't whitespace after (e.g. to not pause on ".txt")
+				if (LettersLeft < Segment.Text.Len())
+				{
+					if (IsSentenceTerminator(Segment.Text[LettersLeft]) ||
+						(!bPauseOnlyIfWhitespaceFollowsSentenceTerminator || FText::IsWhitespace(Segment.Text[LettersLeft])))
+					{
+						PauseTime = PauseTimeAtSentenceTerminators;
+					}
+				}
 			}
 
 			if (!Segment.RunInfo.Name.IsEmpty())
