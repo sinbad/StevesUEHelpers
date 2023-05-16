@@ -1,7 +1,7 @@
 #include "StevesUEHelpers.h"
 
-#include "ISettingsModule.h"
-#include "ISettingsSection.h"
+#include "Developer/Settings/Public/ISettingsModule.h"
+#include "Developer/Settings/Public/ISettingsSection.h"
 #include "StevesPluginSettings.h"
 
 #define LOCTEXT_NAMESPACE "FStevesUEHelpers"
