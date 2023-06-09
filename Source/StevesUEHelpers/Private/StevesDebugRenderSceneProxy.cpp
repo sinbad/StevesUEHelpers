@@ -3,9 +3,11 @@
 
 #include "StevesDebugRenderSceneProxy.h"
 
+#include "Materials/MaterialRenderProxy.h"
+
 
 void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>& Views,
-	const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const
+                                                          const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const
 {
 	FDebugRenderSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
 
