@@ -29,8 +29,7 @@ public class StevesUEHelpers : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UMG",
-				"Paper2D",
-				"Settings"
+				"Paper2D"
 			}
 			);
 			
