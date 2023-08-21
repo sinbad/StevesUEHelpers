@@ -3,7 +3,10 @@
 
 #include "StevesDebugRenderSceneProxy.h"
 
+// Added in UE 5.2
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 2
 #include "Materials/MaterialRenderProxy.h"
+#endif
 
 
 void FStevesDebugRenderSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>& Views,
