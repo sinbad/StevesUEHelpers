@@ -16,11 +16,11 @@ TSharedRef<SWidget> UFocusableButton::RebuildWidget()
             .OnReleased(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleReleased))
             .OnHovered_UObject( this, &ThisClass::SlateHandleHovered )
             .OnUnhovered_UObject( this, &ThisClass::SlateHandleUnhovered )
-            .ButtonStyle(&WidgetStyle)
-            .ClickMethod(ClickMethod)
-            .TouchMethod(TouchMethod)
-            .PressMethod(PressMethod)
-            .IsFocusable(IsFocusable)
+            .ButtonStyle(&GetStyle())
+            .ClickMethod(GetClickMethod())
+            .TouchMethod(GetTouchMethod())
+            .PressMethod(GetPressMethod())
+            .IsFocusable(GetIsFocusable())
             // Our new events
             .OnFocusReceived(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleFocusReceived))
             .OnFocusLost(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleFocusLost))
@@ -39,7 +39,7 @@ TSharedRef<SWidget> UFocusableButton::RebuildWidget()
 void UFocusableButton::RefreshFocussedStyle_Implementation()
 {
     // Copy Widget style but make normal same as hovered    
-    FocussedStyle = WidgetStyle;
+    FocussedStyle = GetStyle();
     FocussedStyle.Normal = FocussedStyle.Hovered;
 }
 
@@ -68,7 +68,7 @@ void UFocusableButton::UndoFocusStyle()
 {
     if (MyButton.IsValid())
     {
-        MyButton->SetButtonStyle(&WidgetStyle);
+        MyButton->SetButtonStyle(&GetStyle());
     }
 }
 

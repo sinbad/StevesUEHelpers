@@ -18,7 +18,7 @@ TSharedRef<SWidget> UFocusableCheckBox::RebuildWidget()
         .PressMethod(PressMethod)
 #endif
         .HAlign( HorizontalAlignment )
-        .IsFocusable(IsFocusable)
+        .IsFocusable(GetIsFocusable())
         // Our new events
         .OnHovered(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleHovered))
         .OnUnhovered(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleUnhovered))
