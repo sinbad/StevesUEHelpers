@@ -9,7 +9,8 @@ which makes a bunch of things better:
   * Focusable buttons, menu stacks, control prompts and more
 * [Input events](doc/Input.md)
   * Reliable notification when the player changes input method
-
+* [Debug visualisation](https://www.stevestreeting.com/2021/09/14/ue4-editor-visualisation-helper/)
+* [Better DataTable Row References](https://www.stevestreeting.com/2023/10/06/a-better-unreal-datatable-row-picker/)
 
 ## Examples
 
