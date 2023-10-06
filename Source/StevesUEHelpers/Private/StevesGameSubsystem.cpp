@@ -144,7 +144,7 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
         auto GI = GetGameInstance();        
         auto VC = Cast<UStevesGameViewportClientBase>(GI->GetGameViewportClient());
         if (!VC)
-            UE_LOG(LogStevesUEHelpers, Warning, TEXT("Your GameViewportClient needs to be set to a subclass of UStevesGameViewportClientBase if you want full functionality!"))
+            UE_LOG(LogStevesUEHelpers, Log, TEXT("Consider using UStevesGameViewportClientBase for your GameViewportClient"))
 
         bCheckedViewportClient = true;
     
