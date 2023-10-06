@@ -1,35 +1,39 @@
 {
-	"FileVersion" : 3,
-	"Version" : 1,
-	"VersionName" : "1.0",
-	"FriendlyName" : "Steve's UE4 Helpers",
-	"Description" : "A set of common helper classes for UE4 projects by Steve Streeing",
-	"Category" : "Code Utilities",
-	"CreatedBy" : "Steve Streeting",
-	"CreatedByURL" : "https://www.stevestreeting.com",
-	"DocsURL" : "",
-	"MarketplaceURL" : "",
-	"SupportURL" : "https://github.com/sinbad/StevesUEHelpers",
-	"EnabledByDefault" : true,
-	"CanContainContent" : false,
-	"IsBetaVersion" : true,
-	"Installed" : false,
-	"Modules" :
-	[
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Steve's UE4 Helpers",
+	"Description": "A set of common helper classes for UE4 projects by Steve Streeing",
+	"Category": "Code Utilities",
+	"CreatedBy": "Steve Streeting",
+	"CreatedByURL": "https://www.stevestreeting.com",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/sinbad/StevesUEHelpers",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
 		{
-			"Name" : "StevesUEHelpers",
-			"Type" : "Runtime",
-			"LoadingPhase" : "PreDefault"
+			"Name": "StevesUEHelpers",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "StevesUEHelpersEd",
+			"Type": "Editor",
+			"LoadingPhase": "PostDefault"
 		}
 	],
-	"Plugins": [                       
+	"Plugins": [
 		{
 			"Name": "Paper2D",
-			"Enabled": true            
+			"Enabled": true
 		},
 		{
 			"Name": "EnhancedInput",
 			"Enabled": true
 		}
-	]	
+	]
 }
