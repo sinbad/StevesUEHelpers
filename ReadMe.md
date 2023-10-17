@@ -40,6 +40,10 @@ Alternatively you can download the ZIP of this repo and place it in
 Edit YourProject.Build.cs and do something similar to this:
 
 ```csharp
+
+using System.IO;
+using UnrealBuildTool;
+
 public class YourProject : ModuleRules
 {
 	private string PluginsPath
