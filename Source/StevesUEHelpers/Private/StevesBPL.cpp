@@ -15,3 +15,8 @@ void UStevesBPL::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int A
 {
 	StevesUiHelpers::InsertChildWidgetAt(Parent, Child, AtIndex);
 }
+
+FStevesBalancedRandomStream UStevesBPL::MakeBalancedRandomStream(int64 Seed)
+{
+	return FStevesBalancedRandomStream(Seed);
+}
