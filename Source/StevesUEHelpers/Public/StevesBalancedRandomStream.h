@@ -136,13 +136,20 @@ public:
 		return FRotator(PitchYaw.X, PitchYaw.Y, 0).RotateVector(FVector::UpVector);
 	}
 
+	/// Random point in a box
 	FORCEINLINE FVector RandPointInBox(const FBox& Box) const
 	{
 		const FVector R3 = Rand3D();
 		return FVector(FMath::Lerp(Box.Min.X, Box.Max.X, R3.X),
 		               FMath::Lerp(Box.Min.Y, Box.Max.Y, R3.Y),
 		               FMath::Lerp(Box.Min.Z, Box.Max.Z, R3.Z));
-	}	
+	}
+
+	/// Random value in a range (inclusive)
+	float RandRange(float Min, float Max) const
+	{
+		return FMath::Lerp(Min, Max, Rand());
+	}
 
 	/**
 	 * Gets the current seed.
