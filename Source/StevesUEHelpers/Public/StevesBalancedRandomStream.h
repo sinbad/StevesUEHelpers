@@ -151,6 +151,12 @@ public:
 		return FMath::Lerp(Min, Max, Rand());
 	}
 
+	/// Random colour value
+	FLinearColor RandColour(const FLinearColor& From, const FLinearColor& To) const
+	{
+		return FLinearColor::LerpUsingHSV(From, To, Rand());
+	}
+	
 	/**
 	 * Gets the current seed.
 	 *
