@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+struct FKConvexElem;
+
 /// Helper maths routines that UE4 is missing, all static
 class STEVESUEHELPERS_API StevesMathHelpers
 {
@@ -79,4 +81,21 @@ public:
 		}
 		return false;
 	}
+
+	/**
+	 * Explicitly test the overlap of any collision shape with a convex element.
+	 * @param Convex The convex element
+	 * @param ConvexTransform The world transform of the convex element
+	 * @param Shape The test shape
+	 * @param ShapePos The test shape world position 
+	 * @param ShapeRot The test shape world rotation
+	 * @param OutResult Details of the result if returning true
+	 * @return Whether this shape overlaps the convex element
+	 */
+	static bool OverlapConvex(const FKConvexElem& Convex,
+					   const FTransform& ConvexTransform,
+					   const FCollisionShape& Shape,
+					   const FVector& ShapePos,
+					   const FQuat& ShapeRot,
+					   FMTDResult& OutResult);
 };
