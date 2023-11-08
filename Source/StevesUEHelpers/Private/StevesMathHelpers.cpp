@@ -2,6 +2,7 @@
 
 #include "Chaos/CastingUtilities.h"
 #include "Chaos/GeometryQueries.h"
+#include "PhysicsEngine/ConvexElem.h"
 
 bool StevesMathHelpers::OverlapConvex(const FKConvexElem& Convex,
                                       const FTransform& ConvexTransform,
@@ -24,17 +25,17 @@ bool StevesMathHelpers::OverlapConvex(const FKConvexElem& Convex,
 
 	Chaos::FMTDInfo MTDInfo;
 	if (Chaos::Utilities::CastHelper(ShapeGeom,
-									 ShapeGeomTransform,
-									 [&](const auto& Downcast, const auto& FullGeomTransform)
-									 {
-										 return Chaos::OverlapQuery(*ChaosConvex.Get(),
-																	ConvexTransform,
-																	Downcast,
-																	FullGeomTransform,
-																	/*Thickness=*/
-																	0,
-																	&MTDInfo);
-									 }))
+	                                 ShapeGeomTransform,
+	                                 [&](const auto& Downcast, const auto& FullGeomTransform)
+	                                 {
+		                                 return Chaos::OverlapQuery(*ChaosConvex.Get(),
+		                                                            ConvexTransform,
+		                                                            Downcast,
+		                                                            FullGeomTransform,
+		                                                            /*Thickness=*/
+		                                                            0,
+		                                                            &MTDInfo);
+	                                 }))
 	{
 		bHasOverlap = true;
 		OutResult.Distance = MTDInfo.Penetration;
