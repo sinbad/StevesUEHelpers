@@ -1,9 +1,8 @@
 #include "StevesUI/InputImage.h"
-#include "StevesUI/KeySprite.h"
 #include "StevesGameSubsystem.h"
 #include "StevesUEHelpers.h"
 #include "Blueprint/WidgetTree.h"
-#include "Engine/AssetManager.h"
+#include "InputAction.h"
 
 TSharedRef<SWidget> UInputImage::RebuildWidget()
 {
