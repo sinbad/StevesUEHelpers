@@ -29,7 +29,7 @@ void AStevesReplicatedPhysicsActor::BeginPlay()
 	if (IsServer())
 	{
 		// Server collision. Block all but allow pawns through
-		// Subclasses can change this if they like you can change t
+		// Subclasses can change this if they like
 		MeshComp->SetCollisionResponseToAllChannels(ECR_Block);
 		MeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		MeshComp->SetSimulatePhysics(true);
