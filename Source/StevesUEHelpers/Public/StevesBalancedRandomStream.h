@@ -136,13 +136,21 @@ public:
 		return FRotator(PitchYaw.X, PitchYaw.Y, 0).RotateVector(FVector::UpVector);
 	}
 
-	/// Random point in a box
+	/// Random point in a 3D box
 	FORCEINLINE FVector RandPointInBox(const FBox& Box) const
 	{
 		const FVector R3 = Rand3D();
 		return FVector(FMath::Lerp(Box.Min.X, Box.Max.X, R3.X),
 		               FMath::Lerp(Box.Min.Y, Box.Max.Y, R3.Y),
 		               FMath::Lerp(Box.Min.Z, Box.Max.Z, R3.Z));
+	}
+
+	/// Random point in a 2D rectangle
+	FORCEINLINE FVector2D RandPointInBox2D(const FBox2D& Rect) const
+	{
+		const FVector2D R2 = Rand2D();
+		return FVector2D(FMath::Lerp(Rect.Min.X, Rect.Max.X, R2.X),
+					   FMath::Lerp(Rect.Min.Y, Rect.Max.Y, R2.Y));
 	}
 
 	/// Random value in a range (inclusive)
