@@ -101,19 +101,14 @@ public:
 
 
 	/**
-	 * Return the distance to a convex polygon in 2D
-	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in local space
-	 * @param ConvexTransform World transform for convex polygon
-	 * @param WorldPoint Point in world space
+	 * Return the distance to a convex polygon in 2D where points are in the same space
+	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in a chosen space
+	 * @param LocalPoint Point to test, in same space as convex points
 	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
-	                                   const FTransform& ConvexTransform,
-	                                   const FVector& WorldPoint)
+									   const FVector& LocalPoint)
 	{
-		checkf(ConvexTransform.GetMaximumAxisScale() == ConvexTransform.GetMinimumAxisScale(), TEXT("Non-uniform scale not supported in GetDistanceToConvex2D"));
-		const FVector LocalPoint = ConvexTransform.InverseTransformPosition(WorldPoint);
-
 		// Assume inside until 1 or more tests show it's outside
 		bool bInside = true;
 		float ClosestOutside = 0;
@@ -146,8 +141,25 @@ public:
 			}
 		}
 
+		return bInside ? ClosestInside : ClosestOutside;		
+	}
+	
+	/**
+	 * Return the distance to a convex polygon in 2D world space, converting between spaces
+	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in local space
+	 * @param ConvexTransform World transform for convex polygon
+	 * @param WorldPoint Point in world space
+	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
+	 */
+	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
+	                                   const FTransform& ConvexTransform,
+	                                   const FVector& WorldPoint)
+	{
+		checkf(ConvexTransform.GetMaximumAxisScale() == ConvexTransform.GetMinimumAxisScale(), TEXT("Non-uniform scale not supported in GetDistanceToConvex2D"));
+		const FVector LocalPoint = ConvexTransform.InverseTransformPosition(WorldPoint);
+
 		// Need to rescale distance back up to world scale, only uniform scale supported for simplicity
-		return (bInside ? ClosestInside : ClosestOutside) * ConvexTransform.GetScale3D().X;		
+		return GetDistanceToConvex2D(ConvexPoints, LocalPoint) * ConvexTransform.GetScale3D().X;
 	}
 
 };
