@@ -50,6 +50,7 @@ float StevesMathHelpers::GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPo
 	// Assume inside until 1 or more tests show it's outside
 	bool bInside = true;
 	float ClosestOutside = 1e30f;
+	float ClosestInside = 1e30f;
 	const int N = ConvexPoints.Num();
 	for (int i = 0; i < N; ++i)
 	{
@@ -66,13 +67,11 @@ float StevesMathHelpers::GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPo
 		const FVector2f ToPoint = P - ConvexPoints[i];
 		const float DotNormal = Normal.Dot(ToPoint);
 
-		if (DotNormal < 0)
+		if (DotNormal > 0)
 		{
-			// Inside
-			continue;
+			// If >0 result is outside, point must be outside
+			bInside = false;
 		}
-		// If >0 result is outside, point must be outside
-		bInside = false;
 			
 		// Do a perpendicular projection onto the line segment to see if we're within the limits of it
 		const float DotLine = Line.Dot(ToPoint);
@@ -95,8 +94,15 @@ float StevesMathHelpers::GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPo
 			Dist = FMath::Sqrt(ToPoint.SquaredLength() - FMath::Square(T * Line.Length()));
 		}
 
-		ClosestOutside = FMath::Min(ClosestOutside, Dist);
+		if (DotNormal > 0)
+		{
+			ClosestOutside = FMath::Min(ClosestOutside, Dist);
+		}
+		else
+		{
+			ClosestInside = FMath::Min(ClosestInside, Dist);
+		}
 	}
 
-	return bInside ? 0 : ClosestOutside;		
+	return bInside ? -ClosestInside : ClosestOutside;		
 }

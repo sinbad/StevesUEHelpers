@@ -103,7 +103,7 @@ public:
 	 * Return the distance to a convex polygon in 2D where points are in the same space
 	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in a chosen space
 	 * @param LocalPoint Point to test, in same space as convex points
-	 * @return The distance to this convex polygon in 2D space. == 0 if inside
+	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
 									   const FVector& LocalPoint);
@@ -112,7 +112,7 @@ public:
 	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in local space
 	 * @param ConvexTransform World transform for convex polygon
 	 * @param WorldPoint Point in world space
-	 * @return The distance to this convex polygon in 2D space. == 0 if inside
+	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
 	                                   const FTransform& ConvexTransform,
