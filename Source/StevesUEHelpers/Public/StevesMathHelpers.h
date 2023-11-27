@@ -99,57 +99,20 @@ public:
 					   const FQuat& ShapeRot,
 					   FMTDResult& OutResult);
 
-
 	/**
 	 * Return the distance to a convex polygon in 2D where points are in the same space
 	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in a chosen space
 	 * @param LocalPoint Point to test, in same space as convex points
-	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
+	 * @return The distance to this convex polygon in 2D space. == 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
-									   const FVector& LocalPoint)
-	{
-		// Assume inside until 1 or more tests show it's outside
-		bool bInside = true;
-		float ClosestOutside = 0;
-		float ClosestInside = -1e30f;
-		const int N = ConvexPoints.Num();
-		for (int i = 0; i < N; ++i)
-		{
-			const int OtherIdx = (i + 1) % N;
-			const FVector2f Edge = ConvexPoints[OtherIdx] - ConvexPoints[i];
-			// Simple cross procduct to get the normal
-			const FVector2f Normal = FVector2f(Edge.Y, -Edge.X).GetSafeNormal();
-			if (!Normal.IsNearlyZero())
-			{
-				const FVector2f ToPoint = FVector2f(LocalPoint.X, LocalPoint.Y) - ConvexPoints[i];
-				const float Dot = Normal.Dot(ToPoint);
-
-				if (Dot > 0)
-				{
-					// Outside
-					// When outside we want the largest separation because convex
-					ClosestOutside = FMath::Max(ClosestOutside, Dot);
-					bInside = false;
-				}
-				else if (bInside)
-				{
-					// Inside (don't bother if we've already found one outside)
-					// Max because negative and inside we want the closest dot
-					ClosestInside = FMath::Max(ClosestInside, Dot);
-				}
-			}
-		}
-
-		return bInside ? ClosestInside : ClosestOutside;		
-	}
-	
+									   const FVector& LocalPoint);
 	/**
 	 * Return the distance to a convex polygon in 2D world space, converting between spaces
 	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in local space
 	 * @param ConvexTransform World transform for convex polygon
 	 * @param WorldPoint Point in world space
-	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
+	 * @return The distance to this convex polygon in 2D space. == 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
 	                                   const FTransform& ConvexTransform,
