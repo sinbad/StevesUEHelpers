@@ -124,5 +124,27 @@ public:
 		// Need to rescale distance back up to world scale, only uniform scale supported for simplicity
 		return GetDistanceToConvex2D(ConvexPoints, LocalPoint) * ConvexTransform.GetScale3D().X;
 	}
+	
+	/**
+	 * Returns whether a 2D point is inside a triangle
+	 * @param p Point to test
+	 * @param v0 First triangle point
+	 * @param v1 Second triangle point
+	 * @param v2 Third triangle point
+	 * @return Whether point p is inside the triangle.
+	 */
+	static bool IsPointInTriangle2D(const FVector& p,
+	                                const FVector2f& v0,
+	                                const FVector2f& v1,
+	                                const FVector2f& v2)
+	{
+		const float s = (v0.X - v2.X) * (p.Y - v2.Y) - (v0.Y - v2.Y) * (p.X - v2.X);
+		const float t = (v1.X - v0.X) * (p.Y - v0.Y) - (v1.Y - v0.Y) * (p.X - v0.X);
 
+		if ((s < 0) != (t < 0) && s != 0 && t != 0)
+			return false;
+
+		const float d = (v2.X - v1.X) * (p.Y - v1.Y) - (v2.Y - v1.Y) * (p.X - v1.X);
+		return d == 0 || (d < 0) == (s + t <= 0);
+	}
 };
