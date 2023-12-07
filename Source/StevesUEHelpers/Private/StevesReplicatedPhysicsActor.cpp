@@ -3,7 +3,7 @@
 #include "StevesReplicatedPhysicsActor.h"
 
 
-AStevesReplicatedPhysicsActor::AStevesReplicatedPhysicsActor()
+AStevesReplicatedPhysicsActor::AStevesReplicatedPhysicsActor(const FObjectInitializer& ObjInit)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -13,6 +13,8 @@ AStevesReplicatedPhysicsActor::AStevesReplicatedPhysicsActor()
 	const auto MeshComp = GetStaticMeshComponent();
 	MeshComp->SetMobility(EComponentMobility::Movable);
 	MeshComp->SetCollisionObjectType(ECC_WorldDynamic);
+	// I think this is actually not needed, since on clients the role is ROLE_SimulatedProxy not ROLE_AutonomousProxy
+	// When using ROLE_SimulatedProxy physics is replicated all the time
 	MeshComp->bReplicatePhysicsToAutonomousProxy = true;
 
 	// We do NOT replicate MeshComp itself! That's expensive and unnecessary
@@ -36,8 +38,19 @@ void AStevesReplicatedPhysicsActor::BeginPlay()
 	}
 	else
 	{
-		// Ignore all collisions on client
+		// We're on a client so will be receiving replicated physics
+		// Ignore all collisions; if we don't do this, things jank because of conflicting collisions
 		MeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+		// We DON'T disable physics. Physics still needs to be enabled for replicated physics to be respected.
+		// Otherwise objects will not move on the client.
+
+		// There's one case where this is problematic: replicated physics actors that are already asleep
+		// once a new client joins a game in-progress will locally simulate themselves through the floor, because no further
+		// updates will be received about their physics from the server. 
+		// My solution is to start all objects asleep on the client; if they're not, the server will send updates and
+		// the objects will wake up. If they're asleep on the server, we're good.
+		MeshComp->PutAllRigidBodiesToSleep();
 	}
 	
 	Super::BeginPlay();	

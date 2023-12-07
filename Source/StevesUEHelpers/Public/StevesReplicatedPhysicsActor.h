@@ -15,7 +15,7 @@ class STEVESUEHELPERS_API AStevesReplicatedPhysicsActor : public AStaticMeshActo
 	GENERATED_BODY()
 
 public:
-	AStevesReplicatedPhysicsActor();
+	AStevesReplicatedPhysicsActor(const FObjectInitializer& ObjInit);
 
 protected:
 	virtual void BeginPlay() override;
