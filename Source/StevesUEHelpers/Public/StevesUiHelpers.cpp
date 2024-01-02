@@ -2,7 +2,7 @@
 
 #include "Components/PanelWidget.h"
 
-void StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex)
+UPanelSlot* StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex)
 {
 	checkf(AtIndex <= Parent->GetChildrenCount(), TEXT("Insertion index %d is greater than child count"), AtIndex);
 	
@@ -10,7 +10,7 @@ void StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, 
 	const int OrigCount = Parent->GetChildrenCount();
 	if (OrigCount == AtIndex)
 	{
-		Parent->AddChild(Child);
+		return Parent->AddChild(Child);
 	}
 	else
 	{
@@ -32,12 +32,13 @@ void StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, 
 			Parent->RemoveChildAt(i);
 		}
 		// insert item
-		Parent->AddChild(Child);
+		auto Slot = Parent->AddChild(Child);
 		// add back previous, reverse order
 		for (int i = WidgetsToReplaceReversed.Num()  - 1; i >= 0; --i)
 		{
 			Parent->AddChild(WidgetsToReplaceReversed[i]);
 		}
+		return Slot;
 		
 	}
 	

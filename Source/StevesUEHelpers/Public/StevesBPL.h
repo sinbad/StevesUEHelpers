@@ -6,6 +6,7 @@
 #include "StevesBalancedRandomStream.h"
 
 #include "StevesMathHelpers.h"
+#include "Components/PanelSlot.h"
 #include "StevesBPL.generated.h"
 
 class UPanelWidget;
@@ -51,9 +52,10 @@ public:
 	 * @param Parent The container widget
 	 * @param Child The child widget to add
 	 * @param AtIndex The index at which the new child should exist
+	 * @returns The slot the child was inserted at
 	 */
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|UI")
-	static void InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
+	static UPanelSlot* InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
 
 	UFUNCTION(BlueprintPure, Category="StevesUEHelpers|Random", meta=(NativeMakeFunc))
 	static FStevesBalancedRandomStream MakeBalancedRandomStream(int64 Seed);

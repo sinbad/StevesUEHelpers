@@ -12,6 +12,7 @@ public:
 	 * @param Parent The container widget
 	 * @param Child The child widget to add
 	 * @param AtIndex The index at which the new child should exist
+	 * @returns The slot the child was inserted at
 	 */
-	static void InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
+	static UPanelSlot* InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
 };
