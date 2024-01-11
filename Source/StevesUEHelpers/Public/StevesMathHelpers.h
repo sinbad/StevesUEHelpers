@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <functional>
 
 struct FKConvexElem;
 
@@ -147,4 +148,32 @@ public:
 		const float d = (v2.X - v1.X) * (p.Y - v1.Y) - (v2.Y - v1.Y) * (p.X - v1.X);
 		return d == 0 || (d < 0) == (s + t <= 0);
 	}
+
+	/**
+	 * Function that tries to fill a 2D area with the largest rectangles it can. The area is abstractly defined as a boundary
+	 * index area with start X/Y and width/height, and will call back the CellIncludeFunc to determine whether a given
+	 * cell index X/Y should be considered valid to include in a rectangle. This means you can define irregular grids of
+	 * "valid" cells, and this function will fill the area with the largest rectangles it can while staying out of "invalid"
+	 * cells.
+	 * If you return "true" from every call to your CellIncludeFunc then the result will be a single rectangle covering
+	 * the entire area. It's expected that you will return "false" for some X/Y combinations and that will cause the area
+	 * to be split into multiple rectangles.
+	 * The returned rectangles will not overlap, and the entire valid area will be filled.
+	 * @param StartX The start X index. This is defined by your own data, so you can address a subset if you want.
+	 * @param StartY The start Y index.This is defined by your own data, so you can address a subset if you want.
+	 * @param Width The width of the area to fill. This is defined by your own data, so you can address a subset if you want.
+	 * @param Height The height of the area to fill. This is defined by your own data, so you can address a subset if you want.
+	 * @param CellIncludeFunc Your function which given an X/Y cell index, must return true if that cell is valid to be
+	 *		included in a rectangle.
+	 * @param OutRects Array of rectangles which this function should append results to. Will not be cleared before adding.
+	 * @return The number of rectangles added by this call. Each rectangle is a min/max inclusive X/Y value.
+	 */
+	static int Fill2DRegionWithRectangles(int StartX,
+	                                      int StartY,
+	                                      int Width,
+	                                      int Height,
+	                                      std::function<bool(int, int)> CellIncludeFunc,
+	                                      TArray<FIntRect>& OutRects);
+
+	
 };

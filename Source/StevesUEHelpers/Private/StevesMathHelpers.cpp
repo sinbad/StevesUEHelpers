@@ -106,3 +106,128 @@ float StevesMathHelpers::GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPo
 
 	return bInside ? -ClosestInside : ClosestOutside;		
 }
+
+int StevesMathHelpers::Fill2DRegionWithRectangles(int StartX,
+	int StartY,
+	int Width,
+	int Height,
+	std::function<bool(int, int)> CellIncludeFunc,
+	TArray<FIntRect>& OutRects)
+{
+	int RectCount = 0;
+
+	const int Len = Width*Height;
+	TArray<bool> bDoneMarkers;
+	bDoneMarkers.SetNumUninitialized(Len);
+	int CellsTodo = 0;
+
+	int StartN = 0;
+	const int EndX = StartX + Width - 1;
+	const int EndY = StartY + Height - 1;
+	// Initialise done markers based on func
+	for (int y = 0; y < Height; ++y)
+	{
+		for (int x = 0; x < Width; ++x)
+		{
+			const bool Include = CellIncludeFunc(x+StartX, y+StartY);
+			bDoneMarkers[y*Width + x] = !Include;
+			if (Include)
+			{
+				if (++CellsTodo == 1)
+				{
+					// This is the one we'll start with, might as well calculate it while we're here
+					StartN = y*Width + x;
+				}
+			}
+		}		
+	}
+
+	while (CellsTodo > 0)
+	{
+		// Find next starting point, from last one, until not done
+		for (; StartN < Len && bDoneMarkers[StartN]; ++StartN) {}
+
+		// Shouldn't happen, but just in case
+		if (StartN >= Len)
+			break;
+
+		// NOTE: this X/Y is local (based at 0,0 not StartX/StartY, for use with DoneMarkers)
+		const int LocalStartX = StartN % Width;
+		const int LocalStartY = StartN / Width;
+
+		// We try not to create long & thin rects if we can help it, unlike greedy meshing
+		// We're greedy in alternate dims to try to make fatter quads
+		bool bCanExtendX = true, bCanExtendY = true;
+		bool bExtendingX = true;
+		int W = 1;
+		int H = 1;
+
+		while (bCanExtendX || bCanExtendY)
+		{
+			// Try extending right
+			if (bExtendingX)
+			{
+				bool ExtendOK = LocalStartX+W < Width;
+				for (int TestY = LocalStartY; ExtendOK && TestY < LocalStartY+H; ++TestY)
+				{
+					if (bDoneMarkers[TestY*Width + LocalStartX+W])
+					{
+						// No good
+						ExtendOK = false;
+					}
+				}
+				if (ExtendOK)
+				{
+					++W;
+				}
+				else
+				{
+					bCanExtendX = false;
+				}
+				// Flip extending axis if possible
+				if (bCanExtendY)
+					bExtendingX = false;
+			}
+			else
+			{
+				// Try extending down
+				bool ExtendOK = LocalStartY+H < Height;
+				for (int TestX = LocalStartX; ExtendOK && TestX < LocalStartX+W; ++TestX)
+				{
+					if (bDoneMarkers[(LocalStartY+H)*Width + TestX])
+					{
+						// No good
+						ExtendOK = false;
+					}
+				}
+				if (ExtendOK)
+				{
+					++H;
+				}
+				else
+				{
+					bCanExtendY = false;
+				}
+				// Flip extending axis if possible
+				if (bCanExtendX)
+					bExtendingX = true;
+			}
+		}
+
+		// We've calculated the max extension
+		for (int y = LocalStartY; y < LocalStartY+H; ++y)
+		{
+			for (int x = LocalStartX; x < LocalStartX+W; ++x)
+			{
+				bDoneMarkers[y*Width+x] = true;
+				--CellsTodo;
+			}
+		}
+		OutRects.Add(FIntRect(StartX+LocalStartX, StartY+LocalStartY, StartX+LocalStartX+W-1, StartY+LocalStartY+H-1));
+		++RectCount;
+		
+	}
+
+	return RectCount;
+	
+}
