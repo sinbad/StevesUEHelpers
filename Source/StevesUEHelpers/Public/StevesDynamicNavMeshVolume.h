@@ -15,7 +15,9 @@ class STEVESUEHELPERS_API AStevesDynamicNavMeshVolume : public ANavMeshBoundsVol
 public:
 	AStevesDynamicNavMeshVolume();
 
+	UFUNCTION(BlueprintCallable)
 	void SetLocationAndDimensions(const FVector& Location, const FVector& NewDimensions);
+	UFUNCTION(BlueprintCallable)
 	void SetDimensions(const FVector& NewDimensions);
 
 protected:
