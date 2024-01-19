@@ -1,5 +1,5 @@
 ﻿#include "StevesVisualLogger.h"
-#include "VisualLogger/VisualLogger.h"
+
 
 
 void FStevesVisualLogger::InternalPolyLogfImpl(const UObject* Object,

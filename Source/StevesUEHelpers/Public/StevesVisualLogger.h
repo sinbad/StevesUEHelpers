@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
+#include "VisualLogger/VisualLogger.h"
 
 class STEVESUEHELPERS_API FStevesVisualLogger
 {
