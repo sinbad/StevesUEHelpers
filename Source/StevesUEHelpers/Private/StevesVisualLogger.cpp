@@ -9,6 +9,7 @@ void FStevesVisualLogger::InternalPolyLogfImpl(const UObject* Object,
 	const FColor& Color,
 	const uint16 Thickness)
 {
+#if ENABLE_VISUAL_LOG
 	const FName CategoryName = Category.GetCategoryName();
 
 	SCOPE_CYCLE_COUNTER(STAT_VisualLog); \
@@ -21,5 +22,6 @@ void FStevesVisualLogger::InternalPolyLogfImpl(const UObject* Object,
 
 	// EVisualLoggerShapeElement::Path doesn't support a label, so description is always blank
 	CurrentEntry->AddElement(Points, CategoryName, Verbosity, Color, "", Thickness);
-	
+
+#endif
 }
