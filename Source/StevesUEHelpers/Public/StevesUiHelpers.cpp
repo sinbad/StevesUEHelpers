@@ -1,6 +1,8 @@
 ﻿#include "StevesUiHelpers.h"
 
+#include "Components/HorizontalBoxSlot.h"
 #include "Components/PanelWidget.h"
+#include "Components/VerticalBoxSlot.h"
 
 UPanelSlot* StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex)
 {
@@ -24,6 +26,32 @@ UPanelSlot* StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* 
 		// I'm not sure ReplaceChildAt is designed to move children around (note: ShiftChild exists but again, editor-only)
 
 		TArray<UWidget*> WidgetsToReplaceReversed;
+		TArray<FMargin> HVBoxPadding;
+
+		// Keep slot padding info
+		HVBoxPadding.Reserve(OrigCount - AtIndex);
+		// Go backwards for consistency with below
+		const auto Slots = Parent->GetSlots();
+		for (int i = OrigCount - 1; i >= AtIndex; --i)
+		{
+			if (Slots.IsValidIndex(i))
+			{
+				const auto Slot = Slots[i];
+				if (const auto HSlot = Cast<UHorizontalBoxSlot>(Slot))
+				{
+					HVBoxPadding.Add(HSlot->GetPadding());
+				}
+				else if (const auto VSlot = Cast<UVerticalBoxSlot>(Slot))
+				{
+					HVBoxPadding.Add(VSlot->GetPadding());
+				}
+				else
+				{
+					HVBoxPadding.Add(FMargin());
+				}
+			}
+		}
+
 		WidgetsToReplaceReversed.Reserve(OrigCount - AtIndex);
 		// Go backwards so we can remove as we go and not remove from the middle
 		for (int i = OrigCount - 1; i >= AtIndex; --i)
@@ -36,7 +64,21 @@ UPanelSlot* StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* 
 		// add back previous, reverse order
 		for (int i = WidgetsToReplaceReversed.Num()  - 1; i >= 0; --i)
 		{
-			Parent->AddChild(WidgetsToReplaceReversed[i]);
+			auto PrevSlot = Parent->AddChild(WidgetsToReplaceReversed[i]);
+
+			// Restore the padding on H/VBox slots
+			if (HVBoxPadding.IsValidIndex(i))
+			{
+				if (auto HSlot = Cast<UHorizontalBoxSlot>(PrevSlot))
+				{
+					HSlot->SetPadding(HVBoxPadding[i]);
+				}
+				else if (auto VSlot = Cast<UVerticalBoxSlot>(PrevSlot))
+				{
+					VSlot->SetPadding(HVBoxPadding[i]);
+				}
+			}
+			
 		}
 		return Slot;
 		
