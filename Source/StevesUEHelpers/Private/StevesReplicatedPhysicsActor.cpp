@@ -17,6 +17,9 @@ AStevesReplicatedPhysicsActor::AStevesReplicatedPhysicsActor(const FObjectInitia
 	// When using ROLE_SimulatedProxy physics is replicated all the time
 	MeshComp->bReplicatePhysicsToAutonomousProxy = true;
 
+	// The default MinNetUpdateFrequency of 2 is too slow at responding to woken physics objects
+	MinNetUpdateFrequency = 10;
+	
 	// We do NOT replicate MeshComp itself! That's expensive and unnecessary
 
 }
