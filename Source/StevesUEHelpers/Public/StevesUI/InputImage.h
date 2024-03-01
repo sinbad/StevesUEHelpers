@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 
 #include "UiTheme.h"
+#include "InputCoreTypes.h"
+#include "InputAction.h"
 #include "Components/Image.h"
 #include "StevesHelperCommon.h"
 #include "InputImage.generated.h"
