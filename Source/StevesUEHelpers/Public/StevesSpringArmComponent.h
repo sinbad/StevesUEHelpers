@@ -21,6 +21,10 @@ public:
 protected:
 	TOptional<float> PrevArmLength;
 
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(Transient, EditAnywhere, Category=CameraCollision)
+	bool bVisualLogCameraCollision = false;
+#endif
 
 public:
 	UStevesSpringArmComponent();

@@ -1,10 +1,8 @@
 ﻿
 #include "StevesSpringArmComponent.h"
-
 #include "StevesUEHelpers.h"
 
-// Set this to 1 to VLOG where camera is being occluded from
-#define ENABLE_VLOG_CAMERA_OCCLUSION 0
+
 
 UStevesSpringArmComponent::UStevesSpringArmComponent()
 {
@@ -17,9 +15,8 @@ FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocat
 	float DeltaTime)
 {
 
-#if ENABLE_VLOG_CAMERA_OCCLUSION
-#if ENABLE_VISUAL_LOG
-	if (bHitSomething)
+#if WITH_EDITORONLY_DATA && ENABLE_VISUAL_LOG
+	if (bHitSomething && bVisualLogCameraCollision)
 	{
 		FVector NewDesiredLoc = PreviousDesiredLoc - PreviousDesiredRot.Vector() * TargetArmLength;
 		// Add socket offset in local space
@@ -33,7 +30,7 @@ FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocat
 		}
 	}
 #endif
-#endif
+
 	// These locations are in world space, we only want to blend the arm length, not the rest
 	const FVector Base = Super::BlendLocations(DesiredArmLocation, TraceHitLocation, bHitSomething, DeltaTime);
 
