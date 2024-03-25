@@ -30,6 +30,7 @@ void FStevesTextureRenderTargetPool::ReleaseReservation(UTextureRenderTarget2D* 
 			UnreservedTextures.Add(R.Key, Tex);
 			Reservations.RemoveAtSwap(i);
 			ReservedTextures.Remove(Tex);
+			
 			return;
 		}
 	}

@@ -73,8 +73,8 @@ protected:
 	};
 
 	TWeakObjectPtr<UObject> PoolOwner;
-	TMultiMap<FTextureKey, UTextureRenderTarget2D*> UnreservedTextures;
-	TSet<UTextureRenderTarget2D*> ReservedTextures;
+	TMultiMap<FTextureKey, TObjectPtr<UTextureRenderTarget2D>> UnreservedTextures;
+	TSet<TObjectPtr<UTextureRenderTarget2D>> ReservedTextures;
 
 	/// Weak reverse tracking of reservations, mostly for debugging
 	struct FReservationInfo
