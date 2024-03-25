@@ -12,9 +12,19 @@ bool StevesMathHelpers::OverlapConvex(const FKConvexElem& Convex,
                                       FMTDResult& OutResult)
 {
 	const FPhysicsShapeAdapter ShapeAdapter(ShapeRot, Shape);
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+	const Chaos::FConvexPtr& ChaosConvex = Convex.GetChaosConvexMesh();
+#else
 	const TSharedPtr<Chaos::FConvex, ESPMode::ThreadSafe>& ChaosConvex = Convex.GetChaosConvexMesh();
+#endif
 	if (!ChaosConvex.IsValid())
 		return false;
+
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+	const auto& ChaosConvexObj = *ChaosConvex.GetReference();
+#else
+	const auto& ChaosConvexObj = *ChaosConvex.Get();
+#endif
 
 	const Chaos::FImplicitObject& ShapeGeom = ShapeAdapter.GetGeometry();
 	const FTransform& ShapeGeomTransform = ShapeAdapter.GetGeomPose(ShapePos);
@@ -28,7 +38,7 @@ bool StevesMathHelpers::OverlapConvex(const FKConvexElem& Convex,
 	                                 ShapeGeomTransform,
 	                                 [&](const auto& Downcast, const auto& FullGeomTransform)
 	                                 {
-		                                 return Chaos::OverlapQuery(*ChaosConvex.Get(),
+		                                 return Chaos::OverlapQuery(ChaosConvexObj,
 		                                                            ConvexTransform,
 		                                                            Downcast,
 		                                                            FullGeomTransform,

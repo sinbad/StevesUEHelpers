@@ -21,7 +21,11 @@ void FStevesVisualLogger::InternalPolyLogfImpl(const UObject* Object,
 	}
 
 	// EVisualLoggerShapeElement::Path doesn't support a label, so description is always blank
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+	CurrentEntry->AddPath(Points, CategoryName, Verbosity, Color, "", Thickness);
+#else
 	CurrentEntry->AddElement(Points, CategoryName, Verbosity, Color, "", Thickness);
-
+#endif
+	
 #endif
 }
