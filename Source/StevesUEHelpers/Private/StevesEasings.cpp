@@ -102,9 +102,21 @@ float UStevesEasings::EaseAlpha(float InAlpha, EStevesEaseFunction Func)
 			constexpr float d1 = 2.75f;
 
 			if (InAlpha < 1.f / d1) { return n1 * InAlpha * InAlpha; }
-			else if (InAlpha < 2.f / d1) { return n1 * (InAlpha -= 1.5f / d1) * InAlpha + 0.75f; }
-			else if (InAlpha < 2.5f / d1) { return n1 * (InAlpha -= 2.25f / d1) * InAlpha + 0.9375f; }
-			else { return n1 * (InAlpha -= 2.625f / d1) * InAlpha + 0.984375f; }
+			else if (InAlpha < 2.f / d1)
+			{
+				const float newAlpha = InAlpha - 1.5f/d1;
+				return n1 * newAlpha * newAlpha + 0.75f;
+			}
+			else if (InAlpha < 2.5f / d1)
+			{
+				const float newAlpha = InAlpha - 2.25f/d1;
+				return n1 * newAlpha * newAlpha + 0.9375f;
+			}
+			else
+			{
+				const float newAlpha = InAlpha - 2.625f/d1;
+				return n1 * newAlpha * newAlpha + 0.984375f;
+			}
 		}
 	case EStevesEaseFunction::EaseInOut_Bounce:
 		return InAlpha < 0.5f
