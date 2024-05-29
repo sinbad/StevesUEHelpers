@@ -38,7 +38,12 @@ void FStevesFixedDataTableCustomisationLayout::CustomizeHeader(TSharedRef<class 
 		const FString& DataTablePath = InStructPropertyHandle->GetMetaData(TEXT("DataTable"));
 		if (UDataTable* DataTable = LoadObject<UDataTable>(nullptr, *DataTablePath, nullptr))
 		{
-			DataTablePropertyHandle->SetValue(DataTable);
+			UObject* Existing = nullptr;
+			const bool TablePicked = DataTablePropertyHandle->GetValue(Existing) == FPropertyAccess::Success;
+			if (!TablePicked || Existing != DataTable)
+			{
+				DataTablePropertyHandle->SetValue(DataTable);
+			}
 		}
 		else
 		{
