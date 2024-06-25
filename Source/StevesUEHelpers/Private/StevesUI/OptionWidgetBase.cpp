@@ -150,7 +150,7 @@ void UOptionWidgetBase::SetFocusProperly_Implementation()
     if (GamepadVersion && GamepadVersion->IsVisible())
         GamepadVersion->SetFocus();
     else if (MouseUpButton && MouseDownButton)
-        MouseUpButton->GetIsEnabled() ? MouseUpButton->SetFocus() : MouseDownButton->SetFocus();
+        MouseUpButton->GetVisibility() == ESlateVisibility::Visible ? MouseUpButton->SetFocus() : MouseDownButton->SetFocus();
 }
 
 void UOptionWidgetBase::SetSelectedIndex(int NewIndex)
@@ -168,9 +168,9 @@ void UOptionWidgetBase::SetSelectedIndex(int NewIndex)
     const bool CanDecrease = SelectedIndex > 0;
     const bool CanIncrease = SelectedIndex < Options.Num() - 1;
     if (MouseDownButton)
-        MouseDownButton->SetIsEnabled(CanDecrease);
+        MouseDownButton->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
     if (MouseUpButton)
-        MouseUpButton->SetIsEnabled(CanIncrease);
+        MouseUpButton->SetVisibility(CanIncrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
     if (GamepadDownImage)
         GamepadDownImage->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
     if (GamepadUpImage)
