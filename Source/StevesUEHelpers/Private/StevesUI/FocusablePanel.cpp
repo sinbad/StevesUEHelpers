@@ -13,6 +13,12 @@ void UFocusablePanel::NativeConstruct()
     if (!InitialFocusWidgetName.IsNone())
     {
         InitialFocusWidget = WidgetTree->FindWidget(InitialFocusWidgetName);
+#if WITH_EDITOR
+        if (!InitialFocusWidget.IsValid())
+        {
+            UE_LOG(LogStevesUI, Error, TEXT("Initial focus widget `%s` not found on %s, focus will be lost"), *InitialFocusWidgetName.ToString(), *GetName())
+        }
+#endif
     }
 
 }
