@@ -38,6 +38,12 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool bTakeFocusOnHover = true;
 
+    // Simulate a button press
+    UFUNCTION(BlueprintCallable)
+    void SimulatePress();
+    // Simulate a button release
+    UFUNCTION(BlueprintCallable)
+    void SimulateRelease();
 
 protected:    
     FButtonStyle FocussedStyle;
