@@ -10,12 +10,14 @@
 #include "StevesUI/FocusSystem.h"
 #include "StevesUI/InputImage.h"
 #include "StevesUI/UiTheme.h"
+#include "Templates/TypeHash.h"
 
 #include "StevesGameSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnhancedInputMappingsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEnhancedInputActionTriggered, const UInputAction*, Action, ETriggerEvent, TriggeredEvent);
 
 /// Entry point for all the top-level features of the helper system
 UCLASS(Config=Game)
@@ -33,7 +35,33 @@ protected:
     /// so that it's included when packaging
     UPROPERTY(Config)
     FString DefaultUiThemePath;
-    
+
+    struct FEnhancedInputInterest
+    {
+        
+        TWeakObjectPtr<const UInputAction> Action;
+        ETriggerEvent Trigger;
+        FEnhancedInputInterest(const UInputAction* TheAction, ETriggerEvent TheTriggerEvent) : Action(TheAction), Trigger(TheTriggerEvent) {}
+
+        
+        friend uint32 GetTypeHash(const FEnhancedInputInterest& Arg)
+        {
+            return HashCombine(GetTypeHash(Arg.Action), GetTypeHash(Arg.Trigger));
+        }
+
+        friend bool operator==(const FEnhancedInputInterest& Lhs, const FEnhancedInputInterest& RHS)
+        {
+            return Lhs.Action == RHS.Action
+                && Lhs.Trigger == RHS.Trigger;
+        }
+
+        friend bool operator!=(const FEnhancedInputInterest& Lhs, const FEnhancedInputInterest& RHS)
+        {
+            return !(Lhs == RHS);
+        }
+    };
+
+    TSet<FEnhancedInputInterest> RegisteredEnhancedInputActionInterests;
 
 public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -143,7 +171,9 @@ protected:
 
     TSoftObjectPtr<UDataTable> GetGamepadImages(int PlayerIndex, const UUiTheme* Theme);
     UPaperSprite* GetImageSpriteFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
-    
+    UFUNCTION()
+    void EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance);
+
 public:
 
     /// Event raised when main input mode changed between gamepad and keyboard / mouse (for any of axis / button events)
@@ -167,6 +197,11 @@ public:
     /// plugin provides NO events to monitor it (sigh)
     UPROPERTY(BlueprintAssignable)
     FOnEnhancedInputMappingsChanged OnEnhancedInputMappingsChanged;
+
+    /// Event fired when an enhanced input event that an interest has previously been registered in triggers.
+    /// Nothing will fire on this event unless you call RegisterInterestInEnhancedInputAction to listen for it.
+    UPROPERTY(BlueprintAssignable)
+    FOnEnhancedInputActionTriggered OnEnhancedInputActionTriggered;
     
     /// Event raised when the game window's foreground status changes
     UPROPERTY(BlueprintAssignable)
@@ -301,4 +336,10 @@ public:
      */
     TSoftObjectPtr<UInputAction> FindEnhancedInputAction(const FString& Name);
 
+
+    /// Register an interest in an enhanced input action. Calling this will result in OnEnhancedInputActionTriggered being called
+    /// when this action is triggered.
+    /// This is mainly for use in UI bindings. You only need to call it once for each UI-specific action.
+    UFUNCTION(BlueprintCallable)
+    void RegisterInterestInEnhancedInputAction(const UInputAction* Action, ETriggerEvent TriggerEvent);
 };

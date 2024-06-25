@@ -1,6 +1,7 @@
 #include "StevesGameSubsystem.h"
 
 #include "EngineUtils.h"
+#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "StevesGameViewportClientBase.h"
 #include "StevesPluginSettings.h"
@@ -106,6 +107,34 @@ TSoftObjectPtr<UInputAction> UStevesGameSubsystem::FindEnhancedInputAction(const
     }
     return nullptr;
 }
+
+void UStevesGameSubsystem::RegisterInterestInEnhancedInputAction(const UInputAction* Action, ETriggerEvent TriggerEvent)
+{
+    // Avoid registering duplicate interest
+    FEnhancedInputInterest Interest(Action, TriggerEvent);
+    if (!RegisteredEnhancedInputActionInterests.Contains(Interest))
+    {
+        if (auto GI = GetGameInstance())
+        {
+            if (auto PC = GI->GetFirstLocalPlayerController())
+            {
+                if (auto EIC = Cast<UEnhancedInputComponent>(PC->InputComponent))
+                {
+                    EIC->BindAction(Action, TriggerEvent, this, &ThisClass::EnhancedInputActionTriggered);
+                    RegisteredEnhancedInputActionInterests.Add(Interest);
+                }
+            }
+        }
+    }
+    
+}
+
+void UStevesGameSubsystem::EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance)
+{
+    OnEnhancedInputActionTriggered.Broadcast(InputActionInstance.GetSourceAction(), InputActionInstance.GetTriggerEvent());
+}
+
+
 
 void UStevesGameSubsystem::InitTheme()
 {
