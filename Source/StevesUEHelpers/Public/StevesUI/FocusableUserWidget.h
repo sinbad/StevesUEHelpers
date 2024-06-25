@@ -25,6 +25,8 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Focus")
     int AutomaticFocusPriority = 0;
 
+    virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+
 public:
     /// UWidget::SetFocus is not virtual FFS. This does the same as SetFocus by default but can be overridden,
     /// e.g. to delegate focus to specific children

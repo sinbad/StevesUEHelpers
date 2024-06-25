@@ -27,6 +27,19 @@ bool UFocusableUserWidget::TakeFocusIfDesired_Implementation()
     return false;
 }
 
+FReply UFocusableUserWidget::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+    FReply Reply = Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
+
+    if (!Reply.IsEventHandled())
+    {
+        SetFocusProperly();
+        Reply.Handled();
+    }
+
+    return Reply;
+}
+
 void UFocusableUserWidget::NativeConstruct()
 {
     Super::NativeConstruct();
