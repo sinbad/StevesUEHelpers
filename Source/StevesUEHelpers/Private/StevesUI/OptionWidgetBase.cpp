@@ -165,6 +165,15 @@ void UOptionWidgetBase::SetSelectedIndex(int NewIndex)
     if (GamepadText)
         GamepadText->SetText(NewText);
 
+    UpdateUpDownButtons();
+    
+    if (bRaiseEvent)
+        OnSelectedOptionChanged.Broadcast(this, SelectedIndex);
+    
+}
+
+void UOptionWidgetBase::UpdateUpDownButtons()
+{
     const bool CanDecrease = SelectedIndex > 0;
     const bool CanIncrease = SelectedIndex < Options.Num() - 1;
     if (MouseDownButton)
@@ -175,15 +184,22 @@ void UOptionWidgetBase::SetSelectedIndex(int NewIndex)
         GamepadDownImage->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
     if (GamepadUpImage)
         GamepadUpImage->SetVisibility(CanIncrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-
-    if (bRaiseEvent)
-        OnSelectedOptionChanged.Broadcast(this, SelectedIndex);
     
 }
 
+
 int UOptionWidgetBase::AddOption(FText Option)
 {
-    return Options.Add(Option);
+    const int Ret = Options.Add(Option);
+    if (GetSelectedIndex() == -1)
+    {
+        SetSelectedIndex(0);
+    }
+    else
+    {
+        UpdateUpDownButtons();
+    }
+    return Ret;
 }
 
 void UOptionWidgetBase::SetOptions(const TArray<FText>& InOptions, int NewSelectedIndex)

@@ -111,6 +111,7 @@ protected:
     virtual void ChangeOption(int Delta);
     UFUNCTION(BlueprintCallable)
     virtual EInputMode GetCurrentInputMode() const;
+	virtual void UpdateUpDownButtons();
 
 
 protected:
