@@ -59,6 +59,8 @@ protected:
 
     virtual void EmbedInParent();
 
+	UFUNCTION(BlueprintNativeEvent)
+	bool ValidateClose(bool bWasCancel);
 public:
     
     /**
@@ -70,11 +72,20 @@ public:
     UFUNCTION(BlueprintCallable)
     void Open(bool bIsRegainedFocus = false); 
     /**
-     * @brief Close this menu.
+     * @brief Request this menu to close. The menu can veto this request.
+     * @param bWasCancel Set this to true if the reason for closure was a cancellation action
+     * @return True if the request was approved
+     */
+    UFUNCTION(BlueprintCallable)
+    bool RequestClose(bool bWasCancel);
+    /**
+     * @brief Close this menu. This ALWAYS closes the menu, if you want it to be able to veto it, call RequestClose
      * @param bWasCancel Set this to true if the reason for closure was a cancellation action
      */
     UFUNCTION(BlueprintCallable)
     void Close(bool bWasCancel);
+
+    
 
     TWeakObjectPtr<UMenuStack> GetParentStack() const { return ParentStack; }
     virtual bool IsRequestingFocus_Implementation() const override { return bRequestFocus; }

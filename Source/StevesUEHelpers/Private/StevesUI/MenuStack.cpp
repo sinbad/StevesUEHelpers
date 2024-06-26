@@ -149,7 +149,12 @@ bool UMenuStack::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
     if (BackKeys.Contains(Key))
     {
         // This is "Back"
-        PopMenu(true);
+        // Request close but allow veto
+        if (Menus.Num() > 0)
+        {
+            auto Top = Menus.Last();
+            Top->RequestClose(true);
+        }
         return true;
     }
     else if (InstantCloseKeys.Contains(Key))

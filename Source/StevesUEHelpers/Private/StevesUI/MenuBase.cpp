@@ -94,6 +94,7 @@ void UMenuBase::Open(bool bIsRegain)
     auto PC = GetOwningPlayer();    
     switch (InputModeSetting)
     {
+    default:
     case EInputModeChange::DoNotChange:
         break;
     case EInputModeChange::UIOnly:
@@ -109,6 +110,7 @@ void UMenuBase::Open(bool bIsRegain)
 
     switch (MousePointerVisibility)
     {
+    default:
     case EMousePointerVisibilityChange::DoNotChange:
         break;
     case EMousePointerVisibilityChange::Visible:
@@ -121,6 +123,7 @@ void UMenuBase::Open(bool bIsRegain)
 
     switch (GamePauseSetting)
     {
+    default:
     case EGamePauseChange::DoNotChange:
         break;
     case EGamePauseChange::Paused:
@@ -133,4 +136,20 @@ void UMenuBase::Open(bool bIsRegain)
 
     TakeFocusIfDesired();
     
+}
+
+bool UMenuBase::RequestClose(bool bWasCancel)
+{
+    if (ValidateClose(bWasCancel))
+    {
+        Close(bWasCancel);
+        return true;
+    }
+    return false;
+}
+
+bool UMenuBase::ValidateClose_Implementation(bool bWasCancel)
+{
+    // Default always pass
+    return true;
 }
