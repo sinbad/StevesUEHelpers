@@ -66,7 +66,8 @@ void FFocusSystem::FocusableWidgetDestructed(UFocusableUserWidget* Widget)
     if (Widget->HasFocusedDescendants())
     {
         auto Highest = GetHighestFocusPriority();
-        if (Highest.IsValid())
+        // Make sure player controller is valid too, this could be on shutdown
+        if (Highest.IsValid() && Highest->GetOwningPlayer())
         {
             UE_LOG(LogFocusSystem, Display, TEXT("Giving focus to %s"), *Highest->GetName());
             Highest->TakeFocusIfDesired();
