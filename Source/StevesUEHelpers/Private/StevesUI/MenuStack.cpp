@@ -95,6 +95,11 @@ void UMenuStack::ApplyInputModeChange(EInputModeChange Change) const
         ApplyInputModeChange(PreviousInputMode);
         break;
     }
+
+    if (Change != EInputModeChange::DoNotChange && bFlushOnInputModeChange)
+    {
+        PC->FlushPressedKeys();
+    }
 }
 
 void UMenuStack::ApplyMousePointerVisibility(EMousePointerVisibilityChange Change) const

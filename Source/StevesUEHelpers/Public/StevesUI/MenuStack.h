@@ -80,6 +80,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
     EInputModeChange InputModeSettingOnOpen = EInputModeChange::DoNotChange;
 
+    /// When changing input mode, whether to flush pressed keys so we start fresh
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    bool bFlushOnInputModeChange = false;
+
     /// How this stack should set the mouse pointer visibility when it opens (default no change)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
     EMousePointerVisibilityChange MousePointerVisibilityOnOpen = EMousePointerVisibilityChange::DoNotChange;
