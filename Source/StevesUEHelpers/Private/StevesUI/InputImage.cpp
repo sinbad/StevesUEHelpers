@@ -127,7 +127,7 @@ void UInputImage::UpdateImage()
         
         if (Sprite)
         {
-            if (bHiddenBecauseBlank)
+            if (bHiddenBecauseBlank || bOverrideHiddenState)
             {
                 // Use Internal so as not to recurse back here
                 SetVisibilityInternal(OldVisibility);

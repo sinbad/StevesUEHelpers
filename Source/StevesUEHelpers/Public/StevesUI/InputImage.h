@@ -41,6 +41,14 @@ protected:
     UPROPERTY(EditAnywhere)
     float UpdateDelay = 0.1f;
 
+    /// Option to set this image as visible when bound, even if its state is hidden from outside
+    /// The default behaviour is that if this image is hidden by other means, visibility is not overridden.
+    /// This is safer but can result in a 1-frame blank image sometimes. Instead if you set this to true you can
+    /// set your images to hidden in the designer and have them display themselves when there's something to show.
+    /// You can then control invisiblity for other reasons from a parent widget.
+    UPROPERTY(EditAnywhere)
+    bool bOverrideHiddenState = false;
+
     /// The player index for which the input should be looked up 
     UPROPERTY(EditAnywhere)
     int PlayerIndex = 0;
