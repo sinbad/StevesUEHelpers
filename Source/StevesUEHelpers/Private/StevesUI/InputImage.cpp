@@ -154,8 +154,15 @@ void UInputImage::UpdateImage()
 
 void UInputImage::MarkImageDirty()
 {
-    bIsDirty = true;
-    DelayUpdate = 0.1f;
+    if (UpdateDelay > 0)
+    {
+        bIsDirty = true;
+        DelayUpdate = UpdateDelay;
+    }
+    else
+    {
+        UpdateImage();
+    }
 }
 
 // Tickables

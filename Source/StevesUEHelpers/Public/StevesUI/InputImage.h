@@ -37,6 +37,10 @@ protected:
     UPROPERTY(EditAnywhere)
     FKey Key;
 
+    /// When input mode changes, how quickly to update
+    UPROPERTY(EditAnywhere)
+    float UpdateDelay = 0.1f;
+
     /// The player index for which the input should be looked up 
     UPROPERTY(EditAnywhere)
     int PlayerIndex = 0;
