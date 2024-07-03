@@ -39,8 +39,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Layout")
     bool bEmbedInParentContainer = true;
 
-    /// Whether to hide this menu when it's superceded by another in the stack. This property is only relevant
-    /// when bEmbedInParentContainer = false, since only one menu can be embedded at once.
+    /// Whether to hide this menu when it's superceded by another in the stack.
+    /// If you set this to "false" when bEmbedInParentContainer=true, then the superceding menu should have its
+    /// own bEmbedInParentContainer set to false in order to overlay on top of this one.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
     bool bHideWhenSuperceded = true;
 
@@ -92,7 +93,7 @@ public:
 
     void AddedToStack(UMenuStack* Parent);
     void RemovedFromStack(UMenuStack* Parent);
-    void SupercededInStack();
+    void SupercededInStack(UMenuBase* ByMenu);
     void RegainedFocusInStack();
     void InputModeChanged(EInputMode OldMode, EInputMode NewMode);
 };

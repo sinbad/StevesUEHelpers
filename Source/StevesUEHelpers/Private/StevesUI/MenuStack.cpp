@@ -204,7 +204,7 @@ void UMenuStack::PushMenuByObject(UMenuBase* NewMenu)
     if (Menus.Num() > 0)
     {
         auto Top = Menus.Last();
-        Top->SupercededInStack();
+        Top->SupercededInStack(NewMenu);
         // We keep this allocated, to restore later on back
     }
     Menus.Add(NewMenu);

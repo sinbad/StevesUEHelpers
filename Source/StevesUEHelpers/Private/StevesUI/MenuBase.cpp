@@ -52,12 +52,15 @@ void UMenuBase::RemovedFromStack(UMenuStack* Parent)
     PreviousFocusWidget.Reset();
 }
 
-void UMenuBase::SupercededInStack()
+void UMenuBase::SupercededInStack(UMenuBase* ByMenu)
 {
     SavePreviousFocus();
     
     if (bEmbedInParentContainer)
-        RemoveFromParent();
+    {
+        if (bHideWhenSuperceded)
+            RemoveFromParent();
+    }
     else
     {
         if (bHideWhenSuperceded)
@@ -85,7 +88,7 @@ void UMenuBase::EmbedInParent()
 
 void UMenuBase::Open(bool bIsRegain)
 {
-    if (ParentStack.IsValid() && bEmbedInParentContainer)
+    if (ParentStack.IsValid() && bEmbedInParentContainer && bHideWhenSuperceded)
         EmbedInParent();
     else
         AddToViewport();
