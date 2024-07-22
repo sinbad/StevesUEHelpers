@@ -13,7 +13,7 @@ class STEVESUEHELPERS_API UStevesSpringArmComponent : public USpringArmComponent
 public:
 	/// Whether to move the camera smoothly to avoid collisions rather than jumping instantly
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CameraCollision)
-	uint32 bEnableSmoothCollisionAvoidance : 1 = true;
+	uint32 bEnableSmoothCollisionAvoidance : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CameraCollision)
 	float SmoothCollisionAvoidanceSpeed = 5;
