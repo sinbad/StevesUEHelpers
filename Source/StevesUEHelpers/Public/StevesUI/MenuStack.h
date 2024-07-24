@@ -139,6 +139,9 @@ public:
     virtual void PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel);
     virtual void RemoveFromParent() override;
 
+    /// Return the menu which is currently top of the stack
+    UFUNCTION(BlueprintCallable)
+    UMenuBase* GetTopMenu() const;
 
     UMenuStack();
 

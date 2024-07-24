@@ -269,6 +269,15 @@ void UMenuStack::RemoveFromParent()
 
 }
 
+UMenuBase* UMenuStack::GetTopMenu() const
+{
+    if (Menus.Num() > 0)
+    {
+        return Menus.Top();
+    }
+    return nullptr;
+}
+
 UMenuStack::UMenuStack()
 {
     // Default to enabling automatic focus for menus (can still be overridden in serialized properties)

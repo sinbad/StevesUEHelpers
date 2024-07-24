@@ -27,6 +27,7 @@ void UMenuBase::AddedToStack(UMenuStack* Parent)
     ParentStack = MakeWeakObjectPtr(Parent);
 
     Open(false);
+    OnAddedToStack(Parent);
 }
 
 
@@ -45,11 +46,22 @@ void UMenuBase::InputModeChanged(EInputMode OldMode, EInputMode NewMode)
     }
 }
 
+bool UMenuBase::IsTopOfStack() const
+{
+    if (ParentStack.IsValid())
+    {
+        return ParentStack->GetTopMenu() == this;
+    }
+
+    return true;
+}
+
 void UMenuBase::RemovedFromStack(UMenuStack* Parent)
 {
     // This works whether embedded or not
     RemoveFromParent();
     PreviousFocusWidget.Reset();
+    OnRemovedFromStack(Parent);
 }
 
 void UMenuBase::SupercededInStack(UMenuBase* ByMenu)
@@ -66,12 +78,13 @@ void UMenuBase::SupercededInStack(UMenuBase* ByMenu)
         if (bHideWhenSuperceded)
             SetVisibility(ESlateVisibility::Collapsed);
     }
+    OnSupercededInStack(ByMenu);
 }
 
 void UMenuBase::RegainedFocusInStack()
 {
     Open(true);
-    
+    OnRegainedFocusInStack();
 }
 
 void UMenuBase::EmbedInParent()
@@ -155,4 +168,20 @@ bool UMenuBase::ValidateClose_Implementation(bool bWasCancel)
 {
     // Default always pass
     return true;
+}
+
+void UMenuBase::OnSupercededInStack_Implementation(UMenuBase* ByMenu)
+{
+}
+
+void UMenuBase::OnRegainedFocusInStack_Implementation()
+{
+}
+
+void UMenuBase::OnAddedToStack_Implementation(UMenuStack* Parent)
+{
+}
+
+void UMenuBase::OnRemovedFromStack_Implementation(UMenuStack* Parent)
+{
 }

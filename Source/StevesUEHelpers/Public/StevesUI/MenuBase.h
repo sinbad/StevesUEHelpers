@@ -62,6 +62,19 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	bool ValidateClose(bool bWasCancel);
+
+	/// Called when this menu is superceded by another menu being pushed on to this stack
+	UFUNCTION(BlueprintNativeEvent)
+	void OnSupercededInStack(UMenuBase* ByMenu);
+	/// Called when this menu is superceded by another menu being pushed on to this stack
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRegainedFocusInStack();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnAddedToStack(UMenuStack* Parent);
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRemovedFromStack(UMenuStack* Parent);
+
 public:
     
     /**
@@ -96,4 +109,9 @@ public:
     void SupercededInStack(UMenuBase* ByMenu);
     void RegainedFocusInStack();
     void InputModeChanged(EInputMode OldMode, EInputMode NewMode);
+
+	/// Return whether this menu is currently at the top of the menu stack
+	/// Note: if this menu is not owned by a stack, will always return true
+	UFUNCTION(BlueprintCallable)
+	bool IsTopOfStack() const;
 };
