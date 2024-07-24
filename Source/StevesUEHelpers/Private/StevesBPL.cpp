@@ -5,6 +5,7 @@
 
 #include "StevesUiHelpers.h"
 #include "StevesUI/StevesUI.h"
+#include "ContentStreaming.h"
 
 void UStevesBPL::SetWidgetFocus(UWidget* Widget)
 {
