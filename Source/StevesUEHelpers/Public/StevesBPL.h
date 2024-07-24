@@ -75,4 +75,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
 	static FVector BalancedRandomPointInBox(const FStevesBalancedRandomStream& Stream, const FVector& Min, const FVector& Max) { return Stream.RandPointInBox(FBox(Min, Max)); }
 
+	
+	/**
+	 * Let the content streaming system know that there is a viewpoint other than a possessed camera that should be taken
+	 * into account when deciding what to stream in. This can be useful when you're using a scene capture component,
+	 * which if it's capturing a scene that isn't close to a player, can result in blurry textures.
+	 * @param ViewOrigin The world space view point
+	 * @param ScreenWidth The width in pixels of the screen being rendered
+	 * @param FOV Horizontal field of view, in degrees
+	 * @param BoostFactor How much to boost the LOD by (1 being normal, higher being higher detail)
+	 * @param bOverrideLocation	Whether this is an override location, which forces the streaming system to ignore all other regular locations
+	 * @param Duration How long the streaming system should keep checking this location (in seconds). 0 means just for the next Tick.
+	 * @param ActorToBoost Optional pointer to an actor who's textures should have their streaming priority boosted
+	 */
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Streaming")
+	static void AddViewOriginToStreaming(const FVector& ViewOrigin,
+	                                     float ScreenWidth,
+	                                     float FOV,
+	                                     float BoostFactor = 1.0f,
+	                                     bool bOverrideLocation = false,
+	                                     float Duration = 0.0f,
+	                                     AActor* ActorToBoost = nullptr); 
+	
+
 };
