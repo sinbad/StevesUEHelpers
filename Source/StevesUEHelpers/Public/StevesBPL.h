@@ -98,4 +98,12 @@ public:
 	                                     AActor* ActorToBoost = nullptr); 
 	
 
+	/**
+	 * Force content streaming to update. Useful if you need things to stream in sooner than usual.
+	 * @param DeltaTime The amount of time to tell the streaming system that has passed.
+	 * @param bBlockUntilDone If true, this call will not return until the streaming system has updated
+	 */
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Streaming")
+	static void UpdateStreaming(float DeltaTime, bool bBlockUntilDone = false);
+	
 };

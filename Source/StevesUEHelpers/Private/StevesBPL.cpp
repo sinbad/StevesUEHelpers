@@ -38,3 +38,13 @@ void UStevesBPL::AddViewOriginToStreaming(const FVector& ViewOrigin,
 	                                            Duration,
 	                                            ActorToBoost);
 }
+
+void UStevesBPL::UpdateStreaming(float DeltaTime, bool bBlockUntilDone)
+{
+	FStreamingManagerCollection& SM = IStreamingManager::Get();
+	SM.UpdateResourceStreaming(DeltaTime, true);
+	if (bBlockUntilDone)
+	{
+		SM.BlockTillAllRequestsFinished();
+	}
+}
