@@ -14,6 +14,7 @@ which makes a bunch of things better:
 * [Light Flicker](doc/LightFlicker.md)
 * [Easing Functions](Source/StevesUEHelpers/Public/StevesEasings.h)
 * [Replicated Physics Actor](Source/StevesUEHelpers/Public/StevesReplicatedPhysicsActor.h)
+* [Actor Pooling System](Source/StevesUEHelpers/Public/StevesPooledActorSystem.h)
 * Halton Sequence based random stream
 
 ## Examples
