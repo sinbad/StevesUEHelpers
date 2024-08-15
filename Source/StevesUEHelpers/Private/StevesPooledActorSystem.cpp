@@ -104,7 +104,9 @@ AActor* UStevesPooledActorSystem::SpawnNewActor(UClass* Class, const FVector& Lo
 	Params.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	AActor* Ret = GetWorld()->SpawnActor(Class, &Location, &Rotation, Params);
+#if WITH_EDITOR
 	Ret->SetActorLabel(Ret->GetName());
+#endif
 	return Ret;
 }
 
