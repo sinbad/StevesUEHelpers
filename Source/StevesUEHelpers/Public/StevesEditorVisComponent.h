@@ -241,6 +241,15 @@ struct STEVESUEHELPERS_API FStevesEditorVisCapsule : public FStevesEditorVisCyli
 {
 	GENERATED_BODY()
 
+	FStevesEditorVisCapsule(const FVector& InLocation, float InHeight, float InRadius, const FRotator& InRot,
+						const FColor& InColour) : FStevesEditorVisCylinder(InLocation, InHeight, InRadius, InRot, InColour)
+	{
+	}
+
+	FStevesEditorVisCapsule() : FStevesEditorVisCylinder()
+	{
+	}
+
 };
 
 USTRUCT(BlueprintType)
