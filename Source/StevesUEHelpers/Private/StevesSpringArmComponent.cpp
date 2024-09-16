@@ -1,5 +1,6 @@
 ﻿
 #include "StevesSpringArmComponent.h"
+#include "VisualLogger/VisualLogger.h"
 #include "StevesUEHelpers.h"
 
 

@@ -118,7 +118,9 @@ void UStevesPooledActorSystem::DisableActor(AActor* Actor)
 		if (auto Prim = Cast<UPrimitiveComponent>(Actor->GetRootComponent()))
 		{
 			Prim->SetSimulatePhysics(false);
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 3
 			Prim->ResetSceneVelocity();
+#endif
 		}
 		Actor->SetActorLocation(StorageLocation, false, nullptr, ETeleportType::ResetPhysics);
 
