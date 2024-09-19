@@ -41,7 +41,8 @@ void AStevesDynamicNavMeshVolume::UpdateDimensions(const FVector& NewDimensions)
 		Box.X = NewDimensions.X;
 		Box.Y = NewDimensions.Y;
 		Box.Z = NewDimensions.Z;
-		GetBrushComponent()->Bounds = FBoxSphereBounds(FVector::ZeroVector, NewDimensions*0.5f, NewDimensions.GetMax()*0.5f);
+		// Bounds are in World Space, hence use actor location as origin
+		GetBrushComponent()->Bounds = FBoxSphereBounds(GetActorLocation(), NewDimensions*0.5f, NewDimensions.GetMax()*0.5f);
 	}
 
 }
