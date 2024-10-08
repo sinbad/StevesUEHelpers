@@ -45,6 +45,11 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
     bool bHideWhenSuperceded = true;
 
+	/// Whether this panel should block clicks itself (useful for preventing click-through).
+	/// Set to false if you want to be able to click through the panel to other elements.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+	bool bBlockClicks = true;
+
     /// How this menu should set the input mode when it becomes the top of the stack
     /// This can be useful if your menus have variable input settings between levels in the stack
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")

@@ -105,7 +105,7 @@ void UMenuBase::Open(bool bIsRegain)
         EmbedInParent();
     else
         AddToViewport();
-    SetVisibility(ESlateVisibility::Visible);
+    SetVisibility(bBlockClicks ? ESlateVisibility::Visible : ESlateVisibility::SelfHitTestInvisible);
 
     auto PC = GetOwningPlayer();    
     switch (InputModeSetting)
