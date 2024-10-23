@@ -21,8 +21,13 @@ class STEVESUEHELPERS_API UMenuBase : public UFocusablePanel
 {
     GENERATED_BODY()
 public:
+	/// Raised just as the menu is closing
     UPROPERTY(BlueprintAssignable)
     FOnMenuClosed OnClosed;
+
+	/// Raised just after the menu has closed
+    UPROPERTY(BlueprintAssignable)
+    FOnMenuClosed AfterClosed;
     
 protected:
     UPROPERTY(BlueprintReadOnly)

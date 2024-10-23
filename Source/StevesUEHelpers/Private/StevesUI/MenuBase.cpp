@@ -20,6 +20,7 @@ void UMenuBase::Close(bool bWasCancel)
         RemoveFromParent();
         PreviousFocusWidget.Reset();
     }
+    AfterClosed.Broadcast(this, bWasCancel);
 }
 
 void UMenuBase::AddedToStack(UMenuStack* Parent)
