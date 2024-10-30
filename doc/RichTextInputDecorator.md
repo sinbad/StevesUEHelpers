@@ -108,3 +108,4 @@ Alternatives are:
 ## See Also
 
  * [Input Image](InputImage.md)
+ * [Widgets](Widgets.md)

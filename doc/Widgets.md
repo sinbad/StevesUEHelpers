@@ -66,3 +66,7 @@ Several custom widgets are supplied to assist with some common challenges:
   and also remembers the last focus widget if you switch away & back
   without destroying it.
 
+* [Smooth Changing Progress Bar](SmoothChangingProgress.md)
+
+  A ProgressBar subclass which adds the ability to smoothly change rather than
+  jumping straight to the target value.
