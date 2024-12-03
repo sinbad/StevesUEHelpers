@@ -15,12 +15,13 @@ UCLASS()
 class STEVESUEHELPERS_API UStevesPooledActorSystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
+
 protected:
 	TMap<UClass*, TDeque<TObjectPtr<AActor>>> Pools;
 
 	/// The location that actors in the pool are stored at
 	UPROPERTY(BlueprintReadWrite)
-	FVector StorageLocation = FVector(0,0,-100000);
+	FVector StorageLocation = FVector(0, 0, -100000);
 
 	TDeque<TObjectPtr<AActor>>* GetPool(UClass* Class, bool bCreate);
 	void DisableActor(AActor* Actor);
@@ -30,7 +31,6 @@ protected:
 	void DrainPool(TDeque<TObjectPtr<AActor>>* pPool, int NumberToKeep);
 
 public:
-
 	UFUNCTION(BlueprintCallable, Category="Pooling")
 	static UStevesPooledActorSystem* Get(const UObject* WorldContext);
 
@@ -76,15 +76,15 @@ public:
 	                       const FVector& Location,
 	                       const FRotator& Rotation,
 	                       bool& bWasReUsed);
-	
-	
-	template< class T >
+
+
+	template <class T>
 	T* GetPooledActor(UClass* Class, const FVector& Location, const FRotator& Rotation, bool& bOutWasReused)
 	{
 		return Cast<T>(GetPooledActor(Class, Location, Rotation, bOutWasReused));
 	}
 
-	template< class T >
+	template <class T>
 	T* GetPooledActor(UClass* Class, const FVector& Location, const FRotator& Rotation)
 	{
 		bool Dummy;
@@ -112,7 +112,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Pooling")
 	void DrainAllActorPools();
-	
-	virtual void Deinitialize() override;
 
+	virtual void Deinitialize() override;
 };
