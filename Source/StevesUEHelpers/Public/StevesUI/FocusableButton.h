@@ -38,6 +38,9 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool bTakeFocusOnHover = true;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool bLoseFocusOnUnhover = true;
+
     // Simulate a button press
     UFUNCTION(BlueprintCallable)
     void SimulatePress();
@@ -55,6 +58,8 @@ protected:
     void UndoFocusStyle();
     void SlateHandleHovered();
     void SlateHandleUnhovered();
+
+    void Unfocus() const;
 
     virtual TSharedRef<SWidget> RebuildWidget() override;
 

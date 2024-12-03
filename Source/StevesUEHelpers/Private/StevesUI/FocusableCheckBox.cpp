@@ -95,5 +95,28 @@ void UFocusableCheckBox::SlateHandleHovered()
 
 void UFocusableCheckBox::SlateHandleUnhovered()
 {
-    OnUnhovered.Broadcast();
+	if (bLoseFocusOnUnhover)
+	{
+		Unfocus();
+	}
+	OnUnhovered.Broadcast();
+}
+
+void UFocusableCheckBox::Unfocus() const
+{
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (OwningPlayer == nullptr || !OwningPlayer->IsLocalController() || OwningPlayer->Player ==
+		nullptr)
+	{
+		return;
+	}
+	if (ULocalPlayer* LocalPlayer = OwningPlayer->GetLocalPlayer())
+	{
+		TOptional<int32> UserIndex = FSlateApplication::Get().GetUserIndexForController(
+			LocalPlayer->GetControllerId());
+		if (UserIndex.IsSet())
+		{
+			FSlateApplication::Get().ClearUserFocus(UserIndex.GetValue());
+		}
+	}
 }

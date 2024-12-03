@@ -43,6 +43,10 @@ public:
     
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bTakeFocusOnHover = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bLoseFocusOnUnhover = true;
+
 protected:    
 	FCheckBoxStyle FocussedStyle;
 
@@ -53,6 +57,8 @@ protected:
 	void UndoFocusStyle();
 	void SlateHandleHovered();
 	void SlateHandleUnhovered();
+
+	void Unfocus() const;
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
