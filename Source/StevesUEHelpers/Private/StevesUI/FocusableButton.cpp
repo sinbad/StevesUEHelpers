@@ -109,5 +109,35 @@ void UFocusableButton::SlateHandleHovered()
 
 void UFocusableButton::SlateHandleUnhovered()
 {
-    OnUnhovered.Broadcast();
+	if (bLoseFocusOnUnhover)
+	{
+		Unfocus();
+	}
+	OnUnhovered.Broadcast();
+}
+
+void UFocusableButton::Unfocus() const
+{
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (OwningPlayer == nullptr || !OwningPlayer->IsLocalController() || OwningPlayer->Player ==
+		nullptr)
+	{
+		return;
+	}
+	if (ULocalPlayer* LocalPlayer = OwningPlayer->GetLocalPlayer())
+	{
+		TOptional<int32> UserIndex = FSlateApplication::Get().GetUserIndexForController(
+			LocalPlayer->GetControllerId());
+		if (UserIndex.IsSet())
+		{
+			TSharedPtr<SWidget> SafeWidget = GetCachedWidget();
+			if (SafeWidget.IsValid())
+			{
+				if (SafeWidget->HasUserFocus(UserIndex.GetValue()))
+				{
+					FSlateApplication::Get().ClearUserFocus(UserIndex.GetValue());
+				}
+			}
+		}
+	}
 }
