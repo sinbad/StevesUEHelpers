@@ -137,7 +137,8 @@ FPrimitiveSceneProxy* UStevesEditorVisComponent::CreateSceneProxy()
 
 FBoxSphereBounds UStevesEditorVisComponent::CalcBounds(const FTransform& LocalToWorld) const
 {
-	FBoxSphereBounds B = Super::CalcBounds(LocalToWorld);
+	// Get superclass bounds in LOCAL space (don't pass LocalToWorld)
+	FBoxSphereBounds B = Super::CalcBounds(FTransform::Identity);
 
 	// Now we need to merge in all components
 	for (auto& L : Lines)
