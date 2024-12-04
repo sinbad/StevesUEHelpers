@@ -116,7 +116,14 @@ void UFocusableCheckBox::Unfocus() const
 			LocalPlayer->GetControllerId());
 		if (UserIndex.IsSet())
 		{
-			FSlateApplication::Get().ClearUserFocus(UserIndex.GetValue());
+			TSharedPtr<SWidget> SafeWidget = GetCachedWidget();
+			if (SafeWidget.IsValid())
+			{
+				if (SafeWidget->HasUserFocus(UserIndex.GetValue()))
+				{
+					FSlateApplication::Get().ClearUserFocus(UserIndex.GetValue());
+				}
+			}
 		}
 	}
 }
