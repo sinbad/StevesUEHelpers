@@ -9,10 +9,35 @@ UStevesSpringArmComponent::UStevesSpringArmComponent(): bEnableSmoothCollisionAv
 {
 }
 
-FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
-	const FVector& TraceHitLocation,
-	bool bHitSomething,
+void UStevesSpringArmComponent::UpdateDesiredArmLocation(bool bDoTrace,
+	bool bDoLocationLag,
+	bool bDoRotationLag,
 	float DeltaTime)
+{
+	// Smooth target & socket offsets
+	if (SmoothTargetOffsetTarget.IsSet())
+	{
+		TargetOffset = FMath::VInterpTo(TargetOffset, SmoothTargetOffsetTarget.GetValue(), DeltaTime, SmoothTargetOffsetSpeed);
+		if (TargetOffset.Equals(SmoothTargetOffsetTarget.GetValue()))
+		{
+			CancelTargetOffsetSmooth();
+		}
+	}
+	if (SmoothSocketOffsetTarget.IsSet())
+	{
+		SocketOffset = FMath::VInterpTo(SocketOffset, SmoothSocketOffsetTarget.GetValue(), DeltaTime, SmoothSocketOffsetSpeed);
+		if (SocketOffset.Equals(SmoothSocketOffsetTarget.GetValue()))
+		{
+			CancelSocketOffsetSmooth();
+		}
+	}
+	Super::UpdateDesiredArmLocation(bDoTrace, bDoLocationLag, bDoRotationLag, DeltaTime);
+}
+
+FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
+                                                  const FVector& TraceHitLocation,
+                                                  bool bHitSomething,
+                                                  float DeltaTime)
 {
 
 #if WITH_EDITORONLY_DATA && ENABLE_VISUAL_LOG
@@ -49,7 +74,7 @@ FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocat
 		Ret += FRotationMatrix(PreviousDesiredRot).TransformVector(SocketOffset);
 
 		PrevArmLength = NewArmLen;
-
+			
 		return Ret;
 	}
 	else
@@ -57,4 +82,26 @@ FVector UStevesSpringArmComponent::BlendLocations(const FVector& DesiredArmLocat
 		return Base;
 	}
 	
+}
+
+void UStevesSpringArmComponent::SetTargetOffsetSmooth(const FVector& NewTargetOffset, float Speed)
+{
+	SmoothTargetOffsetTarget = NewTargetOffset;
+	SmoothTargetOffsetSpeed = Speed;
+}
+
+void UStevesSpringArmComponent::CancelTargetOffsetSmooth()
+{
+	SmoothTargetOffsetTarget.Reset();
+}
+
+void UStevesSpringArmComponent::SetSocketOffsetSmooth(const FVector& NewSocketOffset, float Speed)
+{
+	SmoothSocketOffsetTarget = NewSocketOffset;
+	SmoothSocketOffsetSpeed = Speed;
+}
+
+void UStevesSpringArmComponent::CancelSocketOffsetSmooth()
+{
+	SmoothSocketOffsetTarget.Reset();
 }

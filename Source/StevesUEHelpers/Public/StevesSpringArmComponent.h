@@ -21,6 +21,11 @@ public:
 protected:
 	TOptional<float> PrevArmLength;
 
+	TOptional<FVector> SmoothTargetOffsetTarget;
+	float SmoothTargetOffsetSpeed;
+	TOptional<FVector> SmoothSocketOffsetTarget;
+	float SmoothSocketOffsetSpeed;
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(Transient, EditAnywhere, Category=CameraCollision)
 	bool bVisualLogCameraCollision = false;
@@ -29,10 +34,28 @@ protected:
 public:
 	UStevesSpringArmComponent();
 
+	/// Smoothly change the target offset, instead of jumping
+	UFUNCTION(BlueprintCallable, Category="SpringArm")
+	void SetTargetOffsetSmooth(const FVector& NewTargetOffset, float Speed = 5);
+	/// Interrupt a smooth target offset change, freeze where we are
+	UFUNCTION(BlueprintCallable, Category="SpringArm")
+	void CancelTargetOffsetSmooth();
+
+	/// Smoothly change the socket offset, instead of jumping
+	UFUNCTION(BlueprintCallable, Category="SpringArm")
+	void SetSocketOffsetSmooth(const FVector& NewSocketOffset, float Speed = 5);
+	/// Interrupt a smooth socket offset change, freeze where we are
+	UFUNCTION(BlueprintCallable, Category="SpringArm")
+	void CancelSocketOffsetSmooth();
+
 protected:
-	virtual FVector BlendLocations(const FVector& DesiredArmLocation,
-		const FVector& TraceHitLocation,
-		bool bHitSomething,
+	virtual void UpdateDesiredArmLocation(bool bDoTrace,
+		bool bDoLocationLag,
+		bool bDoRotationLag,
 		float DeltaTime) override;
+	virtual FVector BlendLocations(const FVector& DesiredArmLocation,
+	                               const FVector& TraceHitLocation,
+	                               bool bHitSomething,
+	                               float DeltaTime) override;
 };
 
