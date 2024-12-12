@@ -299,10 +299,14 @@ void UMenuStack::LastMenuClosed(bool bWasCancel)
 void UMenuStack::CloseAll(bool bWasCancel)
 {
     // We don't go through normal pop sequence, this is a shot circuit
-    for (int i = Menus.Num() - 1; i >= 0; --i)
-    {
-        Menus[i]->RemovedFromStack(this);
-    }
+	for (int i = Menus.Num() - 1; i >= 0; --i)
+	{
+		UMenuBase* Menu = Menus[i];
+		if (IsValid(Menu))
+		{
+			Menus[i]->RemovedFromStack(this);
+		}
+	}
     Menus.Empty();
     LastMenuClosed(bWasCancel);
 }
