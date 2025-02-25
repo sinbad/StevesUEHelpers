@@ -16,6 +16,15 @@ void UMenuStack::NativeConstruct()
     {
         GS->OnInputModeChanged.AddDynamic(this, &UMenuStack::InputModeChanged);
         LastInputMode = GS->GetLastInputModeUsed();
+
+    	// Ensure that mouse is offscreen & hidden in gamepad mode
+    	// I've seen mouse *occasionally* end up still in the middle of the screen in gamepad mode,
+    	// causing confusing highlighting effects. I'm not sure if it's because of a resolution change or
+    	// something else, but it needs to never be there. The stack is a decent place to do this
+    	if (LastInputMode == EInputMode::Gamepad)
+    	{
+    		GS->MoveMouseOffScreen(true);
+    	}
     }
 
     SavePreviousInputMousePauseState();

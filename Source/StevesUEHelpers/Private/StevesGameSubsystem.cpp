@@ -187,19 +187,7 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
         if (NewMode == EInputMode::Gamepad)
         {
             // First move mouse pointer out of the way because it still generates mouse hits (unless we make source changes to Slate, ugh)
-            auto PC = GI->GetFirstLocalPlayerController();
-            FVector2D Sz;
-            VC->GetViewportSize(Sz);
-            // -1 because if you move cursor outside window when captured, Slate blows up when you press Return, ughghh 
-            PC->SetMouseLocation(Sz.X-1,Sz.Y-1);
-
-            // Now hide it
-            // I've seen people use PC->bShowMouseCursor but this messes with capturing when you switch back & forth
-            // especially when pausing in the editor
-
-            // instead, I'm using a separate flag to suppress it, see UiFixGameViewportClient for usage
-            if (SVC)
-                SVC->SetSuppressMouseCursor(true);
+        	MoveMouseOffScreen(true);
         }
         else if (NewMode == EInputMode::Mouse)
         {
@@ -208,6 +196,29 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
         }
     }
     OnInputModeChanged.Broadcast(PlayerIndex, NewMode);
+}
+
+void UStevesGameSubsystem::MoveMouseOffScreen(bool bAlsoHide) const
+{
+	if (auto GI = GetGameInstance())
+	{
+		auto VC = GI->GetGameViewportClient();
+		auto SVC = Cast<UStevesGameViewportClientBase>(VC);
+		auto PC = GI->GetFirstLocalPlayerController();
+	
+		FVector2D Sz;
+		VC->GetViewportSize(Sz);
+		// -1 because if you move cursor outside window when captured, Slate blows up when you press Return, ughghh 
+		PC->SetMouseLocation(Sz.X-1,Sz.Y-1);
+
+		// Now hide it
+		// I've seen people use PC->bShowMouseCursor but this messes with capturing when you switch back & forth
+		// especially when pausing in the editor
+		// instead, I'm using a separate flag to suppress it, see UiFixGameViewportClient for usage
+		if (SVC && bAlsoHide)
+			SVC->SetSuppressMouseCursor(true);
+	}
+
 }
 
 void UStevesGameSubsystem::OnButtonInputDetectorModeChanged(int PlayerIndex, EInputMode NewMode)

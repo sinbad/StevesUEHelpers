@@ -342,4 +342,12 @@ public:
     /// This is mainly for use in UI bindings. You only need to call it once for each UI-specific action.
     UFUNCTION(BlueprintCallable)
     void RegisterInterestInEnhancedInputAction(const UInputAction* Action, ETriggerEvent TriggerEvent);
+
+	/// Moves the mouse pointer offscreen so that it can't trigger hovers on anything. This happens by
+	/// default when switching to gamepad mode, but in edge cases I've found it useful to ensure that
+	/// some other effect doesn't interfere with gamepad navigation by relocating the mouse pointer to
+	/// the centre (I've seen this rarely but can't fully explain it). By default all MenuStacks call this
+	/// on open if the current input is gamepad, to ensure the mouse is out of the way.
+	UFUNCTION(BlueprintCallable)
+	void MoveMouseOffScreen(bool bAlsoHide = true) const;
 };
