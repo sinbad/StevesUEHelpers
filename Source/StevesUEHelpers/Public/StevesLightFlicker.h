@@ -100,6 +100,7 @@ protected:
 	UFUNCTION()
 	void OnRep_TimePos();
 	void ValueUpdate();
+	void GenerateCurveAndPlay();
 
 public:
 
@@ -116,4 +117,14 @@ public:
 	virtual void TickComponent(float DeltaTime,
 		ELevelTick TickType,
 		FActorComponentTickFunction* ThisTickFunction) override;
+
+	/// Change the flicker pattern dynamically
+	UFUNCTION(BlueprintCallable, Category="Light Flicker")
+	void SetFlickerPattern(EStevesLightFlickerPattern Pattern, const FString& CustomPatternString = FString(""));
+
+	/// Get the flicker pattern
+	UFUNCTION(BlueprintPure, Category="Light Flicker")
+	EStevesLightFlickerPattern GetFlickerPattern(FString& CustomString);
+
+
 };

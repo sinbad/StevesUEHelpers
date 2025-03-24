@@ -102,6 +102,11 @@ void UStevesLightFlickerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GenerateCurveAndPlay();
+}
+
+void UStevesLightFlickerComponent::GenerateCurveAndPlay()
+{
 	if (FlickerPattern == EStevesLightFlickerPattern::Custom)
 	{
 		Curve = &UStevesLightFlickerHelper::GetLightCurve(CustomFlickerPattern);
@@ -168,6 +173,20 @@ void UStevesLightFlickerComponent::TickComponent(float DeltaTime,
 		TimePos -= MaxTime;
 	}
 	ValueUpdate();
+}
+
+void UStevesLightFlickerComponent::SetFlickerPattern(EStevesLightFlickerPattern Pattern,
+	const FString& CustomPatternString)
+{
+	FlickerPattern = Pattern;
+	CustomFlickerPattern = CustomPatternString;
+	GenerateCurveAndPlay();
+}
+
+EStevesLightFlickerPattern UStevesLightFlickerComponent::GetFlickerPattern(FString& CustomString)
+{
+	CustomString = CustomFlickerPattern;
+	return FlickerPattern;
 }
 
 void UStevesLightFlickerComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
