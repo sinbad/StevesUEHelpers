@@ -22,6 +22,8 @@ enum class EStevesLightFlickerPattern : uint8
 	GentlePulse1,
 	FlourescentFlicker,
 	SlowPulseNoBlack,
+	Torch1,
+	Torch2,
 
 	Custom
 	
@@ -37,7 +39,7 @@ protected:
 	static TMap<EStevesLightFlickerPattern, FRichCurve> Curves;
 	static TMap<FString, FRichCurve> CustomCurves;
 	static FCriticalSection CriticalSection;
-	static const TMap<EStevesLightFlickerPattern, FString> QuakeCurveSources;
+	static const TMap<EStevesLightFlickerPattern, FString> StandardPatterns;
 	
 
 	static void BuildCurve(EStevesLightFlickerPattern CurveType, FRichCurve& OutCurve);
