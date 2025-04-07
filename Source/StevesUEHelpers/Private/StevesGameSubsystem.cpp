@@ -178,23 +178,27 @@ void UStevesGameSubsystem::OnInputDetectorModeChanged(int PlayerIndex, EInputMod
         bCheckedViewportClient = true;
     
     }
-    
-    auto GI = GetGameInstance();
-    auto VC = GI->GetGameViewportClient();
-    auto SVC = Cast<UStevesGameViewportClientBase>(VC);
-    if (VC)
-    {
-        if (NewMode == EInputMode::Gamepad)
-        {
-            // First move mouse pointer out of the way because it still generates mouse hits (unless we make source changes to Slate, ugh)
-        	MoveMouseOffScreen(true);
-        }
-        else if (NewMode == EInputMode::Mouse)
-        {
-            if (SVC)
-                SVC->SetSuppressMouseCursor(false);
-        }
-    }
+
+	auto Settings = GetDefault<UStevesPluginSettings>();
+	if (Settings->bHideMouseWhenGamepadUsed)
+	{
+		auto GI = GetGameInstance();
+		auto VC = GI->GetGameViewportClient();
+		auto SVC = Cast<UStevesGameViewportClientBase>(VC);
+		if (VC)
+		{
+			if (NewMode == EInputMode::Gamepad)
+			{
+				// First move mouse pointer out of the way because it still generates mouse hits (unless we make source changes to Slate, ugh)
+				MoveMouseOffScreen(true);
+			}
+			else if (NewMode == EInputMode::Mouse)
+			{
+				if (SVC)
+					SVC->SetSuppressMouseCursor(false);
+			}
+		}
+	}
     OnInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 

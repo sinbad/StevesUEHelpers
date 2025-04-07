@@ -14,6 +14,9 @@ class STEVESUEHELPERS_API UStevesPluginSettings
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(config, EditAnywhere, Category = StevesUEHelpers, meta = (ToolTip = "Whether to automatically hide the mouse cursor and move it offscreen when using a gamepad"))
+	bool bHideMouseWhenGamepadUsed = true;
+
 	/// Which directories to search for Enhanced Input Actions when referenced just by name in e.g. Rich Text Decorator
 	UPROPERTY(config, EditAnywhere, Category = StevesUEHelpers, meta = (DisplayName = "Directories to search for Enhanced Input Actions", RelativeToGameContentDir, LongPackageName))
 	TArray<FDirectoryPath> EnhancedInputActionSearchDirectories;
