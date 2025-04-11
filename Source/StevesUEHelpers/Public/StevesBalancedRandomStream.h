@@ -152,6 +152,34 @@ public:
 		return FVector2D(FMath::Lerp(Rect.Min.X, Rect.Max.X, R2.X),
 					   FMath::Lerp(Rect.Min.Y, Rect.Max.Y, R2.Y));
 	}
+	
+	/// Random point in a circle
+	FORCEINLINE FVector2D RandPointInCircle(float Radius = 1.0) const
+	{
+		// Just use rejection sampling for simplicity / speed
+		while (true)
+		{
+			const FVector2D Candidate = Rand2D();
+			if (Candidate.SquaredLength() <= 1.0)
+			{
+				return Candidate * Radius;
+			}
+		}
+	}
+
+	/// Random point in a sphere
+	FORCEINLINE FVector RandPointInSphere(float Radius = 1.0) const
+	{
+		// Just use rejection sampling for simplicity / speed
+		while (true)
+		{
+			const FVector Candidate = Rand3D();
+			if (Candidate.SquaredLength() <= 1.0)
+			{
+				return Candidate * Radius;
+			}
+		}
+	}
 
 	/// Random value in a range (inclusive)
 	float RandRange(float Min, float Max) const
