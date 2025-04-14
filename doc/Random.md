@@ -15,7 +15,7 @@ Halton Sequence:
 
 (Both images credit: Wikipedia)
 
-You'll find an implementation of this in the [`FStevesBalancedRandomStream`](Source\StevesUEHelpers\Public\StevesBalancedRandomStream.h) class, which is left open for other random
+You'll find an implementation of this in the [`FStevesBalancedRandomStream`](Source/StevesUEHelpers/Public/StevesBalancedRandomStream.h) class, which is left open for other random
 algorithms but currently only supports Halton Sequences. 
 
 ## Shuffle Bags
@@ -24,4 +24,4 @@ Shuffle bags are a useful way of generating random items without duplication unt
 refilled. Probabilities can be tweaked by adding more of a given item to the "bag". It's very good at simulating
 packs of cards, bags of tokens etc that you see in card games and table top games. 
 
-See [`FStevesShuffleBag`](Source\StevesUEHelpers\Public\StevesShuffleBag.h) for details. 
+See [`FStevesShuffleBag`](Source/StevesUEHelpers/Public/StevesShuffleBag.h) for details. 
