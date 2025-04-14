@@ -15,7 +15,7 @@ which makes a bunch of things better:
 * [Easing Functions](Source/StevesUEHelpers/Public/StevesEasings.h)
 * [Replicated Physics Actor](Source/StevesUEHelpers/Public/StevesReplicatedPhysicsActor.h)
 * [Actor Pooling System](Source/StevesUEHelpers/Public/StevesPooledActorSystem.h)
-* Halton Sequence based random stream
+* [Randomisation Tools](doc/Random.md) 
 
 ## Examples
 
