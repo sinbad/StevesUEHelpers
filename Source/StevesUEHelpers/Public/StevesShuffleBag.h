@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Math/RandomStream.h"
-#include "UObject/Object.h"
+#include "StevesShuffleBag.generated.h"
 
 /// A shufflebag is an array that contains a certain number of items, and can randomly withdraw one
 /// at a time until there are none left. No repeat items will be retrieved until the bag is empty.
@@ -11,7 +11,7 @@
 /// TRandStream which must be a type which implements the same interface as FRandomStream but may generate
 /// numbers differently.
 template<typename T, typename TRandStream = FRandomStream>
-struct FStevesShuffleBag<T>
+struct FStevesShuffleBag
 {
 protected:
 	TArray<T> Bag;
@@ -54,8 +54,9 @@ public:
 	 * @param NewItem The new item to add
 	 * @param Count The number of copies of this item to add. You can control the probability of items
 	 * by adding multiple of the same thing.
-	 * @note If you have already started pulling items from the bag, this item will NOT be available
-	 * to be pulled until the bag is next re-filled.
+	 * @note If you have already started pulling items from the bag, these items will NOT be available
+	 * to be pulled until the bag is next re-filled. They will count as having been pulled already
+	 * (so preferably add all your items before you start pulling items from the bag)
 	 */
 	void Add(const T& NewItem, int Count = 1)
 	{
@@ -136,6 +137,115 @@ public:
 		}
 		return Ret;
 	}
+
+	/// Get the number of items left in the bag
+	int GetNumRemaining() const
+	{
+		return SentinelIndex > 0 ? SentinelIndex : 0;
+	}
+
+	/// Get the number of items which have already been pulled from the bag
+	int GetNumPulled() const
+	{
+		return GetNumTotal() - GetNumRemaining();
+	}
+
+	/// Get the number of items both remaining in the bag and which have already been pulled from it
+	int GetNumTotal() const
+	{
+		return Bag.Num();
+	}
+
+};
+
+/// A shufflebag is an array that contains a certain number of items, and can randomly withdraw one
+/// at a time until there are none left. No repeat items will be retrieved until the bag is empty.
+/// Because Blueprints can't support templated types, FStevesIndexShuffleBag provides a concretely
+/// typed shuffle bag which simply provides array indices rather than values. When you pull out an
+/// item, instead of pulling out the *actual* item, you pull out an index into another array.
+/// You can therefore use this with any other array so long as you keep them synchronised.
+/// If you want to customise the probabilities, add multiple entries of the same item to *your* array
+/// before constructing the index shuffle bag.
+/// Use MakeIndexShuffleBag to create.
+UCLASS(BlueprintType)
+class UStevesIndexShuffleBag : public UObject
+{
+	GENERATED_BODY()
+
+protected:
+	FStevesShuffleBag<int> IndexBag;
+public:
+
+	UStevesIndexShuffleBag()
+	{
+	}
+	
+	/// Reinitialise the shuffle bag with a new size / seed.
+	UFUNCTION(BlueprintCallable, Category="Shuffle Bag")
+	void Reinitialise(int Count, int32 Seed)
+	{
+		IndexBag.Init(Seed, Count);
+
+		for (int i = 0; i < Count; ++i)
+		{
+			IndexBag.Add(i);
+		}
+	}
+
+	
+	/**
+	 * Create a new shuffle bag of indexes for accessing items in an array
+	 * @param Outer The 
+	 * @param Count The number of items in the array you'll be accessing with these indexes
+	 * @param Seed The seed for the random number generator
+	 * @return The new index shuffle bag
+	 */
+	UFUNCTION(BlueprintCallable, Category="Shuffle Bag")
+	static UStevesIndexShuffleBag* MakeIndexShuffleBag(UObject* Outer, int Count, int32 Seed = 0)
+	{
+		auto Ret = NewObject<UStevesIndexShuffleBag>(Outer);
+		Ret->Reinitialise(Count, Seed);
+		return Ret;
+	}
+
+	
+
+	/// Get the number of items left in the bag
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Shuffle Bag")
+	int GetNumRemaining() const
+	{
+		return IndexBag.GetNumRemaining();
+	}
+
+	/// Get the number of items which have already been pulled from the bag
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Shuffle Bag")
+	int GetNumPulled() const
+	{
+		return IndexBag.GetNumPulled();
+	}
+
+	/// Get the number of items both remaining in the bag and which have already been pulled from it
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Shuffle Bag")
+	int GetNumTotal() const
+	{
+		return IndexBag.GetNumTotal();
+	}
+
+	/// Reset the bag, returning all previously retrieved contents to the bag
+	UFUNCTION(BlueprintCallable, Category="Shuffle Bag")
+	void Reset()
+	{
+		IndexBag.Reset();
+	}
+
+	/// Pull a random index from those remaining in the bag. If the bag is empty, it will be
+	/// refilled using the indexes that were previously pulled (via Reset).
+	UFUNCTION(BlueprintCallable, Category="Shuffle Bag")
+	int Next()
+	{
+		return IndexBag.Next();
+	}
+	
 	
 };
 
