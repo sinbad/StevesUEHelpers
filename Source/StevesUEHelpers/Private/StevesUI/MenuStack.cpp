@@ -248,7 +248,7 @@ void UMenuStack::PopMenu(bool bWasCancel)
 
 void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
 {
-    if (Menus.Last() == UiMenuBase)
+    if (Menus.Num() > 0 && Menus.Last() == UiMenuBase)
     {
         PopMenu(bWasCancel);
     }
