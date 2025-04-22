@@ -105,5 +105,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Streaming")
 	static void UpdateStreaming(float DeltaTime, bool bBlockUntilDone = false);
-	
+
+	/// Calculate the perceived luminance of a colour using ITU BT.709 standard
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Colour")
+	static float GetPerceivedLuminance(const FLinearColor& InColour);
+
+	/// Calculate the perceived luminance of a colour using ITU BT.601 standard (more R & B)
+	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Colour")
+	static float GetPerceivedLuminance2(const FLinearColor& InColour);
 };

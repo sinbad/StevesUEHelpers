@@ -48,3 +48,21 @@ void UStevesBPL::UpdateStreaming(float DeltaTime, bool bBlockUntilDone)
 		SM.BlockTillAllRequestsFinished();
 	}
 }
+
+float UStevesBPL::GetPerceivedLuminance(const FLinearColor& InColour)
+{
+	// ITU BT.709
+	return
+		InColour.R * 0.2126f +
+		InColour.G * 0.7152f +
+		InColour.B * 0.0722f;
+}
+
+float UStevesBPL::GetPerceivedLuminance2(const FLinearColor& InColour)
+{
+	// ITU BT.601
+	return
+		InColour.R * 0.299f +
+		InColour.G * 0.587f +
+		InColour.B * 0.114f;
+}
