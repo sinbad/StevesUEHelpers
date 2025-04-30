@@ -10,18 +10,18 @@ void UFocusablePanel::NativeConstruct()
     Super::NativeConstruct();
 
     // Find focus widget
-    if (!InitialFocusWidgetName.IsNone())
-    {
-        InitialFocusWidget = WidgetTree->FindWidget(InitialFocusWidgetName);
+    
+    InitialFocusWidget = GetInitialFocusWidget();
 #if WITH_EDITOR
-        if (!InitialFocusWidget.IsValid())
-        {
-            UE_LOG(LogStevesUI, Error, TEXT("Initial focus widget `%s` not found on %s, focus will be lost"), *InitialFocusWidgetName.ToString(), *GetName())
-        }
-#endif
+    if (!InitialFocusWidget.IsValid())
+    {
+        UE_LOG(LogStevesUI, Error, TEXT("Initial focus widget `%s` not found on %s, focus will be lost"), *InitialFocusWidgetName.ToString(), *GetName())
     }
+#endif
 
 }
+
+
 
 void UFocusablePanel::NativeDestruct()
 {
@@ -30,14 +30,28 @@ void UFocusablePanel::NativeDestruct()
     InitialFocusWidget.Reset();
 }
 
-bool UFocusablePanel::SetFocusToInitialWidget() const
+bool UFocusablePanel::SetFocusToInitialWidget()
 {
+    if (!InitialFocusWidget.IsValid())
+    {
+        // if not set, attempt to get
+        InitialFocusWidget = GetInitialFocusWidget();
+    }
     if (InitialFocusWidget.IsValid())
     {
         SetWidgetFocusProperly(InitialFocusWidget.Get());
         return true;
     }
     return false;
+}
+
+UWidget* UFocusablePanel::GetInitialFocusWidget_Implementation()
+{
+    if (!InitialFocusWidgetName.IsNone())
+    {
+        return WidgetTree->FindWidget(InitialFocusWidgetName);
+    }
+    return nullptr;
 }
 
 
