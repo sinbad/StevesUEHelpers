@@ -30,8 +30,15 @@ public:
      * @return Whether the focus was successfully set
      */
     UFUNCTION(BlueprintCallable)
-    bool SetFocusToInitialWidget() const;
+    bool SetFocusToInitialWidget();
 
+    /**
+     * @brief Get's the desired focus widget. Allows implementation in BP for dynamically generated menus
+     * @return The initial focus widget
+     */
+    UFUNCTION(BlueprintNativeEvent)
+    UWidget* GetInitialFocusWidget();
+    
     /**
      * @brief Try to restore focus to the previously focussed child
      * @return Whether the focus was successfully set
