@@ -27,6 +27,7 @@ void SFocusableSlider::Construct(const FArguments& InArgs)
 	                   .RenderTransformPivot(InArgs._RenderTransformPivot)
 	                   .ToolTip(InArgs._ToolTip)
 	                   .ToolTipText(InArgs._ToolTipText)
+	                   .OnValueChanged(InArgs._OnValueChanged)
 		);
 
 	OnHoveredDelegate = InArgs._OnHovered;
