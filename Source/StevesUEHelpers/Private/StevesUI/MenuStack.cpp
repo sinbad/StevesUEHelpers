@@ -263,6 +263,11 @@ void UMenuStack::FirstMenuOpened()
 {
     // Don't use world time (even real time) since map can change while open
     TimeFirstOpen = FDateTime::Now();
+
+	if (!IsInViewport() && bAutoAddToViewport)
+	{
+		AddToViewport();
+	}
 }
 
 void UMenuStack::RemoveFromParent()
@@ -287,15 +292,23 @@ UMenuBase* UMenuStack::GetTopMenu() const
     return nullptr;
 }
 
-UMenuStack::UMenuStack()
+UMenuStack::UMenuStack():
+	LastInputMode(EInputMode::Unknown),
+	PreviousInputMode(EInputModeChange::GameOnly),
+	PreviousMouseVisibility(EMousePointerVisibilityChange::Visible),
+	PreviousPauseState(EGamePauseChange::Unpaused),
+	MenuContainer(nullptr)
 {
-    // Default to enabling automatic focus for menus (can still be overridden in serialized properties)
-    bEnableAutomaticFocus = true;
+	// Default to enabling automatic focus for menus (can still be overridden in serialized properties)
+	bEnableAutomaticFocus = true;
 }
 
 void UMenuStack::LastMenuClosed(bool bWasCancel)
 {
-    RemoveFromParent(); // this will do MenuSystem interaction
+	if (bAutoRemoveFromViewport)
+	{
+		RemoveFromParent(); // this will do MenuSystem interaction
+	}
     OnClosed.Broadcast(this, bWasCancel);
 
     ApplyInputModeChange(InputModeSettingOnClose);

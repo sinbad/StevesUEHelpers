@@ -65,7 +65,14 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
     TArray<FKey> InstantCloseKeys = TArray<FKey> { EKeys::Gamepad_Special_Right };
 
-    /// This property will bind to a blueprint variable of the same name to contain the actual menu content
+	/// Whether to automatically add this stack to the viewport when a menu is pushed onto it, if not already added
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Viewport")
+	bool bAutoAddToViewport = true;
+	/// Whether to automatically remove this stack from the viewport when the last menu is removed
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Viewport")
+	bool bAutoRemoveFromViewport = true;
+	
+	/// This property will bind to a blueprint variable of the same name to contain the actual menu content
     /// If not set, or the UiMenuBase is set to not use this container, levels are added independently to viewport
     /// Use a NamedSlot for this most of the time, it gives you the most layout flexibility.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
