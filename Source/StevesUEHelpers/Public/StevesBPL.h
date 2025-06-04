@@ -113,4 +113,23 @@ public:
 	/// Calculate the perceived luminance of a colour using ITU BT.601 standard (more R & B)
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Colour")
 	static float GetPerceivedLuminance2(const FLinearColor& InColour);
+
+	
+	/**
+		 * Equivalent to FVector::HeadingAngle but for FVector2D
+		 * @param Dir Input direction in 2D, does not need to be normalised
+		 * @return 'Heading' angle between +/-PI. 0 is pointing down +X.
+		 */
+	UFUNCTION(BlueprintPure)
+	static float HeadingAngle2D(const FVector2D& Dir);
+
+	/**
+	 * Find the angle between two 2D vectors
+	 * @param DirA Input direction in 2D, does not need to be normalised
+	 * @param DirB Input direction in 2D, does not need to be normalised
+	 * @return Difference in heading angle, between +/-PI, positive is anti-clockwise. 0 means directions match.
+	 */
+	UFUNCTION(BlueprintPure)
+	static float AngleBetween2D(const FVector2D& DirA, const FVector2D& DirB);
+
 };
