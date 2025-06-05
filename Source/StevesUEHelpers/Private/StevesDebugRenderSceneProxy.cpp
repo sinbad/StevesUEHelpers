@@ -2,6 +2,7 @@
 
 
 #include "StevesDebugRenderSceneProxy.h"
+#include "DynamicMeshBuilder.h"
 
 // Added in UE 5.2
 #if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 2
