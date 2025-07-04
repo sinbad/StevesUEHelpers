@@ -4,6 +4,7 @@
 #include "StevesUI/SubtitleTextblock.h"
 
 #include "SubtitleManager.h"
+#include "Kismet/GameplayStatics.h"
 
 TSharedRef<SWidget> USubtitleTextblock::RebuildWidget()
 {
@@ -38,5 +39,9 @@ void USubtitleTextblock::BeginDestroy()
 
 void USubtitleTextblock::SetSubtitleText(const FText& InText)
 {
-	SetText(InText);
+	// We get called even when subtitles are disabled
+	if (UGameplayStatics::AreSubtitlesEnabled() || InText.IsEmptyOrWhitespace())
+	{
+		SetText(InText);
+	}
 }
