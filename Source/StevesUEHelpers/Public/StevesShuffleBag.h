@@ -125,6 +125,13 @@ public:
 			Reset();
 			
 		}
+
+		// Empty bag
+		if (SentinelIndex == 0)
+		{
+			return T();
+		}
+		
 		// rand max is inclusive, and we need to exclude >= SentinelIndex
 		int NextIdx = RandomStream.RandRange(0, SentinelIndex - 1);
 		// Copy out
