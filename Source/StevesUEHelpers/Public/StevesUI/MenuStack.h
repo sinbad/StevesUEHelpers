@@ -149,7 +149,10 @@ public:
 
     /// Return the menu which is currently top of the stack
     UFUNCTION(BlueprintCallable)
-    UMenuBase* GetTopMenu() const;
+	UMenuBase* GetTopMenu() const;
+	/// Return the menu which is currently right below the top of the stack
+	UFUNCTION(BlueprintCallable)
+	UMenuBase* GetPreviousMenu() const;
 
     UMenuStack();
 

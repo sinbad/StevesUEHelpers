@@ -292,6 +292,15 @@ UMenuBase* UMenuStack::GetTopMenu() const
     return nullptr;
 }
 
+UMenuBase* UMenuStack::GetPreviousMenu() const
+{
+	if (Menus.Num() > 1)
+	{
+		return Menus.Last(1);
+	}
+	return nullptr;
+}
+
 UMenuStack::UMenuStack():
 	LastInputMode(EInputMode::Unknown),
 	PreviousInputMode(EInputModeChange::GameOnly),
