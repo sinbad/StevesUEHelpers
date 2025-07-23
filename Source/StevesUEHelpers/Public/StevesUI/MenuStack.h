@@ -34,7 +34,8 @@ protected:
     EInputModeChange PreviousInputMode;
     EMousePointerVisibilityChange PreviousMouseVisibility;
     EGamePauseChange PreviousPauseState;
-    
+
+	UPROPERTY()
     TArray<UMenuBase*> Menus;
 
     virtual void FirstMenuOpened();
