@@ -43,7 +43,6 @@ TSharedRef<SWidget> UMultiSubtitleVerticalbox::RebuildWidget()
 			if (Last != nullptr)
 			{
 				RemoveChild(Last);
-				Last->MarkAsGarbage();
 			}
 		}
 	}

@@ -91,6 +91,7 @@ protected:
 	FTimerHandle SubtitleUpdateTimer;
 
 	// The list of text blocks in the widget
+	UPROPERTY()
 	TArray<TObjectPtr<UTextBlock>> TextBlocks;
 
 	// The list of subtitles to show
