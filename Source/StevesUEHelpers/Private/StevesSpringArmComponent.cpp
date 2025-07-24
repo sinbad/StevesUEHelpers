@@ -105,3 +105,10 @@ void UStevesSpringArmComponent::CancelSocketOffsetSmooth()
 {
 	SmoothSocketOffsetTarget.Reset();
 }
+
+void UStevesSpringArmComponent::JumpToDesiredLocation()
+{
+	CancelTargetOffsetSmooth();
+	CancelSocketOffsetSmooth();
+	UpdateDesiredArmLocation(false, false, false, 0);
+}
