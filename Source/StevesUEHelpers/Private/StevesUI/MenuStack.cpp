@@ -26,12 +26,6 @@ void UMenuStack::NativeConstruct()
     		GS->MoveMouseOffScreen(true);
     	}
     }
-
-    SavePreviousInputMousePauseState();
-
-    ApplyInputModeChange(InputModeSettingOnOpen);
-    ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
-    ApplyGamePauseChange(GamePauseSettingOnOpen);
 }
 
 void UMenuStack::NativeDestruct()
@@ -268,6 +262,12 @@ void UMenuStack::FirstMenuOpened()
 	{
 		AddToViewport();
 	}
+	
+	SavePreviousInputMousePauseState();
+	
+	ApplyInputModeChange(InputModeSettingOnOpen);
+	ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
+	ApplyGamePauseChange(GamePauseSettingOnOpen);
 }
 
 void UMenuStack::RemoveFromParent()
@@ -290,6 +290,15 @@ UMenuBase* UMenuStack::GetTopMenu() const
         return Menus.Top();
     }
     return nullptr;
+}
+
+UMenuBase* UMenuStack::GetPreviousMenu() const
+{
+	if (Menus.Num() > 1)
+	{
+		return Menus.Last(1);
+	}
+	return nullptr;
 }
 
 UMenuStack::UMenuStack():
