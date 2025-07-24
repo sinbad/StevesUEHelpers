@@ -48,6 +48,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="SpringArm")
 	void CancelSocketOffsetSmooth();
 
+	/// Immediately jump to where the arm wants to be, ignoring interpolation
+	/// Useful if you need the camera to be where it should be right now
+	UFUNCTION(BlueprintCallable, Category="SpringArm")
+	void JumpToDesiredLocation();
 protected:
 	virtual void UpdateDesiredArmLocation(bool bDoTrace,
 		bool bDoLocationLag,
