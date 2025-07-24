@@ -38,6 +38,7 @@ protected:
 	UPROPERTY()
     TArray<UMenuBase*> Menus;
 
+	virtual void BeforeFirstMenuOpened();
     virtual void FirstMenuOpened();
     virtual void LastMenuClosed(bool bWasCancel);
 
