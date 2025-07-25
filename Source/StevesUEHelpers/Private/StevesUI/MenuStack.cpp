@@ -211,9 +211,14 @@ void UMenuStack::PushMenuByObject(UMenuBase* NewMenu)
         // We keep this allocated, to restore later on back
     }
     Menus.Add(NewMenu);
+	bool IsFirstMenu = Menus.Num() == 1;
+	
+	if (IsFirstMenu)
+		BeforeFirstMenuOpened();
+	
     NewMenu->AddedToStack(this);
 
-    if (Menus.Num() == 1)
+    if (IsFirstMenu)
         FirstMenuOpened();
 }
 
@@ -253,6 +258,15 @@ void UMenuStack::PopMenuIfTop(UMenuBase* UiMenuBase, bool bWasCancel)
 }
 
 
+void UMenuStack::BeforeFirstMenuOpened()
+{
+	SavePreviousInputMousePauseState();
+	
+	ApplyInputModeChange(InputModeSettingOnOpen);
+	ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
+	ApplyGamePauseChange(GamePauseSettingOnOpen);
+}
+
 void UMenuStack::FirstMenuOpened()
 {
     // Don't use world time (even real time) since map can change while open
@@ -262,12 +276,6 @@ void UMenuStack::FirstMenuOpened()
 	{
 		AddToViewport();
 	}
-	
-	SavePreviousInputMousePauseState();
-	
-	ApplyInputModeChange(InputModeSettingOnOpen);
-	ApplyMousePointerVisibility(MousePointerVisibilityOnOpen);
-	ApplyGamePauseChange(GamePauseSettingOnOpen);
 }
 
 void UMenuStack::RemoveFromParent()
