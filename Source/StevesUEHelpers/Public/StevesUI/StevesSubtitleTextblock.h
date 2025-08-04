@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/TextBlock.h"
-#include "SubtitleTextblock.generated.h"
+#include "StevesSubtitleTextblock.generated.h"
 
 /**
  * A simple Text Block that automatically displays subtitle text. Just drop it in and style it
@@ -12,7 +12,7 @@
  * versions will be disabled. 
  */
 UCLASS()
-class STEVESUEHELPERS_API USubtitleTextblock : public UTextBlock
+class STEVESUEHELPERS_API UStevesSubtitleTextblock : public UTextBlock
 {
 	GENERATED_BODY()
 

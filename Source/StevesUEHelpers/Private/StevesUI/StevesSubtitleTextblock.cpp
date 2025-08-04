@@ -1,12 +1,12 @@
 ﻿// 
 
 
-#include "StevesUI/SubtitleTextblock.h"
+#include "StevesUI/StevesSubtitleTextblock.h"
 
 #include "SubtitleManager.h"
 #include "Kismet/GameplayStatics.h"
 
-TSharedRef<SWidget> USubtitleTextblock::RebuildWidget()
+TSharedRef<SWidget> UStevesSubtitleTextblock::RebuildWidget()
 {
 	auto Ret = Super::RebuildWidget();
 
@@ -14,7 +14,7 @@ TSharedRef<SWidget> USubtitleTextblock::RebuildWidget()
 	{
 		if (auto SM = FSubtitleManager::GetSubtitleManager())
 		{
-			SM->OnSetSubtitleText().AddUObject(this, &USubtitleTextblock::SetSubtitleText);
+			SM->OnSetSubtitleText().AddUObject(this, &UStevesSubtitleTextblock::SetSubtitleText);
 			bSubscribed = true;
 		}
 	}
@@ -23,7 +23,7 @@ TSharedRef<SWidget> USubtitleTextblock::RebuildWidget()
 
 }
 
-void USubtitleTextblock::BeginDestroy()
+void UStevesSubtitleTextblock::BeginDestroy()
 {
 	Super::BeginDestroy();
 
@@ -37,7 +37,7 @@ void USubtitleTextblock::BeginDestroy()
 	}
 }
 
-void USubtitleTextblock::SetSubtitleText(const FText& InText)
+void UStevesSubtitleTextblock::SetSubtitleText(const FText& InText)
 {
 	// We get called even when subtitles are disabled
 	if (UGameplayStatics::AreSubtitlesEnabled() || InText.IsEmptyOrWhitespace())

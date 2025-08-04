@@ -35,6 +35,5 @@
       "Name": "EnhancedInput",
       "Enabled": true
     }
-  ],
-  "EngineVersion": "5.5.0"
+  ]
 }
