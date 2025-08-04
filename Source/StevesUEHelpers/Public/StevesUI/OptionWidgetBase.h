@@ -55,7 +55,7 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnSelectedOptionChanged OnSelectedOptionChanged;
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="OptionWidget")
     /// Remove all options
     virtual void ClearOptions();
 

@@ -133,7 +133,7 @@ public:
     void PopMenu(bool bWasCancel);
 
     /// Get the number of active levels in the menu
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     int Count() const { return Menus.Num(); }
 
     /// Close the entire stack at once. This does not give any of the menus chance to do anything before close, so if you
