@@ -4,6 +4,7 @@
 #include "StevesUI/MultiSubtitleVerticalbox.h"
 
 #include "SubtitleManager.h"
+#include "TimerManager.h"
 #include "Engine/Font.h"
 #include "Kismet/GameplayStatics.h"
 

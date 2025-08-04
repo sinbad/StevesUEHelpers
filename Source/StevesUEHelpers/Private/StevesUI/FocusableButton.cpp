@@ -2,6 +2,8 @@
 #include "StevesUI/SFocusableButton.h"
 #include "Components/ButtonSlot.h"
 #include "Framework/Application/NavigationConfig.h"
+#include "Framework/Application/SlateApplication.h"
+
 
 UFocusableButton::UFocusableButton(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)

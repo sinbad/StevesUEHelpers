@@ -1,6 +1,9 @@
 ﻿// Copyright Steve Streeting
 // Licensed under the MIT License (see License.txt)
 #include "StevesReplicatedPhysicsActor.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/World.h"
 
 
 AStevesReplicatedPhysicsActor::AStevesReplicatedPhysicsActor(const FObjectInitializer& ObjInit)

@@ -7,7 +7,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
 #include "Widgets/Layout/SScaleBox.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Images/SImage.h"
+#include "Framework/Application/SlateApplication.h"
 
 
 // Slate SNew only supports 5 custom arguments so we need to batch things up

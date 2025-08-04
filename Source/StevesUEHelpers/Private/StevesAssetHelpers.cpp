@@ -2,6 +2,7 @@
 
 #include "StevesUEHelpers.h"
 #include "Engine/ObjectLibrary.h"
+#include "Blueprint/BlueprintSupport.h"
 
 int UStevesAssetHelpers::FindBlueprintSoftPaths(const TArray<FDirectoryPath>& InPaths,
                                                UObjectLibrary* ObjectLibrary,

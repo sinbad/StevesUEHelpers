@@ -1,5 +1,7 @@
 ﻿#include "StevesUI/FocusableCheckBox.h"
 #include "StevesUI/SFocusableCheckBox.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "Framework/Application/SlateApplication.h"
 
 
 TSharedRef<SWidget> UFocusableCheckBox::RebuildWidget()

@@ -7,6 +7,7 @@
 #include "InputAction.h"
 #include "Components/Image.h"
 #include "StevesHelperCommon.h"
+#include "Tickable.h"
 #include "InputImage.generated.h"
 
 /// A special widget containing an image which populates itself based on an input action / axis and can dynamically

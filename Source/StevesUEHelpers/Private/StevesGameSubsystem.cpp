@@ -14,6 +14,11 @@
 #include "GameFramework/PlayerInput.h"
 #include "StevesUI/KeySprite.h"
 #include "StevesUI/StevesUI.h"
+#include "TimerManager.h"
+#include "AssetRegistry/AssetData.h"
+#include "Engine/Engine.h"
+#include "Engine/LocalPlayer.h"
+#include "UnrealClient.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 

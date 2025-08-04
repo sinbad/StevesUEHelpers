@@ -5,6 +5,8 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Curves/RichCurve.h"
+#include "Components/ActorComponent.h"
 #include "StevesLightFlicker.generated.h"
 
 

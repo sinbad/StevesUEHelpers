@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "StevesBalancedRandomStream.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "StevesMathHelpers.h"
 #include "Components/PanelSlot.h"

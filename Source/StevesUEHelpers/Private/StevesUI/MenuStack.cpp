@@ -5,6 +5,7 @@
 #include "StevesUEHelpers.h"
 #include "StevesUI/MenuBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/GameViewportClient.h"
 
 void UMenuStack::NativeConstruct()
 {

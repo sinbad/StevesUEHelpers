@@ -1,4 +1,5 @@
 ﻿#include "SFocusableCheckBox.h"
+#include "Framework/Application/SlateApplication.h"
 
 void SFocusableCheckBox::Construct(const FArguments& InArgs)
 {

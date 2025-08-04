@@ -1,5 +1,5 @@
 #include "FocusableInputInterceptorUserWidget.h"
-
+#include "Framework/Application/SlateApplication.h"
 
 void UFocusableInputInterceptorUserWidget::NativeConstruct()
 {

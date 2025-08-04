@@ -1,5 +1,9 @@
 ﻿#pragma once
 #include <functional>
+#include "Math/UnrealMathUtility.h"
+#include "Math/MathFwd.h"
+#include "CollisionShape.h"
+#include "Engine/EngineTypes.h"
 
 struct FKConvexElem;
 

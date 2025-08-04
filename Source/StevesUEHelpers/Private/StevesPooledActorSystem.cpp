@@ -2,7 +2,8 @@
 
 
 #include "StevesPooledActorSystem.h"
-
+#include "Components/PrimitiveComponent.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "StevesPooledActor.h"
 
 UStevesPooledActorSystem* UStevesPooledActorSystem::Get(const UObject* WorldContext)

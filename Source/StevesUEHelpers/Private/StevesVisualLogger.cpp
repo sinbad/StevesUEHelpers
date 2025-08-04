@@ -1,5 +1,7 @@
 ﻿#include "StevesVisualLogger.h"
-
+#include "Runtime/Launch/Resources/Version.h"
+#include "EngineStats.h"
+#include "Stats/Stats.h"
 
 
 void FStevesVisualLogger::InternalPolyLogfImpl(const UObject* Object,

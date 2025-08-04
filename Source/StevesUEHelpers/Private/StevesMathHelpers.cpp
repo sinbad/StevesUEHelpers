@@ -3,6 +3,9 @@
 #include "Chaos/CastingUtilities.h"
 #include "Chaos/GeometryQueries.h"
 #include "PhysicsEngine/ConvexElem.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "Chaos/ChaosEngineInterface.h"
+
 
 bool StevesMathHelpers::OverlapConvex(const FKConvexElem& Convex,
                                       const FTransform& ConvexTransform,

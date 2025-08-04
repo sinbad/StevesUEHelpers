@@ -2,6 +2,8 @@
 
 
 #include "StevesUI/FocusableSlider.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Engine/LocalPlayer.h"
 
 #include "SFocusableSlider.h"
 

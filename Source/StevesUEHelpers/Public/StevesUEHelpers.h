@@ -5,6 +5,7 @@
 
 #include "StevesGameSubsystem.h"
 #include "Modules/ModuleManager.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogStevesUEHelpers, Verbose, Verbose);

@@ -3,6 +3,7 @@
 
 #include "StevesEditorVisComponent.h"
 #include "StaticMeshResources.h"
+#include "Engine/StaticMesh.h"
 #include "StevesDebugRenderSceneProxy.h"
 
 UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer)

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
+#include "UObject/Interface.h"
 #include "StevesPooledActor.generated.h"
 
 UINTERFACE(MinimalAPI)
