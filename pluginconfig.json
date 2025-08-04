@@ -1,0 +1,14 @@
+{
+    "PackageDir": "E:\\Gamedev\\Build\\StevesUEHelpers\\Package",
+    "BuildDir": "E:\\Gamedev\\Build\\StevesUEHelpers\\Build",
+    "EngineVersions":
+    [
+        "5.4.0",
+        "5.5.0",
+        "5.6.0"
+    ]
+
+
+}
+
+
