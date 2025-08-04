@@ -148,10 +148,10 @@ protected:
 
     FTimerHandle ForegroundCheckHandle;
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(BlueprintReadOnly, Category="StevesGameSubsystem")
     bool bIsForeground = true;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(BlueprintReadWrite, Category="StevesGameSubsystem")
     UUiTheme* DefaultUiTheme;
 
     TArray<FStevesTextureRenderTargetPoolPtr> TextureRenderTargetPools;
@@ -208,16 +208,16 @@ public:
     FOnWindowForegroundChanged OnWindowForegroundChanged;
 
     /// Gets the device where the most recent input event of any kind happened
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     EInputMode GetLastInputModeUsed(int PlayerIndex = 0) const { return InputDetector->GetLastInputMode(PlayerIndex); }
     /// Gets the device where the most recent button press happened
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     EInputMode GetLastInputButtonPressed(int PlayerIndex = 0) const { return InputDetector->GetLastButtonInputMode(PlayerIndex); }
     /// Gets the device where the most recent axis move happened
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     EInputMode GetLastInputAxisMoved(int PlayerIndex = 0) const { return InputDetector->GetLastAxisInputMode(PlayerIndex); }
     
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     bool LastInputWasGamePad(int PlayerIndex = 0) const { return GetLastInputModeUsed(PlayerIndex) == EInputMode::Gamepad; }
 
     /// Gets the default UI theme object (defaults to our own)
@@ -243,7 +243,7 @@ public:
      * @param Theme Optional explicit theme, if blank use the default theme
      * @return 
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     UPaperSprite* GetInputImageSprite(EInputBindingType BindingType,
                                       FName ActionOrAxis,
                                       FKey Key,
@@ -329,7 +329,7 @@ public:
      * so we need the user to tell us when they make a change.
      * This call is however slightly delayed before being acted upon, because EI defers the rebuild of mappings until the next tick.
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     void NotifyEnhancedInputMappingsChanged();
 
     /** Attempt to find an enhanced input action by name in the configured folders.
@@ -340,7 +340,7 @@ public:
     /// Register an interest in an enhanced input action. Calling this will result in OnEnhancedInputActionTriggered being called
     /// when this action is triggered.
     /// This is mainly for use in UI bindings. You only need to call it once for each UI-specific action.
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     void RegisterInterestInEnhancedInputAction(const UInputAction* Action, ETriggerEvent TriggerEvent);
 
 	/// Moves the mouse pointer offscreen so that it can't trigger hovers on anything. This happens by
@@ -348,6 +348,6 @@ public:
 	/// some other effect doesn't interfere with gamepad navigation by relocating the mouse pointer to
 	/// the centre (I've seen this rarely but can't fully explain it). By default all MenuStacks call this
 	/// on open if the current input is gamepad, to ensure the mouse is out of the way.
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
 	void MoveMouseOffScreen(bool bAlsoHide = true) const;
 };

@@ -77,7 +77,7 @@ public:
 	/// This property will bind to a blueprint variable of the same name to contain the actual menu content
     /// If not set, or the UiMenuBase is set to not use this container, levels are added independently to viewport
     /// Use a NamedSlot for this most of the time, it gives you the most layout flexibility.
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="Menu")
     UContentWidget* MenuContainer;
 
     /// Event raised when the stack is closed for any reason. If bWasCancel, the menu stack was closed because the
@@ -119,17 +119,17 @@ public:
     
     /// Push a new menu level by class. This will instantiate the new menu, display it, and inform the previous menu that it's
     /// been superceded. Use the returned instance if you want to cache it
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     UMenuBase* PushMenuByClass(TSubclassOf<UMenuBase> MenuClass);
 
     /// Push a new menu level by instance on to the stack. This will display the new menu and inform the previous menu that it's
     /// been superceded, which will most likely mean it will be hidden (but will retain its state)
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     void PushMenuByObject(UMenuBase* NewMenu);
 
     /// Pop the top level of the menu stack. This *destroys* the top level menu, meaning it will lose all of its state.
     /// You won't need to call this manually most of the time, because calling Close() on the MenuBase will do it.
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     void PopMenu(bool bWasCancel);
 
     /// Get the number of active levels in the menu
@@ -138,7 +138,7 @@ public:
 
     /// Close the entire stack at once. This does not give any of the menus chance to do anything before close, so if you
     /// want them to do that, use PopMenu() until Count() == 0 instead
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     void CloseAll(bool bWasCancel);
 
     /// Whether the top MenuBase on this stack is requesting focus
@@ -149,10 +149,10 @@ public:
     virtual void RemoveFromParent() override;
 
     /// Return the menu which is currently top of the stack
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
 	UMenuBase* GetTopMenu() const;
 	/// Return the menu which is currently right below the top of the stack
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Menu")
 	UMenuBase* GetPreviousMenu() const;
 
     UMenuStack();

@@ -120,7 +120,7 @@ public:
 		 * @param Dir Input direction in 2D, does not need to be normalised
 		 * @return 'Heading' angle between +/-PI. 0 is pointing down +X.
 		 */
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="StevesUEHelpers|Math")
 	static float HeadingAngle2D(const FVector2D& Dir);
 
 	/**
@@ -129,7 +129,7 @@ public:
 	 * @param DirB Input direction in 2D, does not need to be normalised
 	 * @return Difference in heading angle, between +/-PI, positive is anti-clockwise. 0 means directions match.
 	 */
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="StevesUEHelpers|Math")
 	static float AngleBetween2D(const FVector2D& DirA, const FVector2D& DirB);
 
 };

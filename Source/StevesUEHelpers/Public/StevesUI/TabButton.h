@@ -22,24 +22,24 @@ public:
 	UPROPERTY(BlueprintAssignable,BlueprintCallable)
 	FOnTabSelected OnTabSelected;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="TabButton")
 	int TabIndex;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="TabButton")
 	bool bTabSelected=false;
 
 	void Initialise(int InTabIndex,const FText& InLabel);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category="TabButton")
 	void SetTabLabel(const FText& InLabel);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	void SetTabSelected(bool bSelected);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	void NotifyTabSelected();
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category="TabButton")
 	void RefreshForSelectionChanged();
 	
 };

@@ -19,7 +19,7 @@ protected:
 	TMap<UClass*, TDeque<TObjectPtr<AActor>>> Pools;
 
 	/// The location that actors in the pool are stored at
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category="Pooling")
 	FVector StorageLocation = FVector(0,0,-100000);
 
 	TDeque<TObjectPtr<AActor>>* GetPool(UClass* Class, bool bCreate);

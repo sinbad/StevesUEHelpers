@@ -61,16 +61,16 @@ public:
 	TMap<FName,FTabListRegisteredTabInfo> RegisteredTabs;
 
 	// Where the tab buttons will be added
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category="TabButton")
 	TObjectPtr<UPanelWidget> TabButtonContainer;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="TabButton")
 	int SelectedTabIndex=-1;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="TabButton")
 	FMargin TabButtonPadding=FMargin(10,0);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="TabButton")
 	UWidgetSwitcher* TargetWidgetSwitcher;
 	
 	/**
@@ -80,7 +80,7 @@ public:
 	 * @param ContentWidget The widget to activate when pressed
 	 * @return True If successful
 	 */
-	UFUNCTION(BlueprintCallable, Category = TabList)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	bool RegisterTab(FName TabID, TSubclassOf<UTabButton> ButtonWidgetType,FText Label, UWidget* ContentWidget);
 
 	/**
@@ -94,13 +94,13 @@ public:
 	 * Assign a widget switcher to be driven by this tab selection.
 	 * @param WidgetSwitcher 
 	 */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	void SetTargetWidgetSwitcher(UWidgetSwitcher* WidgetSwitcher);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	void IncrementTabIndex(int Amount);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="TabButton")
 	void SelectTab(int TabIndex);
 
 	virtual bool HandleKeyDownEvent(const FKeyEvent& InKeyEvent) override;

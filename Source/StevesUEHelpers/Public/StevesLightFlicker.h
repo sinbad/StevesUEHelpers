@@ -109,11 +109,11 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnLightFlickerUpdate OnLightFlickerUpdate;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Light Flicker")
 	void Play(bool bResetTime = false);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Light Flicker")
 	void Pause();
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="Light Flicker")
 	float GetCurrentValue() const;
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime,

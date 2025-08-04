@@ -30,16 +30,16 @@ protected:
 public:
     /// UWidget::SetFocus is not virtual FFS. This does the same as SetFocus by default but can be overridden,
     /// e.g. to delegate focus to specific children
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Focus")
     void SetFocusProperly();
 
     /// Whether this widget is *currently* requesting focus. Default is to use IsAutomaticFocusEnabled but subclasses
     /// may override this to be volatile
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Focus")
     bool IsRequestingFocus() const;
 
     /// Tell this widget to take the focus if it desires to
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Focus")
     bool TakeFocusIfDesired();
 
     virtual bool IsAutomaticFocusEnabled() const { return bEnableAutomaticFocus; }

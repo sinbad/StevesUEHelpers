@@ -22,15 +22,15 @@ class STEVESUEHELPERS_API UMenuBase : public UFocusablePanel
     GENERATED_BODY()
 public:
 	/// Raised just as the menu is closing
-    UPROPERTY(BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable, Category="Menu")
     FOnMenuClosed OnClosed;
 
 	/// Raised just after the menu has closed
-    UPROPERTY(BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable, Category="Menu")
     FOnMenuClosed AfterClosed;
     
 protected:
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(BlueprintReadOnly, Category="Menu")
     TWeakObjectPtr<UMenuStack> ParentStack;
 
     /// Whether this menu should request focus when it is displayed
@@ -93,20 +93,20 @@ public:
 
      * @param bIsRegainedFocus Set this to true if the reason this menu is opening is that it regained focus in a stack
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     void Open(bool bIsRegainedFocus = false); 
     /**
      * @brief Request this menu to close. The menu can veto this request.
      * @param bWasCancel Set this to true if the reason for closure was a cancellation action
      * @return True if the request was approved
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     bool RequestClose(bool bWasCancel);
     /**
      * @brief Close this menu. This ALWAYS closes the menu, if you want it to be able to veto it, call RequestClose
      * @param bWasCancel Set this to true if the reason for closure was a cancellation action
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="Menu")
     void Close(bool bWasCancel);
 
     
@@ -122,6 +122,6 @@ public:
 
 	/// Return whether this menu is currently at the top of the menu stack
 	/// Note: if this menu is not owned by a stack, will always return true
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Menu")
 	bool IsTopOfStack() const;
 };

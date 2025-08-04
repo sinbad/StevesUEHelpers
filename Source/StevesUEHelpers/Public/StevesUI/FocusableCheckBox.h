@@ -25,7 +25,7 @@ class STEVESUEHELPERS_API UFocusableCheckBox : public UCheckBox
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Focus")
 	bool bUseHoverStyleWhenFocussed = true;
 
 	UPROPERTY( BlueprintAssignable, Category = "CheckBox|Event" )
@@ -41,10 +41,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="CheckBox|Event")
 	FOnCheckBoxFocusLostEvent OnFocusLost;
     
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Focus")
 	bool bTakeFocusOnHover = true;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Focus")
 	bool bLoseFocusOnUnhover = true;
 
 protected:    
@@ -67,7 +67,7 @@ public:
 	/// Update the focussed style based on changes made to the default widget style.
 	/// Call this if you make runtime changes to the base style of this checkbox.
 	/// Needed because we can't override SetStyle
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Focus")
 	void RefreshFocussedStyle();
 	
 	
