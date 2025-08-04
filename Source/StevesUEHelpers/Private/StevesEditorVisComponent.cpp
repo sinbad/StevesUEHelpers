@@ -5,6 +5,7 @@
 #include "StaticMeshResources.h"
 #include "Engine/StaticMesh.h"
 #include "StevesDebugRenderSceneProxy.h"
+#include "DynamicMeshBuilder.h"
 
 UStevesEditorVisComponent::UStevesEditorVisComponent(const FObjectInitializer& ObjectInitializer)
 	: UPrimitiveComponent(ObjectInitializer)

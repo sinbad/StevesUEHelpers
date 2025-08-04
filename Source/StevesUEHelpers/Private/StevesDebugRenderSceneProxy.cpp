@@ -6,6 +6,7 @@
 #include "SceneManagement.h"
 #include "DynamicMeshBuilder.h"
 #include "Engine/Engine.h"
+#include "Materials/Material.h"
 #include "Materials/MaterialRenderProxy.h"
 
 // Added in UE 5.2
