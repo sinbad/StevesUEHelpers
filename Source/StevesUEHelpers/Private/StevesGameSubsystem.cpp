@@ -134,6 +134,26 @@ void UStevesGameSubsystem::RegisterInterestInEnhancedInputAction(const UInputAct
     
 }
 
+void UStevesGameSubsystem::UnregisterAllInterestInEnhancedInputActions()
+{
+    if (auto GI = GetGameInstance())
+    {
+        if (auto PC = GI->GetFirstLocalPlayerController())
+        {
+            if (auto EIC = Cast<UEnhancedInputComponent>(PC->InputComponent))
+            {
+                for (int i = 0; i < EIC->GetActionEventBindings().Num(); i++) {
+                    if (EIC->GetActionEventBindings()[i].Get()->GetUObject()==this)
+                    {
+                        EIC->RemoveBindingByHandle(EIC->GetActionEventBindings()[i]->GetHandle());
+                    }
+                }
+            }
+        }
+    }
+    RegisteredEnhancedInputActionInterests.Empty();
+}
+
 void UStevesGameSubsystem::EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance)
 {
     OnEnhancedInputActionTriggered.Broadcast(InputActionInstance.GetSourceAction(), InputActionInstance.GetTriggerEvent());
