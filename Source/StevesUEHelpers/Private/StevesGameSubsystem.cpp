@@ -142,12 +142,13 @@ void UStevesGameSubsystem::UnregisterAllInterestInEnhancedInputActions()
         {
             if (auto EIC = Cast<UEnhancedInputComponent>(PC->InputComponent))
             {
-                for (int i = 0; i < EIC->GetActionEventBindings().Num(); i++) {
-                    if (EIC->GetActionEventBindings()[i].Get()->GetUObject()==this)
-                    {
-                        EIC->RemoveBindingByHandle(EIC->GetActionEventBindings()[i]->GetHandle());
-                    }
-                }
+	            for (auto& Binding : EIC->GetActionEventBindings())
+	            {
+		            if (Binding->IsBoundToObject(this))
+		            {
+			            EIC->RemoveBindingByHandle(Binding->GetHandle());
+		            }
+	            }
             }
         }
     }
