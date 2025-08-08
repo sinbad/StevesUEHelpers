@@ -343,6 +343,11 @@ public:
     UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     void RegisterInterestInEnhancedInputAction(const UInputAction* Action, ETriggerEvent TriggerEvent);
 
+     // Unregister all previously registered interests in input actions. This can be needed if a new scene is loaded, as previously
+    // regsitered InputActions will no longer fire
+    UFUNCTION(BlueprintCallable)
+    void UnregisterAllInterestInEnhancedInputActions();
+
 	/// Moves the mouse pointer offscreen so that it can't trigger hovers on anything. This happens by
 	/// default when switching to gamepad mode, but in edge cases I've found it useful to ensure that
 	/// some other effect doesn't interfere with gamepad navigation by relocating the mouse pointer to
