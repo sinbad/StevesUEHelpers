@@ -1,15 +1,15 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DeveloperSettings.h"
 
 #include "StevesPluginSettings.generated.h"
 
 /**
 * Settings for the plug-in.
 */
-UCLASS(config=Engine)
-class STEVESUEHELPERS_API UStevesPluginSettings
-	: public UObject
+UCLASS(config=Engine, DefaultConfig)
+class STEVESUEHELPERS_API UStevesPluginSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
