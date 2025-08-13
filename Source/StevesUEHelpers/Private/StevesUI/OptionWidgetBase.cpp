@@ -168,7 +168,11 @@ void UOptionWidgetBase::SetSelectedIndex(int NewIndex)
     UpdateUpDownButtons();
     
     if (bRaiseEvent)
-        OnSelectedOptionChanged.Broadcast(this, SelectedIndex);
+    {
+    	// BP opportunity
+    	PostSelectedOptionChanged();
+	    OnSelectedOptionChanged.Broadcast(this, SelectedIndex);
+    }
     
 }
 

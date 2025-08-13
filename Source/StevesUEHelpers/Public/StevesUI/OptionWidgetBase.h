@@ -114,6 +114,9 @@ protected:
 	virtual void UpdateUpDownButtons();
 
 
+	UFUNCTION(BlueprintImplementableEvent, Category="OptionWidget")
+	void PostSelectedOptionChanged();
+	
 protected:
     UFUNCTION()
     void InputModeChanged(int PlayerIndex, EInputMode NewMode);
