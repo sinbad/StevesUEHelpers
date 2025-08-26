@@ -55,6 +55,7 @@ class STEVESUEHELPERS_API UTypewriterTextWidget : public UUserWidget
 
 public:
 	UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer);
+	void ClearLetterCountdownTimer();
 
 	/// Event called when a line has finished playing, whether on its own or when skipped to end
 	UPROPERTY(BlueprintAssignable)
@@ -100,7 +101,7 @@ public:
 	/// If set > 0, splits a single PlayLine into multiple segments of this number of lines maximum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	int MaxNumberOfLines = 0;
-
+	
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
 	void SetText(const FText& InText);
@@ -141,6 +142,8 @@ public:
 
 	/// Get the name of the current rich text run, if any
 	const FString& GetCurrentRunName() const { return CurrentRunName; }
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 protected:
 	virtual void NativeConstruct() override;
@@ -197,7 +200,15 @@ private:
 	uint32 bHasFinishedPlaying : 1;
 	uint32 bHasMoreLineParts : 1;
 
-	FTimerHandle LetterTimer;
+	// Properties related to animation
+	bool bNextLetterCountdownActive=false;
+	float NextLetterCountdown=0;
+	float NextLetterCountdownInterval=0;
+	bool bStartPlayLineCountdownActive=false;
+	float StartPlayLineCountdown=0;
+	bool bSkipToLineEndCountdownActive=false;
+	float SkipToLineEndCountdown;
+	
 	float CurrentPlaySpeed = 1;
 	float PauseTime = 0;
 	bool bFirstPlayLine = true;
