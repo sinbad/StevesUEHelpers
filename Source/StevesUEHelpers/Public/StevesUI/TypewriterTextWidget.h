@@ -205,13 +205,10 @@ private:
 	uint32 bHasMoreLineParts : 1;
 
 	// Properties related to animation
-	bool bNextLetterCountdownActive=false;
-	float NextLetterCountdown=0;
-	float NextLetterCountdownInterval=0;
-	bool bStartPlayLineCountdownActive=false;
-	float StartPlayLineCountdown=0;
-	bool bSkipToLineEndCountdownActive=false;
-	float SkipToLineEndCountdown;
+	float NextLetterCountdown = 0;
+	float NextLetterCountdownInterval = 0;
+	float StartPlayLineCountdown = 0;
+	float SkipToLineEndCountdown = 0;
 	
 	float CurrentPlaySpeed = 1;
 	float PauseTime = 0;

@@ -39,8 +39,8 @@ TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
 	return MyRichTextBlock.ToSharedRef();
 }
 
-UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer), LineText(nullptr), bHasMoreLineParts(0), SkipToLineEndCountdown(0)
 {
 	bHasFinishedPlaying = true;
 }
@@ -48,8 +48,7 @@ UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectIni
 
 void UTypewriterTextWidget::ClearLetterCountdownTimer()
 {
-	bNextLetterCountdownActive=false;
-	NextLetterCountdown=0;
+	NextLetterCountdown = 0;
 }
 
 void UTypewriterTextWidget::SetText(const FText& InText)
@@ -94,7 +93,7 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 	MaxLetterIndex = 0;
 	NumberOfLines = 0;
 	CombinedTextHeight = 0;
-	PauseTime=0;
+	PauseTime = 0;
 	CurrentPlaySpeed = Speed;
 	Segments.Empty();
 	CachedSegmentText.Empty();
@@ -132,9 +131,8 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 		{
 			// Delay the very first PlayLine after construction, CalculateWrappedString is not reliable until a couple
 			// of UI geometry updates. At first the geometry is 0, then it's just wrong, and then finally it settles.
-			
-			bStartPlayLineCountdownActive=true;
-			StartPlayLineCountdown=0.2f;
+
+			StartPlayLineCountdown = 0.2f;
 		}
 		else
 		{
@@ -163,9 +161,8 @@ void UTypewriterTextWidget::StartPlayLine()
 	// Clear the lines - this is needed to prevent an occasional visible version of all lines for a single frame
 	TSharedPtr<FSlateTextLayout> Layout = LineText->GetTextLayout();
 	Layout->ClearLines();
-	
-	bNextLetterCountdownActive=true;
-	NextLetterCountdown=NextLetterCountdownInterval=LetterPlayTime/CurrentPlaySpeed;
+
+	NextLetterCountdown = NextLetterCountdownInterval = LetterPlayTime / CurrentPlaySpeed;
 
 	bFirstPlayLine = false;
 
@@ -176,7 +173,7 @@ void UTypewriterTextWidget::StartPlayLine()
 void UTypewriterTextWidget::SkipToLineEnd()
 {
 	// Clear all timers
-	bStartPlayLineCountdownActive=false;
+	StartPlayLineCountdown = 0;
 	ClearLetterCountdownTimer();
 
 	CurrentLetterIndex = MaxLetterIndex - 1;
@@ -193,39 +190,42 @@ void UTypewriterTextWidget::SkipToLineEnd()
 void UTypewriterTextWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	const UWorld* World=GetWorld();
-	if (!World) return;
-	// If paused, confirm that we are able to play when paused
-	if (!bPlayWhenPaused && World->IsPaused()) return;
+
+	if (const UWorld* World = GetWorld())
+	{
+		if (bPlayWhenPaused || !World->IsPaused())
+		{
+			// For replacement of timers to allow to run when paused
+			if (NextLetterCountdown > 0)
+			{
+				NextLetterCountdown -= InDeltaTime;
+				if (NextLetterCountdown <= 0)
+				{
+					PlayNextLetter();
+					NextLetterCountdown = NextLetterCountdownInterval; // Reset countdown
+				}
+			}
+			if (StartPlayLineCountdown > 0)
+			{
+				StartPlayLineCountdown -= InDeltaTime;
+				if (StartPlayLineCountdown <= 0)
+				{
+					StartPlayLineCountdown = 0;
+					StartPlayLine();
+				}
+			}
+			if (SkipToLineEndCountdown > 0)
+			{
+				SkipToLineEndCountdown -= InDeltaTime;
+				if (SkipToLineEndCountdown <= 0)
+				{
+					SkipToLineEndCountdown = 0;
+					SkipToLineEnd();
+				}
+			}
+		}
+	}
 	
-	// For replacement of timers to allow to run when paused
-	if (bNextLetterCountdownActive)
-	{
-		NextLetterCountdown-=InDeltaTime;
-		if (NextLetterCountdown<=0)
-		{
-			PlayNextLetter();
-			NextLetterCountdown=NextLetterCountdownInterval; // Reset countdown
-		}
-	}
-	if (bStartPlayLineCountdownActive)
-	{
-		StartPlayLineCountdown-=InDeltaTime;
-		if (StartPlayLineCountdown<=0)
-		{
-			bStartPlayLineCountdownActive=false;
-			StartPlayLine();
-		}
-	}
-	if (bSkipToLineEndCountdownActive)
-	{
-		SkipToLineEndCountdown-=InDeltaTime;
-		if (SkipToLineEndCountdown<=0)
-		{
-			bSkipToLineEndCountdownActive=false;
-			SkipToLineEnd();
-		}
-	}
 }
 
 void UTypewriterTextWidget::NativeConstruct()
@@ -273,8 +273,7 @@ void UTypewriterTextWidget::PlayNextLetter()
 	else
 	{
 		ClearLetterCountdownTimer();
-		bSkipToLineEndCountdownActive=true;
-		SkipToLineEndCountdown=EndHoldTime;
+		SkipToLineEndCountdown = EndHoldTime;
 		
 	}
 }
