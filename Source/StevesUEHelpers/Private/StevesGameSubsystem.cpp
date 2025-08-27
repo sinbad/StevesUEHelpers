@@ -142,13 +142,19 @@ void UStevesGameSubsystem::UnregisterAllInterestInEnhancedInputActions()
         {
             if (auto EIC = Cast<UEnhancedInputComponent>(PC->InputComponent))
             {
+            	TArray<uint32> HandlesToRemove;
 	            for (auto& Binding : EIC->GetActionEventBindings())
 	            {
 		            if (Binding->IsBoundToObject(this))
 		            {
-			            EIC->RemoveBindingByHandle(Binding->GetHandle());
+		            	HandlesToRemove.Add(Binding->GetHandle());
 		            }
 	            }
+
+            	for (const uint32 Handle : HandlesToRemove)
+            	{
+            		EIC->RemoveBindingByHandle(Handle);
+            	}
             }
         }
     }
