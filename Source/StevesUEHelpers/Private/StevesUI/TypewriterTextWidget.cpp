@@ -4,7 +4,6 @@
 #include "Engine/Font.h"
 #include "Styling/SlateStyle.h"
 #include "Widgets/Text/SRichTextBlock.h"
-#include "TimerManager.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -40,18 +39,23 @@ TSharedRef<SWidget> URichTextBlockForTypewriter::RebuildWidget()
 	return MyRichTextBlock.ToSharedRef();
 }
 
-UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UTypewriterTextWidget::UTypewriterTextWidget(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer), LineText(nullptr), bHasMoreLineParts(0), SkipToLineEndCountdown(0)
 {
 	bHasFinishedPlaying = true;
+}
+
+
+void UTypewriterTextWidget::ClearLetterCountdownTimer()
+{
+	NextLetterCountdown = 0;
 }
 
 void UTypewriterTextWidget::SetText(const FText& InText)
 {
 	if (IsValid(LineText))
 	{
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.ClearTimer(LetterTimer);
+		ClearLetterCountdownTimer();
 		
 		LineText->SetText(InText);
 
@@ -80,8 +84,7 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 {
 	check(GetWorld());
 
-	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.ClearTimer(LetterTimer);
+	ClearLetterCountdownTimer();
 
 	CurrentRunName = "";
 	CurrentLetterIndex = 0;
@@ -90,6 +93,7 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 	MaxLetterIndex = 0;
 	NumberOfLines = 0;
 	CombinedTextHeight = 0;
+	PauseTime = 0;
 	CurrentPlaySpeed = Speed;
 	Segments.Empty();
 	CachedSegmentText.Empty();
@@ -105,14 +109,20 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 		OnTypewriterLineFinished.Broadcast(this);
 		OnLineFinishedPlaying();
 
-		SetVisibility(ESlateVisibility::Hidden);
+		if (IsValid(LineText))
+		{
+			LineText->SetVisibility(ESlateVisibility::Hidden);
+		}
+		
 	}
 	else
 	{
 		if (IsValid(LineText))
 		{
 			LineText->SetText(FText::GetEmpty());
+			LineText->SetVisibility(ESlateVisibility::Hidden);
 		}
+		
 
 		bHasMoreLineParts = false;
 		bHasFinishedPlaying = false;
@@ -121,10 +131,8 @@ void UTypewriterTextWidget::PlayNextLinePart(float Speed)
 		{
 			// Delay the very first PlayLine after construction, CalculateWrappedString is not reliable until a couple
 			// of UI geometry updates. At first the geometry is 0, then it's just wrong, and then finally it settles.
-			FTimerHandle TempHandle;
-			FTimerDelegate DelayDelegate;
-			DelayDelegate.BindUObject(this, &ThisClass::StartPlayLine);
-			TimerManager.SetTimer(TempHandle, DelayDelegate, 0.2f, false);
+
+			StartPlayLineCountdown = 0.2f;
 		}
 		else
 		{
@@ -149,14 +157,12 @@ void UTypewriterTextWidget::StartPlayLine()
 		RemainingLinePart.RightChopInline(Length);
 		bHasMoreLineParts = true;
 	}
-		
-	FTimerDelegate Delegate;
-	Delegate.BindUObject(this, &ThisClass::PlayNextLetter);
 
-	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.SetTimer(LetterTimer, Delegate, LetterPlayTime/CurrentPlaySpeed, true);
+	// Clear the lines - this is needed to prevent an occasional visible version of all lines for a single frame
+	TSharedPtr<FSlateTextLayout> Layout = LineText->GetTextLayout();
+	Layout->ClearLines();
 
-	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	NextLetterCountdown = NextLetterCountdownInterval = LetterPlayTime / CurrentPlaySpeed;
 
 	bFirstPlayLine = false;
 
@@ -166,8 +172,9 @@ void UTypewriterTextWidget::StartPlayLine()
 
 void UTypewriterTextWidget::SkipToLineEnd()
 {
-	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.ClearTimer(LetterTimer);
+	// Clear all timers
+	StartPlayLineCountdown = 0;
+	ClearLetterCountdownTimer();
 
 	CurrentLetterIndex = MaxLetterIndex - 1;
 	if (IsValid(LineText))
@@ -178,6 +185,47 @@ void UTypewriterTextWidget::SkipToLineEnd()
 	bHasFinishedPlaying = true;
 	OnTypewriterLineFinished.Broadcast(this);
 	OnLineFinishedPlaying();
+}
+
+void UTypewriterTextWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (const UWorld* World = GetWorld())
+	{
+		if (bPlayWhenPaused || !World->IsPaused())
+		{
+			// For replacement of timers to allow to run when paused
+			if (NextLetterCountdown > 0)
+			{
+				NextLetterCountdown -= InDeltaTime;
+				if (NextLetterCountdown <= 0)
+				{
+					PlayNextLetter();
+					NextLetterCountdown = NextLetterCountdownInterval; // Reset countdown
+				}
+			}
+			if (StartPlayLineCountdown > 0)
+			{
+				StartPlayLineCountdown -= InDeltaTime;
+				if (StartPlayLineCountdown <= 0)
+				{
+					StartPlayLineCountdown = 0;
+					StartPlayLine();
+				}
+			}
+			if (SkipToLineEndCountdown > 0)
+			{
+				SkipToLineEndCountdown -= InDeltaTime;
+				if (SkipToLineEndCountdown <= 0)
+				{
+					SkipToLineEndCountdown = 0;
+					SkipToLineEnd();
+				}
+			}
+		}
+	}
+	
 }
 
 void UTypewriterTextWidget::NativeConstruct()
@@ -202,6 +250,10 @@ void UTypewriterTextWidget::PlayNextLetter()
 	if (IsValid(LineText))
 	{
 		LineText->SetText(FText::FromString(WrappedString));
+		if (WrappedString.Len()>1) // For some reason this causes issues when just one char
+		{
+			LineText->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 
 	if (NewRunName != CurrentRunName)
@@ -220,13 +272,9 @@ void UTypewriterTextWidget::PlayNextLetter()
 	}
 	else
 	{
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.ClearTimer(LetterTimer);
-
-		FTimerDelegate Delegate;
-		Delegate.BindUObject(this, &ThisClass::SkipToLineEnd);
-
-		TimerManager.SetTimer(LetterTimer, Delegate, EndHoldTime, false);
+		ClearLetterCountdownTimer();
+		SkipToLineEndCountdown = EndHoldTime;
+		
 	}
 }
 
