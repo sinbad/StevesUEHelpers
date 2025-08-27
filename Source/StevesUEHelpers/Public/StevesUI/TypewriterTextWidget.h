@@ -101,6 +101,10 @@ public:
 	/// If set > 0, splits a single PlayLine into multiple segments of this number of lines maximum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	int MaxNumberOfLines = 0;
+
+	/// If set to true, the text will continue to be played when paused
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	bool bPlayWhenPaused = false;
 	
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")

@@ -193,6 +193,11 @@ void UTypewriterTextWidget::SkipToLineEnd()
 void UTypewriterTextWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+	const UWorld* World=GetWorld();
+	if (!World) return;
+	// If paused, confirm that we are able to play when paused
+	if (!bPlayWhenPaused && World->IsPaused()) return;
+	
 	// For replacement of timers to allow to run when paused
 	if (bNextLetterCountdownActive)
 	{
