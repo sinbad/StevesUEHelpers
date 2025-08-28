@@ -201,8 +201,8 @@ void UTypewriterTextWidget::NativeTick(const FGeometry& MyGeometry, float InDelt
 				NextLetterCountdown -= InDeltaTime;
 				if (NextLetterCountdown <= 0)
 				{
-					PlayNextLetter();
 					NextLetterCountdown = NextLetterCountdownInterval; // Reset countdown
+					PlayNextLetter();
 				}
 			}
 			if (StartPlayLineCountdown > 0)
