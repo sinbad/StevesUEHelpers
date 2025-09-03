@@ -29,5 +29,5 @@ public:
     FKey Key;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="KeySprite")
-    UPaperSprite* Sprite = nullptr;
+    TObjectPtr<UPaperSprite> Sprite = nullptr;
 };

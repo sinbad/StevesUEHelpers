@@ -36,7 +36,7 @@ protected:
     EGamePauseChange PreviousPauseState;
 
 	UPROPERTY()
-    TArray<UMenuBase*> Menus;
+    TArray<TObjectPtr<UMenuBase>> Menus;
 
 	virtual void BeforeFirstMenuOpened();
     virtual void FirstMenuOpened();
@@ -78,7 +78,7 @@ public:
     /// If not set, or the UiMenuBase is set to not use this container, levels are added independently to viewport
     /// Use a NamedSlot for this most of the time, it gives you the most layout flexibility.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="Menu")
-    UContentWidget* MenuContainer;
+    TObjectPtr<UContentWidget> MenuContainer;
 
     /// Event raised when the stack is closed for any reason. If bWasCancel, the menu stack was closed because the
     /// last item was cancelled.

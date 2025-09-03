@@ -70,7 +70,7 @@ public:
 	FOnTypewriterRunNameChanged OnTypewriterRunNameChanged;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Typewriter")
-	URichTextBlockForTypewriter* LineText;
+	TObjectPtr<URichTextBlockForTypewriter> LineText;
 
 	/// The amount of time between printing individual letters (for the "typewriter" effect).
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")

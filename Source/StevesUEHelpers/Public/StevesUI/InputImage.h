@@ -56,7 +56,7 @@ protected:
 
     /// Custom theme to use for this input image set; if not supplied will use UStevesGameSubsystem::DefaultUiTheme
     UPROPERTY(EditAnywhere, Category="InputImage")   
-    UUiTheme* CustomTheme;
+    TObjectPtr<UUiTheme> CustomTheme;
 
     bool bSubbedToInputEvents = false;
     bool bIsDirty = true;

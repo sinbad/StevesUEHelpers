@@ -22,34 +22,34 @@ public:
 
     // -- Properties automatically bound to Blueprint widget
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UWidget* MouseVersion;
+    TObjectPtr<UWidget> MouseVersion;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UButton* MouseUpButton;    
+    TObjectPtr<UButton> MouseUpButton;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UButton* MouseDownButton;    
+    TObjectPtr<UButton> MouseDownButton;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UImage* MouseUpImage;    
+    TObjectPtr<UImage> MouseUpImage;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UImage* MouseDownImage;    
+    TObjectPtr<UImage> MouseDownImage;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UTextBlock* MouseText;    
+    TObjectPtr<UTextBlock> MouseText;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UButton* GamepadVersion;    
+    TObjectPtr<UButton> GamepadVersion;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UImage* GamepadUpImage;    
+    TObjectPtr<UImage> GamepadUpImage;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UImage* GamepadDownImage;    
+    TObjectPtr<UImage> GamepadDownImage;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    UTextBlock* GamepadText;
+    TObjectPtr<UTextBlock> GamepadText;
 
     /// Event raised when the selected option changes
     UPROPERTY(BlueprintAssignable)

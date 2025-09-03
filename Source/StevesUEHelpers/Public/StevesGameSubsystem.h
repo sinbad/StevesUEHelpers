@@ -152,7 +152,7 @@ protected:
     bool bIsForeground = true;
 
     UPROPERTY(BlueprintReadWrite, Category="StevesGameSubsystem")
-    UUiTheme* DefaultUiTheme;
+    TObjectPtr<UUiTheme> DefaultUiTheme;
 
     TArray<FStevesTextureRenderTargetPoolPtr> TextureRenderTargetPools;
 

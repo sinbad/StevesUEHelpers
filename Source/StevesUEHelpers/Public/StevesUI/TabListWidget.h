@@ -71,7 +71,7 @@ public:
 	FMargin TabButtonPadding=FMargin(10,0);
 
 	UPROPERTY(BlueprintReadOnly, Category="TabButton")
-	UWidgetSwitcher* TargetWidgetSwitcher;
+	TObjectPtr<UWidgetSwitcher> TargetWidgetSwitcher;
 	
 	/**
 	 * Registers tab content with this tab widget

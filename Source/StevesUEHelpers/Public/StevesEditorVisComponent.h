@@ -259,7 +259,7 @@ struct STEVESUEHELPERS_API FStevesEditorVisMesh
 
 	/// The mesh do display
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="StevesVisMesh")
-	UStaticMesh* Mesh;
+	TObjectPtr<UStaticMesh> Mesh;
 	/// Location relative to component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="StevesVisMesh")
 	FVector Location;
