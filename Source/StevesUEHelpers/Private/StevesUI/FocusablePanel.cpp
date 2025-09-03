@@ -23,6 +23,8 @@ void UFocusablePanel::NativeConstruct()
 
 
 
+
+
 void UFocusablePanel::NativeDestruct()
 {
     Super::NativeDestruct();
@@ -54,6 +56,14 @@ UWidget* UFocusablePanel::GetInitialFocusWidget_Implementation()
     return nullptr;
 }
 
+
+void UFocusablePanel::SetInitialFocusWidget(UWidget* NewInitialFocus)
+{
+	if (NewInitialFocus)
+	{
+		InitialFocusWidgetName = NewInitialFocus->GetFName();
+	}
+}
 
 bool UFocusablePanel::RestorePreviousFocus() const
 {

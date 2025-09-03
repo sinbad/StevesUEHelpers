@@ -38,6 +38,13 @@ public:
      */
     UFUNCTION(BlueprintNativeEvent, Category="Focus")
     UWidget* GetInitialFocusWidget();
+
+	/**
+     * @brief Set the desired initial focus widget. Call to set the initial widget dynamically without overriding GetInitialFocusWidget
+     * @param NewInitialFocus The initial focus widget
+     */
+    UFUNCTION(BlueprintCallable, Category="Focus")
+    void SetInitialFocusWidget(UWidget* NewInitialFocus);
     
     /**
      * @brief Try to restore focus to the previously focussed child
