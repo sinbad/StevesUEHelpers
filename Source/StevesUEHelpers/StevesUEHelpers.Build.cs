@@ -41,6 +41,7 @@ public class StevesUEHelpers : ModuleRules
 				"RenderCore",
 				"PhysicsCore",
 				"Chaos",
+				"ChaosCore",
 				"NavigationSystem"
 			}
 			);
