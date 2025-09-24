@@ -34,7 +34,7 @@ FReply UFocusableUserWidget::NativeOnFocusReceived(const FGeometry& InGeometry, 
     if (!Reply.IsEventHandled())
     {
         SetFocusProperly();
-        Reply.Handled();
+        return Reply.Handled();
     }
 
     return Reply;
