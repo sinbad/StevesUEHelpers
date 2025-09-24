@@ -53,7 +53,13 @@ void UFocusableButton::SimulatePress()
         // In order to get the visual change we need to call SButton::Press() and SButton::Release(), but they're both private
         // The only public method we can use to simulate the click properly is OnKeyDown/Up or OnMouseButtonDown/Up
         // Use Virtual_Accept since that is general
-        FKeyEvent KeyEvent(EKeys::Virtual_Accept, FModifierKeysState(), 0, false, 0, 0);
+        FKeyEvent KeyEvent(
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+	        EKeys::Virtual_Gamepad_Accept.GetVirtualKey(),
+#else
+	        EKeys::Virtual_Accept,
+#endif
+	        FModifierKeysState(), 0, false, 0, 0);
         MyButton->OnKeyDown(MyButton->GetCachedGeometry(), KeyEvent);
     }
 }
@@ -65,7 +71,13 @@ void UFocusableButton::SimulateRelease()
         // In order to get the visual change we need to call SButton::Press() and SButton::Release(), but they're both private
         // The only public method we can use to simulate the click properly is OnKeyDown/Up or OnMouseButtonDown/Up
         // Use Virtual_Accept since that is general
-        FKeyEvent KeyEvent(EKeys::Virtual_Accept, FModifierKeysState(), 0, false, 0, 0);
+        FKeyEvent KeyEvent(
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+			EKeys::Virtual_Gamepad_Accept.GetVirtualKey(),
+#else
+			EKeys::Virtual_Accept,
+#endif
+			FModifierKeysState(), 0, false, 0, 0);
         MyButton->OnKeyUp(MyButton->GetCachedGeometry(), KeyEvent);
 
     }

@@ -4,6 +4,9 @@
 #include "Engine/Font.h"
 #include "Styling/SlateStyle.h"
 #include "Widgets/Text/SRichTextBlock.h"
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+#include "Internationalization/TextChar.h"
+#endif
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -304,7 +307,13 @@ int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, 
 		return TerminatorIndex;
 	}
 
-	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(FText::IsWhitespace, Count);
+	TerminatorIndex = CurrentLineString.FindLastCharByPredicate(
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+	FTextChar::IsWhitespace,
+#else
+	FText::IsWhitespace,
+#endif
+		Count);
 	if (TerminatorIndex != INDEX_NONE)
 	{
 		return TerminatorIndex;
@@ -478,8 +487,14 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 				// and also optionally not if there isn't whitespace after (e.g. to not pause on ".txt")
 				if (LettersLeft < Segment.Text.Len())
 				{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+					const bool bIsWhitespace = FTextChar::IsWhitespace(Segment.Text[LettersLeft]);
+#else
+					const bool bIsWhitespace = FText::IsWhitespace(Segment.Text[LettersLeft]);
+#endif
+
 					if (!IsSentenceTerminator(Segment.Text[LettersLeft]) &&
-						(!bPauseOnlyIfWhitespaceFollowsSentenceTerminator || FText::IsWhitespace(Segment.Text[LettersLeft])))
+						(!bPauseOnlyIfWhitespaceFollowsSentenceTerminator || bIsWhitespace))
 					{
 						PauseTime = PauseTimeAtSentenceTerminators;
 					}
