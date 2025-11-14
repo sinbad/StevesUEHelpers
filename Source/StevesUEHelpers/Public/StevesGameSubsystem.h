@@ -345,7 +345,7 @@ public:
 
      // Unregister all previously registered interests in input actions. This can be needed if a new scene is loaded, as previously
     // regsitered InputActions will no longer fire
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     void UnregisterAllInterestInEnhancedInputActions();
 
 	/// Moves the mouse pointer offscreen so that it can't trigger hovers on anything. This happens by
