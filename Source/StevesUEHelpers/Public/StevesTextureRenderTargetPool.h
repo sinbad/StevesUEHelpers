@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Runtime/Launch/Resources/Version.h"
+#include "UObject/GCObject.h"
 
 typedef TSharedPtr<struct FStevesTextureRenderTargetReservation> FStevesTextureRenderTargetReservationPtr;
 typedef TSharedPtr<struct FStevesTextureRenderTargetPool> FStevesTextureRenderTargetPoolPtr;

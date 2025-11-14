@@ -3,6 +3,7 @@
 #include "Components/ButtonSlot.h"
 #include "Framework/Application/NavigationConfig.h"
 #include "Framework/Application/SlateApplication.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 
 UFocusableButton::UFocusableButton(const FObjectInitializer& ObjectInitializer)

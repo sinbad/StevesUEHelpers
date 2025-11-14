@@ -2,6 +2,8 @@
 
 #include "StevesUEHelpers.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "UObject/UObjectGlobals.h"
+#include "UObject/Package.h"
 
 FStevesTextureRenderTargetReservation::~FStevesTextureRenderTargetReservation()
 {
