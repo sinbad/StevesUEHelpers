@@ -19,6 +19,7 @@
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "UnrealClient.h"
+#include "Slate/SceneViewport.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -31,6 +32,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     InitTheme();
     InitForegroundCheck();
     NotifyEnhancedInputMappingsChanged();
+	InitViewport();
 #endif
 }
 
@@ -42,6 +44,35 @@ void UStevesGameSubsystem::Deinitialize()
 #endif
 }
 
+void UStevesGameSubsystem::InitViewport()
+{
+	FViewport::ViewportResizedEvent.AddUObject(this, &UStevesGameSubsystem::ViewportResized);
+	if (auto GI = GetGameInstance())
+	{
+		if (auto VC = GI->GetGameViewportClient())
+		{
+			VC->OnToggleFullscreen().AddUObject(this, &UStevesGameSubsystem::FullscreenToggled);
+		}
+	}
+}
+
+void UStevesGameSubsystem::ViewportResized(FViewport* Viewport, unsigned Unused)
+{
+	FIntPoint Sz = Viewport->GetSizeXY();
+	OnViewportResized.Broadcast(Sz.X, Sz.Y);
+}
+
+void UStevesGameSubsystem::FullscreenToggled(bool bFullscreen)
+{
+	if (auto GI = GetGameInstance())
+	{
+		if (auto VC = GI->GetGameViewportClient())
+		{
+			FIntPoint Sz = VC->GetGameViewport()->GetSizeXY();
+			OnViewportResized.Broadcast(Sz.X, Sz.Y);
+		}
+	}
+}
 
 void UStevesGameSubsystem::CreateInputDetector()
 {

@@ -18,6 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerInd
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnhancedInputMappingsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEnhancedInputActionTriggered, const UInputAction*, Action, ETriggerEvent, TriggeredEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnViewportResized, int, XSize, int, YSize);
 
 /// Entry point for all the top-level features of the helper system
 UCLASS(Config=Game)
@@ -161,6 +162,9 @@ protected:
     void InitTheme();
     void InitForegroundCheck();
     void CheckForeground();
+	void InitViewport();
+	void ViewportResized(FViewport* Viewport, unsigned Unused);
+	void FullscreenToggled(bool bFullscreen);
 
 
     // Called by detector
@@ -207,6 +211,10 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnWindowForegroundChanged OnWindowForegroundChanged;
 
+	/// Event raised when the viewport changes size
+	UPROPERTY(BlueprintAssignable)
+	FOnViewportResized OnViewportResized;
+	
     /// Gets the device where the most recent input event of any kind happened
     UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     EInputMode GetLastInputModeUsed(int PlayerIndex = 0) const { return InputDetector->GetLastInputMode(PlayerIndex); }
