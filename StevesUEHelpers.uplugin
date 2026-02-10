@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "1.0",
+  "VersionName": "1.1.0",
   "FriendlyName": "Steve's UE4 Helpers",
   "Description": "A set of common helper classes for UE4 projects by Steve Streeing",
   "Category": "Code Utilities",
@@ -35,5 +35,6 @@
       "Name": "EnhancedInput",
       "Enabled": true
     }
-  ]
+  ],
+  "EngineVersion": "5.6.0"
 }
