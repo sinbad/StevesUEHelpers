@@ -29,10 +29,13 @@ which makes a bunch of things better:
 This project contains the master documentation for this library, but if you want
 to see examples of its use, see the [Steve's UE Examples](https://github.com/sinbad/StevesUEExamples) project.
 
-
 ## Installing this plugin
 
-### Cloning
+### On Fab
+
+You can now get this plugin for free on Fab if you like: https://www.fab.com/listings/6a48c58c-1771-42f6-b46f-2b09e31b1699
+
+### Building from Source
 
 The best way is to clone this repository as a submodule; that way you can contribute
 pull requests if you want. The project should be placed in your project's Plugins folder.
