@@ -1,8 +1,10 @@
 # Steve's UE Helper Plugin Library
 
+![](doc/fablogo.png)
+
 ## Introduction
 
-This is a helper plugin library for [Unreal Engine](https://www.unrealengine.com) (version 4.26+ / 5.0+)
+This is a helper plugin library for [Unreal Engine](https://www.unrealengine.com)
 which makes a bunch of things better:
 
 * [New Widgets](doc/Widgets.md)
