@@ -2,6 +2,8 @@
 
 ![](doc/fablogo.png)
 
+> Logo by [Rob Fearon](https://bobbinsrobots.com/@Bobbins)
+
 ## Introduction
 
 This is a helper plugin library for [Unreal Engine](https://www.unrealengine.com)
