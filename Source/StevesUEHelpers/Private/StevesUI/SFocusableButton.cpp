@@ -1,3 +1,5 @@
+// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 #include "StevesUI/SFocusableButton.h"
 
 void SFocusableButton::Construct(const FArguments& InArgs)

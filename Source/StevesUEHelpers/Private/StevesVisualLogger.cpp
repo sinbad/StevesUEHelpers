@@ -1,4 +1,6 @@
-﻿#include "StevesVisualLogger.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesVisualLogger.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "EngineStats.h"
 #include "Stats/Stats.h"

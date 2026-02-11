@@ -1,4 +1,6 @@
-﻿#include "StevesTextureRenderTargetPool.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesTextureRenderTargetPool.h"
 
 #include "StevesUEHelpers.h"
 #include "Kismet/KismetRenderingLibrary.h"

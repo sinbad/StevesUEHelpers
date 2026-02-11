@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+
 #include "StevesSpringArmComponent.h"
 #include "VisualLogger/VisualLogger.h"
 #include "StevesUEHelpers.h"

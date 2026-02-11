@@ -1,4 +1,6 @@
-﻿#include "StevesUI/TabButton.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUI/TabButton.h"
 
 void UTabButton::Initialise(int InTabIndex,const FText& InLabel)
 {

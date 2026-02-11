@@ -1,4 +1,6 @@
-﻿#include "StevesUI/FocusableCheckBox.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUI/FocusableCheckBox.h"
 #include "StevesUI/SFocusableCheckBox.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Framework/Application/SlateApplication.h"

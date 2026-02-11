@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -19,7 +21,7 @@ public:
 	
 	///
 	
-	UPROPERTY(BlueprintAssignable,BlueprintCallable)
+	UPROPERTY(BlueprintAssignable,BlueprintCallable, Category="TabButton")
 	FOnTabSelected OnTabSelected;
 	
 	UPROPERTY(BlueprintReadOnly, Category="TabButton")

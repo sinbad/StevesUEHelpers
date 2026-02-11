@@ -1,4 +1,6 @@
-﻿#include "StevesFixedDataTableCustomisationLayout.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesFixedDataTableCustomisationLayout.h"
 
 #include "AssetRegistry/AssetData.h"
 #include "Containers/Map.h"

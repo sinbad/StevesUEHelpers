@@ -1,4 +1,6 @@
-﻿#include "StevesAssetHelpers.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesAssetHelpers.h"
 
 #include "StevesUEHelpers.h"
 #include "Engine/ObjectLibrary.h"

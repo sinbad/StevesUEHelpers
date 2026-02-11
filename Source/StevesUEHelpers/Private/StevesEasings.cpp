@@ -1,4 +1,6 @@
-﻿#include "StevesEasings.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesEasings.h"
 
 float UStevesEasings::EaseAlpha(float InAlpha, EStevesEaseFunction Func)
 {

@@ -1,4 +1,5 @@
-﻿// Copyright 2020 Old Doorways Ltd
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 
 
 #include "StevesEditorVisComponent.h"

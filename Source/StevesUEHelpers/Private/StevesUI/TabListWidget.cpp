@@ -1,4 +1,6 @@
-﻿#include "StevesUI/TabListWidget.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUI/TabListWidget.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/WidgetSwitcher.h"
 #include "StevesUI/TabButton.h"

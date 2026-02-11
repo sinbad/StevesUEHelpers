@@ -1,4 +1,5 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 
 
 #include "StevesBPL.h"

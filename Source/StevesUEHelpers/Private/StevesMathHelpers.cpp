@@ -1,4 +1,6 @@
-﻿#include "StevesMathHelpers.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesMathHelpers.h"
 
 #include "Chaos/CastingUtilities.h"
 #include "Chaos/GeometryQueries.h"

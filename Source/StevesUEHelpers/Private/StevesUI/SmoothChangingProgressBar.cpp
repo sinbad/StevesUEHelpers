@@ -1,4 +1,6 @@
-﻿#include "StevesUI/SmoothChangingProgressBar.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUI/SmoothChangingProgressBar.h"
 
 void USmoothChangingProgressBar::SetPercentSmoothly(float InPercent)
 {

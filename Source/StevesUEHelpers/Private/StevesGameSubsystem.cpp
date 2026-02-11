@@ -1,3 +1,5 @@
+// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 #include "StevesGameSubsystem.h"
 
 #include "EngineUtils.h"
