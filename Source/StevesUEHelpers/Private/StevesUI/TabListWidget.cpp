@@ -146,6 +146,7 @@ void UTabListWidget::SelectTab(int TabIndex)
 bool UTabListWidget::HandleKeyDownEvent(const FKeyEvent& InKeyEvent)
 {
 	Super::HandleKeyDownEvent(InKeyEvent);
+	if (!this->GetIsEnabled()) return false;  // Ignore if not enabled
 	
 	const FKey Key = InKeyEvent.GetKey();
 	if (PreviousTabKeys.Contains(Key))
