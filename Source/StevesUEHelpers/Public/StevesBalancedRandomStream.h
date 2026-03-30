@@ -8,6 +8,8 @@
 
 /// "Balanced" random stream, using the Halton Sequence
 /// This is deterministic and more uniform in appearance than a general random stream (although not perfectly uniform)
+/// NOTE: You cannot generate more than about 500 unique values with this sequence until it begins to repeat
+/// This is a limitation of the Halton sequence; rather than lose distribution we loop after this
 USTRUCT(BlueprintType)
 struct STEVESUEHELPERS_API FStevesBalancedRandomStream
 {
@@ -16,6 +18,22 @@ struct STEVESUEHELPERS_API FStevesBalancedRandomStream
 protected:
 	int32 InitialSeed = 0;
 	mutable uint32 Seed = 0;
+
+	static int32 SafeSeed(int32 InSeed)
+	{
+		// Halton sequence gets unstable when seed gets too high, especially with higher bases
+		constexpr int32 SafeMaxSeed = 500;
+		while (InSeed > SafeMaxSeed)
+		{
+			InSeed -= SafeMaxSeed;
+		}
+		return InSeed;
+	}
+	int32 SafeSeedInc() const
+	{
+		Seed = SafeSeed(Seed + 1);
+		return Seed;
+	}
 
 public:
 
@@ -52,8 +70,8 @@ public:
 	 */
 	void Initialize( int32 InSeed )
 	{
-		InitialSeed = InSeed;
-		Seed = uint32(InSeed);
+		InitialSeed = SafeSeed(InSeed);
+		Seed = uint32(InitialSeed);
 	}
 
 	/**
@@ -64,16 +82,18 @@ public:
 	 */
 	void Initialize( FName InName )
 	{
+		uint32 StartSeed;
 		if (InName != NAME_None)
 		{
-			InitialSeed = GetTypeHash(InName.ToString());
+			StartSeed = GetTypeHash(InName.ToString());
 		}
 		else
 		{
-			InitialSeed = FPlatformTime::Cycles();
+			StartSeed = FPlatformTime::Cycles();
 		}
 
-		Seed = uint32(InitialSeed);
+		InitialSeed = SafeSeed(StartSeed);
+		Seed = InitialSeed;
 	}
 
 	/**
@@ -94,14 +114,14 @@ public:
 	 */
 	void GenerateNewSeed()
 	{
-		Initialize(FMath::Rand());
+		Initialize(SafeSeed(FMath::Rand()));
 	}
 
 
 	/// Return a value between 0..1, inclusive
 	float Rand() const
 	{
-		return Halton(Seed++, 2);
+		return Halton(SafeSeedInc(), 2);
 	}
 
 	/// Return a 2D value with each element between 0..1, inclusive
@@ -111,7 +131,9 @@ public:
 		const FVector2D Result(
 			Halton(Seed, 2),
 			Halton(Seed, 3));
-		++Seed;
+		
+		SafeSeedInc();
+		
 		return Result;
 	}
 
@@ -123,7 +145,7 @@ public:
 			Halton(Seed, 2),
 			Halton(Seed, 3),
 			Halton(Seed, 5));
-		++Seed;
+		SafeSeedInc();
 		return Result;
 	}
 
