@@ -63,19 +63,19 @@ public:
 	static FStevesBalancedRandomStream MakeBalancedRandomStream(int64 Seed);
 
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
-	static float BalancedRandom(const FStevesBalancedRandomStream& Stream) { return Stream.Rand(); }
+	static float BalancedRandom(FStevesBalancedRandomStream& Stream) { return Stream.Rand(); }
 
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
-	static FVector2D BalancedRandom2D(const FStevesBalancedRandomStream& Stream) { return Stream.Rand2D(); }
+	static FVector2D BalancedRandom2D(FStevesBalancedRandomStream& Stream) { return Stream.Rand2D(); }
 
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
-	static FVector BalancedRandom3D(const FStevesBalancedRandomStream& Stream) { return Stream.Rand3D(); }
+	static FVector BalancedRandom3D(FStevesBalancedRandomStream& Stream) { return Stream.Rand3D(); }
 
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
-	static FVector BalancedRandomVector(const FStevesBalancedRandomStream& Stream) { return Stream.RandUnitVector(); }
+	static FVector BalancedRandomVector(FStevesBalancedRandomStream& Stream) { return Stream.RandUnitVector(); }
 
 	UFUNCTION(BlueprintCallable, Category="StevesUEHelpers|Random")
-	static FVector BalancedRandomPointInBox(const FStevesBalancedRandomStream& Stream, const FVector& Min, const FVector& Max) { return Stream.RandPointInBox(FBox(Min, Max)); }
+	static FVector BalancedRandomPointInBox(FStevesBalancedRandomStream& Stream, const FVector& Min, const FVector& Max) { return Stream.RandPointInBox(FBox(Min, Max)); }
 
 	
 	/**

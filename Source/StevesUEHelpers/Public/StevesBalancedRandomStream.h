@@ -8,30 +8,59 @@
 
 /// "Balanced" random stream, using the Halton Sequence
 /// This is deterministic and more uniform in appearance than a general random stream (although not perfectly uniform)
-/// NOTE: You cannot generate more than about 500 unique values with this sequence until it begins to repeat
-/// This is a limitation of the Halton sequence; rather than lose distribution we loop after this
 USTRUCT(BlueprintType)
 struct STEVESUEHELPERS_API FStevesBalancedRandomStream
 {
 	GENERATED_BODY()
 
 protected:
-	int32 InitialSeed = 0;
-	mutable uint32 Seed = 0;
-
-	static int32 SafeSeed(int32 InSeed)
+	uint32 InitialSeed = 0;
+	uint32 Seed = 0;
+	uint32 Base3Seed = 0;
+	uint32 Base5Seed = 0;
+	
+	static int32 SafeSeed(uint32 InSeed)
 	{
 		// Halton sequence gets unstable when seed gets too high, especially with higher bases
-		constexpr int32 SafeMaxSeed = 500;
-		while (InSeed > SafeMaxSeed)
+		constexpr uint32 SafeMaxSeed2D = 43046721 - 1;
+		constexpr uint32 SafeMaxSeed3D = 9765625 - 1;
+		while (InSeed > SafeMaxSeed3D)
 		{
-			InSeed -= SafeMaxSeed;
+			InSeed -= SafeMaxSeed3D;
 		}
 		return InSeed;
 	}
-	int32 SafeSeedInc() const
+	
+	void UpdateSeeds()
+	{
+		// Credit to Andrew Wilmott for this
+		// See https://github.com/andrewwillmott/distribute-lib
+		// For simplicity this version just derives the other seeds from the main one rather than
+		// calculating the sequence value at the same time like Andrew's does
+		Base3Seed = 0;
+
+		// Average iterations: 1.5
+		for (int i = 0, k = Seed; k; i += 2, k /= 3)
+		{ 
+			const int d = (k % 3);
+			Base3Seed |= d << i;
+		}
+
+		Base5Seed = 0;
+
+		// Average iterations: 2.5
+		for (int i = 0, k = Seed; k; i += 3, k /= 5)
+		{ 
+			const int d = (k % 5);
+			Base5Seed |= d << i;
+		}
+	}
+		
+	uint32 SafeSeedInc()
 	{
 		Seed = SafeSeed(Seed + 1);
+		
+		UpdateSeeds();
 		return Seed;
 	}
 
@@ -47,7 +76,7 @@ public:
 	 *
 	 * @param InSeed The seed value.
 	 */
-	FStevesBalancedRandomStream( int32 InSeed )
+	FStevesBalancedRandomStream( uint32 InSeed )
 	{ 
 		Initialize(InSeed);
 	}
@@ -68,10 +97,12 @@ public:
 	 *
 	 * @param InSeed The seed value.
 	 */
-	void Initialize( int32 InSeed )
+	void Initialize( uint32 InSeed )
 	{
 		InitialSeed = SafeSeed(InSeed);
 		Seed = uint32(InitialSeed);
+		
+		UpdateSeeds();
 	}
 
 	/**
@@ -91,20 +122,18 @@ public:
 		{
 			StartSeed = FPlatformTime::Cycles();
 		}
-
-		InitialSeed = SafeSeed(StartSeed);
-		Seed = InitialSeed;
+		Initialize(StartSeed);
 	}
 
 	/**
 	 * Resets this random stream to the initial seed value.
 	 */
-	void Reset() const
+	void Reset()
 	{
-		Seed = uint32(InitialSeed);
+		Initialize(InitialSeed);
 	}	
 
-	int32 GetInitialSeed() const
+	uint32 GetInitialSeed() const
 	{
 		return InitialSeed;
 	}
@@ -119,34 +148,32 @@ public:
 
 
 	/// Return a value between 0..1, inclusive
-	float Rand() const
+	float Rand()
 	{
 		return Halton(SafeSeedInc(), 2);
 	}
 
 	/// Return a 2D value with each element between 0..1, inclusive
 	/// Use this rather than calling Rand() twice to ensure balanced distribution
-	FVector2D Rand2D() const
+	FVector2D Rand2D()
 	{
-		const FVector2D Result(
-			Halton(Seed, 2),
-			Halton(Seed, 3));
+		const float X = Halton(Seed, 2);
+		const float Y = Halton(Base3Seed, 3);
 		
 		SafeSeedInc();
 		
-		return Result;
+		return FVector2D(X, Y);
 	}
 
 	/// Return a 3D value with each element between 0..1, inclusive
 	/// Use this rather than calling Rand() twice to ensure balanced distribution
-	FVector Rand3D() const
+	FVector Rand3D()
 	{
-		const FVector Result(
-			Halton(Seed, 2),
-			Halton(Seed, 3),
-			Halton(Seed, 5));
+		const float X = Halton(Seed, 2);
+		const float Y = Halton(Base3Seed, 3);
+		const float Z = Halton(Base5Seed, 5);
 		SafeSeedInc();
-		return Result;
+		return FVector(X, Y, Z);
 	}
 
 	/**
@@ -154,14 +181,14 @@ public:
 	 *
 	 * @return Random unit vector.
 	 */
-	FVector RandUnitVector() const
+	FVector RandUnitVector()
 	{
 		const FVector2D PitchYaw = Rand2D();
 		return FRotator(PitchYaw.X, PitchYaw.Y, 0).RotateVector(FVector::UpVector);
 	}
 
 	/// Random point in a 3D box
-	FORCEINLINE FVector RandPointInBox(const FBox& Box) const
+	FORCEINLINE FVector RandPointInBox(const FBox& Box)
 	{
 		const FVector R3 = Rand3D();
 		return FVector(FMath::Lerp(Box.Min.X, Box.Max.X, R3.X),
@@ -170,7 +197,7 @@ public:
 	}
 
 	/// Random point in a 2D rectangle
-	FORCEINLINE FVector2D RandPointInBox2D(const FBox2D& Rect) const
+	FORCEINLINE FVector2D RandPointInBox2D(const FBox2D& Rect)
 	{
 		const FVector2D R2 = Rand2D();
 		return FVector2D(FMath::Lerp(Rect.Min.X, Rect.Max.X, R2.X),
@@ -178,7 +205,7 @@ public:
 	}
 	
 	/// Random point in a circle
-	FORCEINLINE FVector2D RandPointInCircle(float Radius = 1.0) const
+	FORCEINLINE FVector2D RandPointInCircle(float Radius = 1.0)
 	{
 		// Just use rejection sampling for simplicity / speed
 		while (true)
@@ -192,7 +219,7 @@ public:
 	}
 
 	/// Random point in a sphere
-	FORCEINLINE FVector RandPointInSphere(float Radius = 1.0) const
+	FORCEINLINE FVector RandPointInSphere(float Radius = 1.0)
 	{
 		// Just use rejection sampling for simplicity / speed
 		while (true)
@@ -206,13 +233,13 @@ public:
 	}
 
 	/// Random value in a range (inclusive)
-	float RandRange(float Min, float Max) const
+	float RandRange(float Min, float Max)
 	{
 		return FMath::Lerp(Min, Max, Rand());
 	}
 
 	/// Random colour value
-	FLinearColor RandColour(const FLinearColor& From, const FLinearColor& To) const
+	FLinearColor RandColour(const FLinearColor& From, const FLinearColor& To)
 	{
 		return FLinearColor::LerpUsingHSV(From, To, Rand());
 	}
