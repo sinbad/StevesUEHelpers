@@ -90,3 +90,16 @@ float UStevesBPL::AngleBetween2D(const FVector2D& DirA, const FVector2D& DirB)
 	return FMath::FindDeltaAngleRadians(HeadingA, HeadingB);
 }
 
+FString UStevesBPL::GetProjectVersion()
+{
+	FString AppVersion;
+	GConfig->GetString(
+		TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+		TEXT("ProjectVersion"),
+		AppVersion,
+		GGameIni
+	);
+
+	return AppVersion;
+}
+

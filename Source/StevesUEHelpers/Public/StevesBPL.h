@@ -134,4 +134,6 @@ public:
 	UFUNCTION(BlueprintPure, Category="StevesUEHelpers|Math")
 	static float AngleBetween2D(const FVector2D& DirA, const FVector2D& DirB);
 
+	UFUNCTION(BlueprintPure, Category="StevesUEHelpers|Project")
+	static FString GetProjectVersion();
 };
