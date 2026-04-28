@@ -364,19 +364,38 @@ public:
 
 
 	/// Return a value between 0..1, inclusive
-	float Rand()
+	FORCEINLINE float Rand()
 	{
 		return Halton(Seed++, 2);
 	}
 	
-	/// Random value in a range (inclusive)
-	float RandRange(float Min, float Max)
+	/**
+	 * Helper function for rand implementations.
+	 *
+	 * @return A random number in [0..A)
+	 */
+	FORCEINLINE int32 RandHelper( int32 A )
+	{
+		// GetFraction guarantees a result in the [0,1) range.
+		return ((A > 0) ? FMath::TruncToInt(Rand() * float(A)) : 0);
+	}
+	
+	/// Random float value in a range (inclusive)
+	FORCEINLINE float RandRange(float Min, float Max)
 	{
 		return FMath::Lerp(Min, Max, Rand());
 	}
+	
+	/// Random int value in a range (inclusive)
+	FORCEINLINE int32 RandRange( int32 Min, int32 Max )
+	{
+		const int32 Range = (Max - Min) + 1;
+
+		return Min + RandHelper(Range);
+	}
 
 	/// Random colour value
-	FLinearColor RandColour(const FLinearColor& From, const FLinearColor& To)
+	FORCEINLINE FLinearColor RandColour(const FLinearColor& From, const FLinearColor& To)
 	{
 		return FLinearColor::LerpUsingHSV(From, To, Rand());
 	}
@@ -386,7 +405,7 @@ public:
 	 *
 	 * @return Current seed.
 	 */
-	uint32 GetCurrentSeed() const
+	FORCEINLINE uint32 GetCurrentSeed() const
 	{
 		return InitialSeed;
 	}
