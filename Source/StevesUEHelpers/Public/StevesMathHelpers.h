@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#pragma once
 #include <functional>
 #include "Math/UnrealMathUtility.h"
 #include "Math/MathFwd.h"
@@ -111,7 +113,15 @@ public:
 	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
 	 */
 	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
-									   const FVector& LocalPoint);
+	                                   const FVector& LocalPoint);
+	/**
+	 * Return the distance to a convex polygon in 2D where points are in the same space
+	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in a chosen space
+	 * @param LocalPoint Point to test, in same space as convex points
+	 * @return The distance to this convex polygon in 2D space. <= 0 if inside
+	 */
+	static float GetDistanceToConvex2D(const TArray<FVector2f>& ConvexPoints,
+	                                   const FVector2f& LocalPoint);
 	/**
 	 * Return the distance to a convex polygon in 2D world space, converting between spaces
 	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order, in local space

@@ -1,4 +1,6 @@
-﻿#include "StevesUEHelpersEd.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUEHelpersEd.h"
 #include "StevesFixedDataTableCustomisationLayout.h"
 
 #define LOCTEXT_NAMESPACE "FStevesUEHelpersEdModule"

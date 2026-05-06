@@ -1,4 +1,6 @@
-﻿#include "SFocusableCheckBox.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "SFocusableCheckBox.h"
 #include "Framework/Application/SlateApplication.h"
 
 void SFocusableCheckBox::Construct(const FArguments& InArgs)

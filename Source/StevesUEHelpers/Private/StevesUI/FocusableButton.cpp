@@ -1,3 +1,5 @@
+// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 #include "StevesUI/FocusableButton.h"
 #include "StevesUI/SFocusableButton.h"
 #include "Components/ButtonSlot.h"

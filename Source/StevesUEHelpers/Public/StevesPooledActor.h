@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#pragma once
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "StevesPooledActor.generated.h"

@@ -1,0 +1,5 @@
+StevesUEHelpers\doc\
+StevesUEHelpers\TestBuild.ps1
+StevesUEHelpers\Readme.md
+StevesUEHelpers\License.txt
+StevesUEHelpers\.clang-format

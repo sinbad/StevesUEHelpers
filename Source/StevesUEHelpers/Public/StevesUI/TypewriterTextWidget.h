@@ -1,4 +1,6 @@
-﻿// Original Copyright (c) Sam Bloomberg https://github.com/redxdev/UnrealRichTextDialogueBox (MIT License)
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+// Original Copyright (c) Sam Bloomberg https://github.com/redxdev/UnrealRichTextDialogueBox (MIT License)
 // Updates:
 //   1. Fixed adding a spurious newline to single-line text
 //   2. Expose line finished as event

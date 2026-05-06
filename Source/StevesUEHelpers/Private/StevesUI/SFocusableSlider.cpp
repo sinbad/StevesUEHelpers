@@ -1,4 +1,6 @@
-﻿#include "SFocusableSlider.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "SFocusableSlider.h"
 
 void SFocusableSlider::Construct(const FArguments& InArgs)
 {

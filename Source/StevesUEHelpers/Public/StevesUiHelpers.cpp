@@ -1,4 +1,6 @@
-﻿#include "StevesUiHelpers.h"
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+#include "StevesUiHelpers.h"
 
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/PanelWidget.h"

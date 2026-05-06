@@ -1,3 +1,5 @@
+// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 #include "StevesUI/InputImage.h"
 #include "StevesGameSubsystem.h"
 #include "StevesUEHelpers.h"

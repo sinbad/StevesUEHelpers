@@ -1,4 +1,6 @@
-﻿// Original Copyright (c) Sam Bloomberg https://github.com/redxdev/UnrealRichTextDialogueBox (MIT License)
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
+// Original Copyright (c) Sam Bloomberg https://github.com/redxdev/UnrealRichTextDialogueBox (MIT License)
 
 #include "StevesUI/TypewriterTextWidget.h"
 #include "Engine/Font.h"

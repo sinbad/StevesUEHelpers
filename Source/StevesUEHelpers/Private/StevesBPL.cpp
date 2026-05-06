@@ -1,4 +1,5 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright Steve Streeting 2020 onwards
+// Released under the MIT license
 
 
 #include "StevesBPL.h"
@@ -87,5 +88,18 @@ float UStevesBPL::AngleBetween2D(const FVector2D& DirA, const FVector2D& DirB)
 
 	// Get the shortest route
 	return FMath::FindDeltaAngleRadians(HeadingA, HeadingB);
+}
+
+FString UStevesBPL::GetProjectVersion()
+{
+	FString AppVersion;
+	GConfig->GetString(
+		TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+		TEXT("ProjectVersion"),
+		AppVersion,
+		GGameIni
+	);
+
+	return AppVersion;
 }
 
