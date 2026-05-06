@@ -18,6 +18,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTypewriterLineFinished, class UTypewriterTextWidget*, Widget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterLetterAdded, class UTypewriterTextWidget*, Widget, const FString&, Char);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterStartWord, class UTypewriterTextWidget*, Widget, const FString&, Word);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTypewriterRunNameChanged, class UTypewriterTextWidget*, Widget, const FString&, NewRunName);
 /**
  * A text block that exposes more information about text layout for typewriter widget.
@@ -64,6 +65,10 @@ public:
 	/// Event called when one or more new letters have been displayed
 	UPROPERTY(BlueprintAssignable)
 	FOnTypewriterLetterAdded OnTypewriterLetterAdded;
+
+	/// Event called when a new word has started
+	UPROPERTY(BlueprintAssignable)
+	FOnTypewriterStartWord OnTypewriterStartWord;
 
 	/// Event called when the "run name" of the text changes aka the rich text style markup. Also called when reverts to default.
 	UPROPERTY(BlueprintAssignable)
@@ -147,6 +152,17 @@ public:
 	/// Get the name of the current rich text run, if any
 	const FString& GetCurrentRunName() const { return CurrentRunName; }
 
+	/// Get typewriter play speed
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	float GetPlaySpeed() const {return CurrentPlaySpeed;}
+	
+	/// Set typewriter play speed
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	void SetPlaySpeed(float Speed) {CurrentPlaySpeed = Speed;}
+
+	UFUNCTION(BlueprintCallable, Category = "Typewriter")
+	void FindWordVowels(const FString& Word, TArray<int>& VowelsPos);
+
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 protected:
@@ -154,10 +170,12 @@ protected:
 
 	/// Called when on or more letters are added, if subclasses want to override
 	UFUNCTION(BlueprintImplementableEvent, Category = "Typewriter")
-	void OnPlayLetter();
+	void OnPlayLetter();	
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Typewriter")
 	void OnLineFinishedPlaying();
+
+	int OnStartNewWord(const FString SegmentRemain);
 
 	/// Name of the current rich text run, if any
 	/// Can be used to identify the style of the most recently played letter
@@ -169,6 +187,7 @@ private:
 	void PlayNextLetter();
 	bool IsSentenceTerminator(TCHAR Letter) const;
 	bool IsClauseTerminator(TCHAR Letter) const;
+	bool IsPunctuation(TCHAR Letter) const;
 	int FindLastTerminator(const FString& CurrentLineString, int Count) const;
 
 	int CalculateMaxLength();
@@ -199,6 +218,7 @@ private:
 	int32 CurrentLetterIndex = 0;
 	int32 MaxLetterIndex = 0;
 	int32 NumberOfLines = 0;
+	int32 NextBlankLetterLeft = -1;
 	float CombinedTextHeight = 0;
 
 	uint32 bHasFinishedPlaying : 1;
@@ -213,4 +233,5 @@ private:
 	float CurrentPlaySpeed = 1;
 	float PauseTime = 0;
 	bool bFirstPlayLine = true;
+	bool bLastSegmentEndsWithBlank = false;
 };
