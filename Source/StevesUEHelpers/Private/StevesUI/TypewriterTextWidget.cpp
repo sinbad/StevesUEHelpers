@@ -193,6 +193,45 @@ void UTypewriterTextWidget::SkipToLineEnd()
 	OnLineFinishedPlaying();
 }
 
+void UTypewriterTextWidget::FindWordVowels(const FString& Word, TArray<int>& VowelsPos)
+{
+	static const FString Vowels = FString(TEXT("iaeouyIAEOUIY"));
+	static const FString LetterY = FString(TEXT("yY"));
+	static const FString LetterE = FString(TEXT("eE"));
+	static const FString LetterR = FString(TEXT("rR"));
+	
+	int32 Unused;
+	int i = 0;
+	int32 WordLen = Word.Len();
+	
+	if (LetterY.FindChar(Word[0], Unused))  // Trim at start if "y" is at the beginning of the word
+	{
+		i = 1; 
+	}
+	if (WordLen > 3 && LetterE.FindChar(Word[WordLen - 1], Unused) && (Vowels.
+		FindChar(Word[WordLen - 3], Unused) || LetterR.FindChar(Word[WordLen - 3], Unused)))
+	// Trim at end if word ending with "vowel-*-e" or "r-*-e"
+	{
+		WordLen -= 1;
+	}
+	while (i < WordLen)
+	{
+		if (Vowels.FindChar(Word[i], Unused))
+		{
+			VowelsPos.Add(i);
+			if (i+1 < WordLen && Vowels.FindChar(Word[i+1], Unused))  // 2 vowel letters in consecutive
+			{
+				++i;
+			}
+		}
+		++i;
+	}
+	if (VowelsPos.IsEmpty())
+	{
+		VowelsPos.Add(Word.Len()/2);
+	}
+}
+
 void UTypewriterTextWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
@@ -239,6 +278,51 @@ void UTypewriterTextWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	bFirstPlayLine = true;
+}
+
+int UTypewriterTextWidget::OnStartNewWord(const FString SegmentRemain)
+{
+	FString NewWord;
+	int i = 0;
+	while (i < SegmentRemain.Len())
+	{
+		if (i == SegmentRemain.Len()-1)
+		{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+			if (FTextChar::IsWhitespace(SegmentRemain[i]))
+#else
+			if (FText::IsWhitespace(SegmentRemain[i]))
+#endif
+			{
+				bLastSegmentEndsWithBlank = true;
+				NewWord = SegmentRemain.Mid(0, i);
+			}
+			else
+			{
+				NewWord = SegmentRemain.Mid(0, i+1);
+			}
+			if (!NewWord.IsEmpty() && !(NewWord.Len() == 1 && IsPunctuation(NewWord[0])))
+			{
+				OnTypewriterStartWord.Broadcast(this, NewWord);
+			}
+			break;
+		}
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+		if (FTextChar::IsWhitespace(SegmentRemain[i]))
+#else
+		if (FText::IsWhitespace(SegmentRemain[i]))
+#endif
+		{
+			NewWord = SegmentRemain.Mid(0, i);
+			if (!NewWord.IsEmpty() && !(NewWord.Len() == 1 && IsPunctuation(NewWord[0])))
+			{
+				OnTypewriterStartWord.Broadcast(this, NewWord);
+			}
+			break;
+		}
+		++i;
+	}
+	return i;
 }
 
 void UTypewriterTextWidget::PlayNextLetter()
@@ -294,6 +378,13 @@ bool UTypewriterTextWidget::IsClauseTerminator(TCHAR Letter) const
 {
 	int32 Unused;
 	return ClauseTerminators.FindChar(Letter, Unused);
+}
+
+bool UTypewriterTextWidget::IsPunctuation(TCHAR Letter) const
+{
+	static const FString Punctuations = FString(TEXT("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"));
+	int32 Unused;
+	return Punctuations.FindChar(Letter, Unused);
 }
 
 int UTypewriterTextWidget::FindLastTerminator(const FString& CurrentLineString, int Count) const
@@ -451,7 +542,7 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 		if (!Segment.RunInfo.Name.IsEmpty())
 		{
 			Result += FString::Printf(TEXT("<%s"), *Segment.RunInfo.Name);
-
+			
 			if (Segment.RunInfo.MetaData.Num() > 0)
 			{
 				for (const TTuple<FString, FString>& MetaData : Segment.RunInfo.MetaData)
@@ -478,10 +569,41 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 			bIsSegmentComplete = LettersLeft >= Segment.Text.Len();
 			LettersLeft = FMath::Min(LettersLeft, Segment.Text.Len());
 			Idx += LettersLeft;
-
+			
 			Result += Segment.Text.Mid(0, LettersLeft);
-
-			// Add pause for sentence ends
+			
+			if (bNewWordEvent)
+			{
+				if (LettersLeft == 1)
+				{
+					if (CurrentSegmentIndex == 0)  // First letter in a line
+					{
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+					if (bLastSegmentEndsWithBlank && !FTextChar::IsWhitespace(Segment.Text[LettersLeft-1]))
+#else
+					if (bLastSegmentEndsWithBlank && !FText::IsWhitespace(Segment.Text[LettersLeft-1]))
+#endif
+					{
+						bLastSegmentEndsWithBlank = false;
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
+				}
+				if (LettersLeft-1 == NextBlankLetterLeft)
+				{
+					if (!FText::IsWhitespace(Segment.Text[LettersLeft-1]))  // Current letter is not a blank
+					{
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
+					else
+					{
+						NextBlankLetterLeft = LettersLeft;
+					}
+				}
+			}
+			
+			// Add pause for sentence ends 
 			if (Result.Len() > 0 &&
 				IsSentenceTerminator(Result[Result.Len() - 1]) &&
 				CurrentLetterIndex < MaxLetterIndex - 1) // Don't pause on the last letter, that's the end pause's job
@@ -520,6 +642,7 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 			CachedLetterIndex = Idx;
 			CachedSegmentText = Result;
 			++CurrentSegmentIndex;
+			NextBlankLetterLeft = 0;
 		}
 		else
 		{
