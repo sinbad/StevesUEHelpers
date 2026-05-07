@@ -288,7 +288,11 @@ int UTypewriterTextWidget::OnStartNewWord(const FString SegmentRemain)
 	{
 		if (i == SegmentRemain.Len()-1)
 		{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+			if (FTextChar::IsWhitespace(SegmentRemain[i]))
+#else
 			if (FText::IsWhitespace(SegmentRemain[i]))
+#endif
 			{
 				bLastSegmentEndsWithBlank = true;
 				NewWord = SegmentRemain.Mid(0, i);
@@ -303,7 +307,11 @@ int UTypewriterTextWidget::OnStartNewWord(const FString SegmentRemain)
 			}
 			break;
 		}
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+		if (FTextChar::IsWhitespace(SegmentRemain[i]))
+#else
 		if (FText::IsWhitespace(SegmentRemain[i]))
+#endif
 		{
 			NewWord = SegmentRemain.Mid(0, i);
 			if (!NewWord.IsEmpty() && !(NewWord.Len() == 1 && IsPunctuation(NewWord[0])))
@@ -563,28 +571,35 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 			Idx += LettersLeft;
 			
 			Result += Segment.Text.Mid(0, LettersLeft);
-
-			if (LettersLeft == 1)
+			
+			if (bNewWordEvent)
 			{
-				if (CurrentSegmentIndex == 0)  // First letter in a line
+				if (LettersLeft == 1)
 				{
-					NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					if (CurrentSegmentIndex == 0)  // First letter in a line
+					{
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+					if (bLastSegmentEndsWithBlank && !FTextChar::IsWhitespace(Segment.Text[LettersLeft-1]))
+#else
+					if (bLastSegmentEndsWithBlank && !FText::IsWhitespace(Segment.Text[LettersLeft-1]))
+#endif
+					{
+						bLastSegmentEndsWithBlank = false;
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
 				}
-				if (bLastSegmentEndsWithBlank && !FText::IsWhitespace(Segment.Text[LettersLeft-1]))
+				if (LettersLeft-1 == NextBlankLetterLeft)
 				{
-					bLastSegmentEndsWithBlank = false;
-					NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
-				}
-			}
-			if (LettersLeft-1 == NextBlankLetterLeft)
-			{
-				if (!FText::IsWhitespace(Segment.Text[LettersLeft-1]))  // Current letter is not a blank
-				{
-					NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
-				}
-				else
-				{
-					NextBlankLetterLeft = LettersLeft;
+					if (!FText::IsWhitespace(Segment.Text[LettersLeft-1]))  // Current letter is not a blank
+					{
+						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
+					}
+					else
+					{
+						NextBlankLetterLeft = LettersLeft;
+					}
 				}
 			}
 			

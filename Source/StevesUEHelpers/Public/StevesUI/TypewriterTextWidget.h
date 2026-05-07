@@ -112,6 +112,10 @@ public:
 	/// If set to true, the text will continue to be played when paused
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
 	bool bPlayWhenPaused = false;
+
+	/// If set to true, OnTypewriterStartWord will be called when a new word starts
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Typewriter")
+	bool bNewWordEvent = false;
 	
 	/// Set Text immediately
 	UFUNCTION(BlueprintCallable, Category = "Typewriter")
