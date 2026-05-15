@@ -207,22 +207,30 @@ UMenuBase* UMenuStack::PushMenuByClass(TSubclassOf<UMenuBase> MenuClass)
 
 void UMenuStack::PushMenuByObject(UMenuBase* NewMenu)
 {
-    if (Menus.Num() > 0)
-    {
-        auto Top = Menus.Last();
-        Top->SupercededInStack(NewMenu);
-        // We keep this allocated, to restore later on back
-    }
-    Menus.Add(NewMenu);
-	bool IsFirstMenu = Menus.Num() == 1;
+	if (NewMenu)
+	{
+		if (Menus.Num() > 0)
+		{
+			auto Top = Menus.Last();
+			Top->SupercededInStack(NewMenu);
+			// We keep this allocated, to restore later on back
+		}
+		Menus.Add(NewMenu);
+		bool IsFirstMenu = Menus.Num() == 1;
 	
-	if (IsFirstMenu)
-		BeforeFirstMenuOpened();
+		if (IsFirstMenu)
+			BeforeFirstMenuOpened();
 	
-    NewMenu->AddedToStack(this);
+		NewMenu->AddedToStack(this);
 
-    if (IsFirstMenu)
-        FirstMenuOpened();
+		if (IsFirstMenu)
+			FirstMenuOpened();
+	}
+	else
+	{
+		UE_LOG(LogStevesUI, Error, TEXT("Tried to push a null menu onto the stack"));
+
+	}
 }
 
 void UMenuStack::PopMenu(bool bWasCancel)
