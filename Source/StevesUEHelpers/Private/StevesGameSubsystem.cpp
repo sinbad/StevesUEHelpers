@@ -278,6 +278,9 @@ void UStevesGameSubsystem::MoveMouseOffScreen(bool bAlsoHide) const
 		FVector2D Sz;
 		VC->GetViewportSize(Sz);
 		// -1 because if you move cursor outside window when captured, Slate blows up when you press Return, ughghh 
+		// To  make sure we don't generate a mouse move by doing this
+		// Bizarrely the ViewportSize is correct for moving the mouse pointer but the mouse events have different geometry
+		InputDetector->IgnoreNextMouseMove();
 		PC->SetMouseLocation(Sz.X-1,Sz.Y-1);
 
 		// Now hide it
@@ -539,11 +542,18 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplic
 {
     if (ShouldProcessInputEvents())
     {
-        FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
-        if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
-        {
-            SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse, false);
-        }
+    	if (bIgnoreNextMouseMove)
+    	{
+    		bIgnoreNextMouseMove = false;
+    	}
+    	else
+    	{
+    		FVector2D Dist = MouseEvent.GetScreenSpacePosition() - MouseEvent.GetLastScreenSpacePosition();
+    		if (FMath::Abs(Dist.X) > MouseMoveThreshold || FMath::Abs(Dist.Y) > MouseMoveThreshold)
+    		{
+    			SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse, false);
+    		}
+    	}
     }
     // Don't consume
     return false;

@@ -109,6 +109,8 @@ protected:
     public:
         /// Whether this detector should ignore events (e.g. because the application is in the background)
         bool bIgnoreEvents = false;
+    	
+    	bool bIgnoreNextMouseMove = false;
 
         /// Event raised when main input mode changes for any reason 
         FInternalInputModeChanged OnInputModeChanged;
@@ -119,6 +121,8 @@ protected:
 
 
         FInputModeDetector();
+    	
+    	void IgnoreNextMouseMove() { bIgnoreNextMouseMove = true;}
 
         virtual bool HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent) override;
         virtual bool
@@ -198,9 +202,8 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnInputModeChanged OnAxisInputModeChanged;
 
-    /// Event raised justr after the Enhanced Input mappings have changed
-    /// Right now, this has to be user-triggered via NotifyEnhancedInputMappingsChanged, because the Enhanced Input
-    /// plugin provides NO events to monitor it (sigh)
+    /// DEPRECATED: Event raised just after the Enhanced Input mappings have changed
+    /// User-triggered via NotifyEnhancedInputMappingsChanged
     UPROPERTY(BlueprintAssignable)
     FOnEnhancedInputMappingsChanged OnEnhancedInputMappingsChanged;
 
@@ -334,6 +337,7 @@ public:
     FStevesTextureRenderTargetPoolPtr GetTextureRenderTargetPool(FName Name, bool bAutoCreate = true);
 
     /**
+     * DEPRECATED - no longer required
      * Notify this subsystem that changes have been made to the Enhanced Input mappings, e.g. adding or removing a context.
      * Unfortunately, the Enhanced Input plugin currently provides NO WAY for us to monitor context changes automatically,
      * so we need the user to tell us when they make a change.
