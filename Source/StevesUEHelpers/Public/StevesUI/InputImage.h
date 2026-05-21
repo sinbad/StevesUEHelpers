@@ -113,8 +113,9 @@ public:
     virtual bool IsTickable() const override;
     virtual ETickableTickType GetTickableTickType() const override;
     // FTickableGameObject end
-    
-    
+
+    virtual void FinishDestroy() override;
+
 protected:
 
     virtual TSharedRef<SWidget> RebuildWidget() override;

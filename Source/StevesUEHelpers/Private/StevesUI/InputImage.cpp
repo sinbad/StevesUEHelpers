@@ -1,6 +1,8 @@
 // Copyright Steve Streeting 2020 onwards
 // Released under the MIT license
 #include "StevesUI/InputImage.h"
+
+#include "EnhancedInputSubsystems.h"
 #include "StevesGameSubsystem.h"
 #include "StevesUEHelpers.h"
 #include "Blueprint/WidgetTree.h"
@@ -17,7 +19,15 @@ TSharedRef<SWidget> UInputImage::RebuildWidget()
         GS->OnInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnButtonInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
         GS->OnAxisInputModeChanged.AddUniqueDynamic(this, &UInputImage::OnInputModeChanged);
-        GS->OnEnhancedInputMappingsChanged.AddUniqueDynamic(this, &UInputImage::OnEnhancedInputMappingsChanged);
+    	if (InputAction)
+    	{
+    		// Enhanced input now has a mappings rebuilt hook which we can use (Since July 2022)
+    		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningLocalPlayer()))
+    		{
+    			Subsystem->ControlMappingsRebuiltDelegate.AddUniqueDynamic(this, &UInputImage::OnEnhancedInputMappingsChanged);
+    		}
+    	}
+
     }
     
     UpdateImage();
@@ -173,6 +183,19 @@ ETickableTickType UInputImage::GetTickableTickType() const
 {
     return ETickableTickType::Conditional;
 }
+
+void UInputImage::FinishDestroy()
+{
+	
+	// Enhanced input now has a mappings rebuilt hook which we can use (Since July 2022)
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningLocalPlayer()))
+	{
+		Subsystem->ControlMappingsRebuiltDelegate.RemoveAll(this);
+	}
+
+	Super::FinishDestroy();
+}
+
 bool UInputImage::IsTickableWhenPaused() const
 {
     // UIs need to update while game is paused
