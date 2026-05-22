@@ -592,7 +592,11 @@ FString UTypewriterTextWidget::CalculateSegments(FString* OutCurrentRunName)
 				}
 				if (LettersLeft-1 == NextBlankLetterLeft)
 				{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 7
+					if (!FTextChar::IsWhitespace(Segment.Text[LettersLeft-1]))  // Current letter is not a blank
+#else
 					if (!FText::IsWhitespace(Segment.Text[LettersLeft-1]))  // Current letter is not a blank
+#endif
 					{
 						NextBlankLetterLeft = LettersLeft + OnStartNewWord(Segment.Text.Mid(LettersLeft-1, Segment.Text.Len()-LettersLeft+1));
 					}
