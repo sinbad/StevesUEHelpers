@@ -262,13 +262,13 @@ public:
 	 */
 	uint32 GetCurrentSeed() const
 	{
-		return InitialSeed;
+		return Seed;
 	}
 	
 	
 	FString ToString() const
 	{
-		return FString::Printf(TEXT("FStevesBalancedRandomStream(InitialSeed=%i, Seed=%u)"), InitialSeed, InitialSeed);
+		return FString::Printf(TEXT("FStevesBalancedRandomStream(InitialSeed=%u, Seed=%u)"), InitialSeed, Seed);
 	}	
 
 	
@@ -407,13 +407,13 @@ public:
 	 */
 	FORCEINLINE uint32 GetCurrentSeed() const
 	{
-		return InitialSeed;
+		return Seed;
 	}
 	
 	
 	FString ToString() const
 	{
-		return FString::Printf(TEXT("FStevesBalancedRandomStream1D(InitialSeed=%i, Seed=%u)"), InitialSeed, InitialSeed);
+		return FString::Printf(TEXT("FStevesBalancedRandomStream1D(InitialSeed=%u, Seed=%u)"), InitialSeed, Seed);
 	}	
 	
 };
@@ -650,13 +650,13 @@ public:
 	 */
 	uint32 GetCurrentSeed() const
 	{
-		return InitialSeed;
+		return Base2Seed;
 	}
 	
 	
 	FString ToString() const
 	{
-		return FString::Printf(TEXT("FStevesBalancedRandomStream2D(InitialSeed=%i, Seed=%u)"), InitialSeed, InitialSeed);
+		return FString::Printf(TEXT("FStevesBalancedRandomStream2D(InitialSeed=%u, Seed=%u)"), InitialSeed, Base2Seed);
 	}	
 };
 
@@ -775,7 +775,7 @@ public:
 
 	uint32 GetInitialSeed() const
 	{
-		return InitialSeed;
+		return Base2Seed;
 	}
 
 	/**
@@ -922,7 +922,7 @@ public:
 	
 	FString ToString() const
 	{
-		return FString::Printf(TEXT("FStevesBalancedRandomStream(InitialSeed=%i, Seed=%u)"), InitialSeed, InitialSeed);
+		return FString::Printf(TEXT("FStevesBalancedRandomStream(InitialSeed=%u, Seed=%u)"), InitialSeed, Base2Seed);
 	}	
 
 	
