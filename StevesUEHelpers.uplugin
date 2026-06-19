@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "1.1.1.0",
+  "VersionName": "1.2.0.0",
   "EngineVersion": "",
   "FriendlyName": "Steve's UE Helpers",
   "Description": "A set of common helper classes for UE projects by Steve Streeting",
