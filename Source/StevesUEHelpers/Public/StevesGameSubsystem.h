@@ -103,7 +103,7 @@ protected:
         const EInputMode DefaultButtonInputMode = EInputMode::Keyboard;
         const EInputMode DefaultAxisInputMode = EInputMode::Mouse;
         const float MouseMoveThreshold = 1;
-        const float GamepadAxisThreshold = 0.2;
+        const float GamepadAxisThreshold = 0.2f;
 
         bool ShouldProcessInputEvents() const;
     public:

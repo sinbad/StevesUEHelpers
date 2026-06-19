@@ -110,7 +110,7 @@ void UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()
         OnEnhancedInputMappingsChanged.Broadcast();
     };
     FTimerHandle TempHandle;
-    GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05, false);
+    GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05f, false);
 }
 
 TSoftObjectPtr<UInputAction> UStevesGameSubsystem::FindEnhancedInputAction(const FString& Name)

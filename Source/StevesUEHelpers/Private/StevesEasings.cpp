@@ -8,7 +8,7 @@ float UStevesEasings::EaseAlpha(float InAlpha, EStevesEaseFunction Func)
 	constexpr float BackC2 = BackC1 * 1.525f;
 	constexpr float BackC3 = BackC1 + 1.f;
 	constexpr float ElasticC4 = UE_TWO_PI / 3.f;
-	constexpr float ElasticC5 = UE_TWO_PI / 4.5;
+	constexpr float ElasticC5 = UE_TWO_PI / 4.5f;
 
 	switch(Func)
 	{
