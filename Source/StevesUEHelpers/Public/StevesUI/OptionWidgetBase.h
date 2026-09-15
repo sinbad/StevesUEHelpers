@@ -50,6 +50,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
     TObjectPtr<UImage> GamepadDownImage;    
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidgetOptional), Category="OptionWidget")
+    TObjectPtr<UImage> GamepadUpDisabledImage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidgetOptional), Category="OptionWidget")
+    TObjectPtr<UImage> GamepadDownDisabledImage;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
     TObjectPtr<UTextBlock> GamepadText;
 
@@ -99,6 +105,11 @@ protected:
     TArray<FText> Options;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     int SelectedIndex;
+
+    /// Whether this option widget should set the up/down widgets to disabled at
+    /// the end of the range instead of hiding them as is the default.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OptionWidget")
+    bool bDisableAtLimit = false;
 
     UFUNCTION(BlueprintCallable, Category="OptionWidget")
     virtual void SetMouseMode();

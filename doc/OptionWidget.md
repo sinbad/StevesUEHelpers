@@ -23,6 +23,22 @@ Since this widget is designed to fit inside other widgets, it's a good idea to
 change the sizing mode in the top-right to Custom, and set it to something
 representative for this widget e.g. 300x60.
 
+## Control the behaviour of the widget
+
+The Option Widget has a `Disable at Limit` option which is off by default.
+When enabled, it changes the behaviour of the widget when the selection index
+reaches the start or end of the option list:
+
+* When this option is off, the up or down buttons and images will be hidden
+  when it is not possible to increment or decrement the selection index, and
+  shown when it is possible.
+* When this option is on, the up or down mouse buttons remain visible at all
+  times, but are disabled when it is not possible to increment or decrement
+  the selection index, and enabled when it is possible. The mouse up and down
+  images remain visible at all times. The gamepad up or down images are
+  hidden when at the limits of the selection index, and optional "disabled"
+  versions of them become visible instead.
+
 ## Linking the visual elements
 
 `OptionWidgetBase` works by assuming a certain visual elements are present, which 
@@ -40,6 +56,14 @@ GamepadVersion|The container for all elements which will be shown when a gamepad
 GamepadDownImage|The image displayed when decrementing the selection index in gamepad mode is allowed
 GamepadUpImage|The image displayed when incrementing the selection index in gamepad mode is allowed
 GamepadText|The text widget which displays the selected item in gamepad mode
+
+Two additional elements may be present. They are optional, and only used when
+`Disable at Limit` is turned on.
+
+Element Name|Usage
+:------------|:-----
+GamepadDownDisabledImage|The image displayed when decrementing the selection index in gamepad mode is not allowed, and `bDisableAtLimit` is enabled
+GamepadUpDisabledImage|The image displayed when incrementing the selection index in gamepad mode is not allowed, and `bDisableAtLimit` is enabled
 
 An example of how to create a conforming visual widget can be found in the
 [Example project](https://github.com/sinbad/StevesUEExamples), under the Blueprints/UI/Components
