@@ -87,3 +87,47 @@ UPanelSlot* StevesUiHelpers::InsertChildWidgetAt(UPanelWidget* Parent, UWidget* 
 	}
 	
 }
+
+UWidget* StevesUiHelpers::FindClosestWidgetInInputDirection(UWidget* FromWidget,
+                                                      const FVector2D& Direction,
+                                                      UPanelWidget* InParent,
+                                                      float AngleDegrees)
+{
+	UWidget* BestMatch = nullptr;
+	float BestDist = UE_MAX_FLT;
+	const float CosAngle = FMath::Cos(FMath::DegreesToRadians(AngleDegrees));
+	
+	FVector2D NormDir = Direction.GetSafeNormal();
+	// Invert Y since UI coords are opposite to input
+	NormDir.Y = -NormDir.Y;
+	
+	const FGeometry& FromGeom = FromWidget->GetCachedGeometry();
+	// Centre pos
+	const FVector2D FromPos  = FromGeom.LocalToAbsolute(FromGeom.GetLocalSize() * 0.5f);
+	
+	for (const auto W : InParent->GetAllChildren())
+	{
+		if (W == FromWidget)
+			continue;
+		
+		const FGeometry& ToGeom = W->GetCachedGeometry();
+		// Centre pos
+		const FVector2D ToPos= ToGeom.LocalToAbsolute(ToGeom.GetLocalSize() * 0.5f);
+		
+		FVector2D ToDir = ToPos - FromPos;
+		const float Dist = ToDir.Length();
+		// Normalise
+		ToDir /= Dist;
+		// Dot to get closest to direction
+		float Dot = NormDir.Dot(ToDir); // 1 is closer
+		
+		if (Dot >= CosAngle && Dist < BestDist)
+		{
+			BestMatch = W;
+			BestDist = Dist;
+		}
+	}
+	
+	return BestMatch;
+}
+

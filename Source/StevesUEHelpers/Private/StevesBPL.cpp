@@ -103,3 +103,11 @@ FString UStevesBPL::GetProjectVersion()
 	return AppVersion;
 }
 
+UWidget* UStevesBPL::FindClosestWidgetInInputDirection(UWidget* FromWidget,
+                                                 const FVector2D& Direction,
+                                                 UPanelWidget* InParent,
+                                                 float AngleDegrees)
+{
+	return StevesUiHelpers::FindClosestWidgetInInputDirection(FromWidget, Direction, InParent, AngleDegrees);
+}
+

@@ -17,4 +17,18 @@ public:
 	 * @returns The slot the child was inserted at
 	 */
 	static UPanelSlot* InsertChildWidgetAt(UPanelWidget* Parent, UWidget* Child, int AtIndex = 0);
+	/**
+	 * Utility function to find an input widget based on an input direction. Unlike regular UI navigation,
+	 * this supports a full 2D direction and not juse Left/Right/Up/Down
+	 * @param FromWidget The widget to start from
+	 * @param Direction The input direction
+	 * @param InParent The parent container to search for widgets. This is because we can't use the internal Slate
+	 * hit grid (it's inaccessible) so we have to check widgets manually
+	 * @param AngleDegrees The angle to search for hits
+	 * @return 
+	 */
+	static UWidget* FindClosestWidgetInInputDirection(UWidget* FromWidget,
+	                                                  const FVector2D& Direction,
+	                                                  UPanelWidget* InParent,
+	                                                  float AngleDegrees = 30);
 };
