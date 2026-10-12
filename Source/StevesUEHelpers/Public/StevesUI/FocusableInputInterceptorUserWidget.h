@@ -25,6 +25,13 @@ class STEVESUEHELPERS_API UFocusableInputInterceptorUserWidget : public UFocusab
         
         virtual bool HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent) override
         {
+#if WITH_EDITOR
+        	// Avoid processing when this is from an editor Slate window
+        	if (!SlateApp.GetGameViewport().IsValid())
+        	{
+        		return false;
+        	}
+#endif
             return OnUiKeyDown.Execute(InKeyEvent);
         }
         // Required by IInputProcessor but we don't need
