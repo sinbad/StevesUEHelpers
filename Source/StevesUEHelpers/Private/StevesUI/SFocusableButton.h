@@ -109,6 +109,9 @@ public:
     void SetOnFocusReceived(FSimpleDelegate InOnFocusReceived);
     void SetOnFocusLost(FSimpleDelegate InOnFocusLost);
 
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+
 protected:
     FSimpleDelegate OnFocusReceivedDelegate;
     FSimpleDelegate OnFocusLostDelegate;

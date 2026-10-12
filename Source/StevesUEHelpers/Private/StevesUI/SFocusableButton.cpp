@@ -2,6 +2,8 @@
 // Released under the MIT license
 #include "StevesUI/SFocusableButton.h"
 
+#include "Engine/Console.h"
+
 void SFocusableButton::Construct(const FArguments& InArgs)
 {
     // Call SButton construct and pass through
@@ -73,5 +75,32 @@ void SFocusableButton::SetOnFocusReceived(FSimpleDelegate InOnFocusReceived)
 void SFocusableButton::SetOnFocusLost(FSimpleDelegate InOnFocusLost)
 {
     OnFocusLostDelegate = InOnFocusLost;
+}
+
+FReply SFocusableButton::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	// SButton::OnKeyDown/Up doesn't check whether the console is open, which means typing commands
+	// including Space/Enter in the console with a UI up triggers button, which we don't want.
+	
+	UConsole* ViewportConsole = (GEngine->GameViewport != nullptr) ? GEngine->GameViewport->ViewportConsole : nullptr;
+	if (ViewportConsole && ViewportConsole->ConsoleState != NAME_None)
+	{
+		return FReply::Unhandled();
+	}
+	
+	return SButton::OnKeyDown(MyGeometry, InKeyEvent);
+}
+
+FReply SFocusableButton::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	// SButton::OnKeyDown/Up doesn't check whether the console is open, which means typing commands
+	// including Space/Enter in the console with a UI up triggers button, which we don't want.
+	UConsole* ViewportConsole = (GEngine->GameViewport != nullptr) ? GEngine->GameViewport->ViewportConsole : nullptr;
+	if (ViewportConsole && ViewportConsole->ConsoleState != NAME_None)
+	{
+		return FReply::Unhandled();
+	}
+	
+	return SButton::OnKeyUp(MyGeometry, InKeyEvent);
 }
 
