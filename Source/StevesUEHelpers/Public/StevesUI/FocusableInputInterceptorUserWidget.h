@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "FocusableUserWidget.h"
+#include "Engine/Console.h"
 #include "Framework/Application/IInputProcessor.h"
 
 #include "FocusableInputInterceptorUserWidget.generated.h"
@@ -32,7 +33,12 @@ class STEVESUEHELPERS_API UFocusableInputInterceptorUserWidget : public UFocusab
         		return false;
         	}
 #endif
-            return OnUiKeyDown.Execute(InKeyEvent);
+        	UConsole* ViewportConsole = (GEngine->GameViewport != nullptr) ? GEngine->GameViewport->ViewportConsole : nullptr;
+        	if (ViewportConsole && ViewportConsole->ConsoleState != NAME_None)
+        	{
+        		return false;
+        	}
+        	return OnUiKeyDown.Execute(InKeyEvent);
         }
         // Required by IInputProcessor but we don't need
         virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Crs) override{}
