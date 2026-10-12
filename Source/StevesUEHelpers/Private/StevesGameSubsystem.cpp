@@ -500,8 +500,19 @@ FStevesTextureRenderTargetPoolPtr UStevesGameSubsystem::GetTextureRenderTargetPo
 }
 
 
-bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents() const
+bool UStevesGameSubsystem::FInputModeDetector::ShouldProcessInputEvents(FSlateApplication& SlateApp) const
 {
+	if (bIgnoreEvents)
+		return false;
+	
+#if WITH_EDITOR
+	// Avoid processing when this is from an editor Slate window
+	if (!SlateApp.GetGameViewport().IsValid())
+	{
+		return false;
+	}
+#endif
+	
     return !bIgnoreEvents;
 }
 
@@ -515,7 +526,7 @@ UStevesGameSubsystem::FInputModeDetector::FInputModeDetector()
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
 {
-    if (ShouldProcessInputEvents())
+    if (ShouldProcessInputEvents(SlateApp))
     {
         // Key down also registers for gamepad buttons
         ProcessKeyOrButton(InKeyEvent.GetUserIndex(), InKeyEvent.GetKey());
@@ -528,7 +539,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleKeyDownEvent(FSlateApplicat
 bool UStevesGameSubsystem::FInputModeDetector::HandleAnalogInputEvent(FSlateApplication& SlateApp,
     const FAnalogInputEvent& InAnalogInputEvent)
 {
-    if (ShouldProcessInputEvents())
+    if (ShouldProcessInputEvents(SlateApp))
     {
         if (InAnalogInputEvent.GetAnalogValue() > GamepadAxisThreshold)
             SetMode(InAnalogInputEvent.GetUserIndex(), EInputMode::Gamepad, false);
@@ -540,7 +551,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleAnalogInputEvent(FSlateAppl
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    if (ShouldProcessInputEvents())
+    if (ShouldProcessInputEvents(SlateApp))
     {
     	if (bIgnoreNextMouseMove)
     	{
@@ -561,7 +572,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseMoveEvent(FSlateApplic
 
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)
 {
-    if (ShouldProcessInputEvents())
+    if (ShouldProcessInputEvents(SlateApp))
     {
         // We don't care which button
         SetMode(MouseEvent.GetUserIndex(), EInputMode::Mouse, true);
@@ -574,7 +585,7 @@ bool UStevesGameSubsystem::FInputModeDetector::HandleMouseButtonDownEvent(FSlate
 bool UStevesGameSubsystem::FInputModeDetector::HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& InWheelEvent,
     const FPointerEvent* InGestureEvent)
 {
-    if (ShouldProcessInputEvents())
+    if (ShouldProcessInputEvents(SlateApp))
     {
         SetMode(InWheelEvent.GetUserIndex(), EInputMode::Mouse, false);
     }

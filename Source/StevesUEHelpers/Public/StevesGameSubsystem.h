@@ -105,7 +105,7 @@ protected:
         const float MouseMoveThreshold = 1;
         const float GamepadAxisThreshold = 0.2f;
 
-        bool ShouldProcessInputEvents() const;
+        bool ShouldProcessInputEvents(FSlateApplication& SlateApp) const;
     public:
         /// Whether this detector should ignore events (e.g. because the application is in the background)
         bool bIgnoreEvents = false;
