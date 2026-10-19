@@ -273,6 +273,7 @@ public:
      * @param Theme Optional explicit theme, if blank use the default theme
      * @return 
      */
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     UPaperSprite* GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action,
                                                              EInputImageDevicePreference DevicePreference,
                                                              int PlayerIdx,
@@ -287,6 +288,7 @@ public:
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     UPaperSprite* GetInputImageSpriteFromAction(const FName& Name,
                                                 EInputImageDevicePreference DevicePreference =
                                                     EInputImageDevicePreference::Gamepad_Keyboard_Mouse,
@@ -300,6 +302,7 @@ public:
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     UPaperSprite* GetInputImageSpriteFromAxis(const FName& Name,
                                               EInputImageDevicePreference DevicePreference =
                                                   EInputImageDevicePreference::Gamepad_Mouse_Keyboard,
@@ -315,6 +318,7 @@ public:
     * @param Theme Optional explicit theme, if blank use the default theme
     * @return 
     */
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     UPaperSprite* GetInputImageSpriteFromKey(const FKey& Key, int PlayerIndex = 0, const UUiTheme* Theme = nullptr);
 
     /**
