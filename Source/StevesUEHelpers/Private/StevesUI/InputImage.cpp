@@ -129,7 +129,7 @@ void UInputImage::UpdateImage()
         {
             if (auto IA = InputAction.LoadSynchronous())
             {
-                Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme);
+                Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme, bSearchInactiveMappingContexts);
             }
         }
         else

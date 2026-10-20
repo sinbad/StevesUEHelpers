@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnhancedActionKeyMapping.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InputCoreTypes.h"
 #include "PaperSprite.h"
@@ -38,6 +39,10 @@ protected:
     /// so that it's included when packaging
     UPROPERTY(Config)
     FString DefaultUiThemePath;
+	
+	/// Storage of all the enhanced input mappings we've been told about, so that we can search for mappings
+	/// which are not currently active if asked. 
+    TArray<FEnhancedActionKeyMapping> AllEnhancedInputMappings;
 
     struct FEnhancedInputInterest
     {
@@ -183,6 +188,8 @@ protected:
     UPaperSprite* GetImageSpriteFromTable(const FKey& Key, const TSoftObjectPtr<UDataTable>& Asset);
     UFUNCTION()
     void EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance);
+	void CacheEnhancedInputMappings();
+    TArray<FKey> QueryAllInputMappings(UInputAction* Action);
 
 public:
 
@@ -271,6 +278,8 @@ public:
      * @param PlayerIdx The player index to look up the binding for 
      * @param PC The player controller to look up the binding for 
      * @param Theme Optional explicit theme, if blank use the default theme
+     * @param bSearchInactiveMappings If true, and no current mapping is found for this action, will search all the possible
+     *    mappings for this action. This is to allow you to e.g. make tips which mention inputs which are not currently in the active context.
      * @return 
      */
     UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
@@ -278,7 +287,8 @@ public:
                                                              EInputImageDevicePreference DevicePreference,
                                                              int PlayerIdx,
                                                              APlayerController* PC,
-                                                             UUiTheme* Theme = nullptr);
+                                                             UUiTheme* Theme = nullptr, 
+                                                             bool bSearchInactiveMappings = false);
     
     /**
     * @brief Get an input button / key image from an action

@@ -41,6 +41,12 @@ This displays the image for a bound Enhanced Input action. The name of the actio
 should match the action name, which is relative to one of the directories
 you specify in Project Settings > Plugins > StevesUEHelpers.
 
+You can also optionally add `inactive=1` to the input tag if you want to look up mappings for actions which are 
+not currently active as a mapping context. This can be useful if you're trying to indicate an input which is not 
+currently active in the mapping contexts.
+
+`<input eaction="IA_MyAction" inactive="1"/>`
+
 ### Legacy Input Actions
 
 `<input action="TheActionName"/>`

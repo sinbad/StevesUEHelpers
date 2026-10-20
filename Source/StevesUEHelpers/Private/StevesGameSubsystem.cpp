@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "StevesGameViewportClientBase.h"
 #include "StevesPluginSettings.h"
 #include "StevesUEHelpers.h"
@@ -35,6 +36,7 @@ void UStevesGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     InitForegroundCheck();
     NotifyEnhancedInputMappingsChanged();
 	InitViewport();
+	CacheEnhancedInputMappings();
 #endif
 }
 
@@ -112,6 +114,44 @@ void UStevesGameSubsystem::NotifyEnhancedInputMappingsChanged()
     FTimerHandle TempHandle;
     GetWorld()->GetTimerManager().SetTimer(TempHandle, FTimerDelegate::CreateLambda(DelayedFunc), 0.05f, false);
 }
+
+void UStevesGameSubsystem::CacheEnhancedInputMappings()
+{
+	if (FAssetRegistryModule* AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+	{
+		IAssetRegistry& AssetRegistry = AssetRegistryModule->Get();
+
+		TArray<FAssetData> Assets;
+		AssetRegistry.GetAssetsByClass(UInputMappingContext::StaticClass()->GetClassPathName(), Assets, false);
+
+		for (const FAssetData& Asset : Assets)
+		{
+			if (Asset.GetClass() == UInputMappingContext::StaticClass())
+			{
+				if (auto Context = Cast<UInputMappingContext>(Asset.GetAsset()))
+				{
+					AllEnhancedInputMappings.Append(Context->GetMappings());
+				}
+			}
+		}
+	}
+}
+
+TArray<FKey> UStevesGameSubsystem::QueryAllInputMappings(UInputAction* Action)
+{
+	TArray<FKey> MappedKeys;
+	
+	for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+	{
+		if (Mapping.Action == Action)
+		{
+			MappedKeys.AddUnique(Mapping.Key);
+		}
+	}
+	
+	return MappedKeys;
+}
+
 
 TSoftObjectPtr<UInputAction> UStevesGameSubsystem::FindEnhancedInputAction(const FString& Name)
 {
@@ -386,15 +426,21 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromAxis(const FName& Nam
 }
 
 UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(UInputAction* Action,
-    EInputImageDevicePreference DevicePreference,
-    int PlayerIdx,
-    APlayerController* PC,
-    UUiTheme* Theme)
+	EInputImageDevicePreference DevicePreference,
+	int PlayerIdx,
+	APlayerController* PC,
+	UUiTheme* Theme,
+	bool bSearchInactiveMappings)
 {
     
     if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
     {
-        const TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+        TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+    	
+    	if (Keys.Num() == 0 && bSearchInactiveMappings)
+    	{
+    		Keys = QueryAllInputMappings(Action);
+    	}
 
         // For default, prefer mouse for axes
         if (DevicePreference == EInputImageDevicePreference::Auto)

@@ -25,6 +25,8 @@ struct FRichTextInputImageParams
     FKey Key;
     /// If binding type is EnhancedInputAction, a reference to an enhanced input action
     TSoftObjectPtr<UInputAction> InputAction;
+	/// Whether to search inactive action mappings as well as active ones
+	bool bSearchInactiveActionMappings = false;
     /// Player index, if binding type is action or axis
     int PlayerIndex;
     /// Where there are multiple mappings, which to prefer 
@@ -47,6 +49,8 @@ protected:
     FKey Key;
     /// If binding type is EnhancedInputAction, a reference to an enhanced input action
     TSoftObjectPtr<UInputAction> InputAction;
+	/// Whether to search inactive action mappings as well as active ones
+	bool bSearchInactiveActionMappings = false;
     /// Player index, if binding type is action or axis
     int PlayerIndex = 0;
     /// Where there are multiple mappings, which to prefer 
@@ -69,13 +73,14 @@ public:
 public:
 
     void Construct(const FArguments& InArgs, FRichTextInputImageParams InParams,
-        const FTextBlockStyle& TextStyle, TOptional<int32> Width, TOptional<int32> Height, EStretch::Type Stretch)
+                   const FTextBlockStyle& TextStyle, TOptional<int32> Width, TOptional<int32> Height, EStretch::Type Stretch)
     {
         BindingType = InParams.BindingType;
         ActionOrAxisName = InParams.ActionOrAxisName;
         DevicePreference = InParams.DevicePreference;
         Key = InParams.Key;
         InputAction = InParams.InputAction;
+    	bSearchInactiveActionMappings = InParams.bSearchInactiveActionMappings;
         PlayerIndex = InParams.PlayerIndex;
         Decorator = InParams.Decorator;
         RequestedWidth = Width;
@@ -144,7 +149,7 @@ public:
                     if (auto IA = InputAction.LoadSynchronous())
                     {
                         auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), PlayerIndex);
-                        Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, PC);
+                        Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, PC, nullptr, bSearchInactiveActionMappings);
                     }
                 }
                 else
@@ -245,6 +250,13 @@ protected:
             {
                 Params.InputAction = GS->FindEnhancedInputAction(*EInputStr);
             }
+        	
+        	if (const FString* InactiveStr = RunInfo.MetaData.Find(TEXT("inactive")))
+        	{
+        		int BTemp;
+        		Params.bSearchInactiveActionMappings = (FDefaultValueHelper::ParseInt(*InactiveStr, BTemp) ? BTemp : 0) > 0;            
+        	}
+
         }
 
         if (const FString* PreferStr = RunInfo.MetaData.Find(TEXT("prefer")))
@@ -281,7 +293,7 @@ protected:
                 if (auto IA = Params.InputAction.LoadSynchronous())
                 {
                     auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), Params.PlayerIndex);
-                    Params.InitialSprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, Params.DevicePreference, Params.PlayerIndex, PC);
+                    Params.InitialSprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, Params.DevicePreference, Params.PlayerIndex, PC, nullptr, Params.bSearchInactiveActionMappings);
                 }
             }
             else

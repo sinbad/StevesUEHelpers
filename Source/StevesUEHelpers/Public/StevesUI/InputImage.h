@@ -32,7 +32,12 @@ protected:
     UPROPERTY(EditAnywhere, Category="InputImage") // can't be inside  #if
     TSoftObjectPtr<UInputAction> InputAction;
     
-    /// Where there are multiple mappings, which to prefer 
+	/// If true, will search for InputAction in *inactive* mapping contexts as well as active ones. 
+	/// This can allow you to provide images for input actions which are not currently active in a context.
+	UPROPERTY(EditAnywhere, Category="InputImage") 
+	bool bSearchInactiveMappingContexts = false;
+	
+	/// Where there are multiple mappings, which to prefer 
     UPROPERTY(EditAnywhere, Category="InputImage")
     EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
     
