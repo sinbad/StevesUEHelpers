@@ -130,7 +130,7 @@ public:
         	}
         	
         }
-        TimeUntilNextSpriteCheck = 0.25f;
+        TimeUntilNextSpriteCheck = 0.05f;
 
 
     	for (int i = 0; i < MaxNumMappings; ++i)
@@ -153,6 +153,76 @@ public:
 				]
 			];
     	}
+    	
+    	// This might not be right but try anyway
+    	UpdateImages();
+    }
+	
+	void UpdateImages()
+    {
+	    auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
+	    if (GS)
+        {
+            // Can only support default theme, no way to edit theme in decorator config 
+            TArray<UPaperSprite*> Sprites;
+            if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
+            {
+                if (auto IA = InputAction.LoadSynchronous())
+                {
+                    auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), PlayerIndex);
+                    GS->GetAllInputImageSpritesFromEnhancedInputAction(Sprites, IA, DevicePreference, PlayerIndex, PC, nullptr, bSearchInactiveActionMappings);
+                }
+            }
+            else
+            {
+                if (auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex))
+                {
+                    Sprites.Add(Sprite);
+                }
+            }
+            const int NewImageCount = FMath::Min(MaxNumMappings, Sprites.Num());
+            const int NumToUpdate = FMath::Max(NewImageCount, CurrentImageCount);
+            for (int i = 0; i < NumToUpdate; ++i)
+            {
+            	// Deal with visibility changes
+            	if (i >= NewImageCount)
+            	{
+            		ImageBoxes[i]->SetVisibility(EVisibility::Collapsed);
+            	}
+            	else if (i >= CurrentImageCount)
+            	{
+            		ImageBoxes[i]->SetVisibility(EVisibility::SelfHitTestInvisible);
+            	}
+            	
+            	if (i < NewImageCount)
+            	{
+            		auto Sprite = Sprites[i];
+            		if (Sprite && Brushes[i].GetResourceObject() != Sprite)
+            		{
+            			UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[i], Sprite, true);
+
+            			// Deal with aspect ratio changes
+            			float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[i].ImageSize.Y);
+            			if (RequestedHeight.IsSet())
+            			{
+            				IconHeight = RequestedHeight.GetValue();
+            			}
+                
+            			float IconWidth = Brushes[i].ImageSize.X * (IconHeight / Brushes[i].ImageSize.Y) ;
+            			if (RequestedWidth.IsSet())
+            			{
+            				IconWidth = RequestedWidth.GetValue();
+            			}
+
+            			ImageBoxes[i]->SetWidthOverride(IconWidth);
+            			ImageBoxes[i]->SetHeightOverride(IconHeight);
+                
+            		}
+            	}
+            }
+            CurrentImageCount = NewImageCount;
+            
+        }
     }
 
 
@@ -166,69 +236,7 @@ public:
         TimeUntilNextSpriteCheck -= InDeltaTime;
         if (TimeUntilNextSpriteCheck <= 0)
         {
-            auto GS = GetStevesGameSubsystem(Decorator->GetWorld());
-            if (GS)
-            {
-                // Can only support default theme, no way to edit theme in decorator config 
-                TArray<UPaperSprite*> Sprites;
-                if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
-                {
-                    if (auto IA = InputAction.LoadSynchronous())
-                    {
-                        auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), PlayerIndex);
-                        GS->GetAllInputImageSpritesFromEnhancedInputAction(Sprites, IA, DevicePreference, PlayerIndex, PC, nullptr, bSearchInactiveActionMappings);
-                    }
-                }
-                else
-                {
-                    if (auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex))
-                    {
-	                    Sprites.Add(Sprite);
-                    }
-                }
-            	const int NewImageCount = FMath::Min(MaxNumMappings, Sprites.Num());
-            	const int NumToUpdate = FMath::Max(NewImageCount, CurrentImageCount);
-            	for (int i = 0; i < NumToUpdate; ++i)
-            	{
-            		// Deal with visibility changes
-            		if (i >= NewImageCount)
-            		{
-            			ImageBoxes[i]->SetVisibility(EVisibility::Collapsed);
-            		}
-            		else if (i >= CurrentImageCount)
-            		{
-            			ImageBoxes[i]->SetVisibility(EVisibility::SelfHitTestInvisible);
-            		}
-            		
-            		if (i < NewImageCount)
-            		{
-            			auto Sprite = Sprites[i];
-            			if (Sprite && Brushes[i].GetResourceObject() != Sprite)
-            			{
-            				UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[i], Sprite, true);
-
-            				// Deal with aspect ratio changes
-            				float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[i].ImageSize.Y);
-            				if (RequestedHeight.IsSet())
-            				{
-            					IconHeight = RequestedHeight.GetValue();
-            				}
-                    
-            				float IconWidth = Brushes[i].ImageSize.X * (IconHeight / Brushes[i].ImageSize.Y) ;
-            				if (RequestedWidth.IsSet())
-            				{
-            					IconWidth = RequestedWidth.GetValue();
-            				}
-
-            				ImageBoxes[i]->SetWidthOverride(IconWidth);
-            				ImageBoxes[i]->SetHeightOverride(IconHeight);
-                    
-            			}
-            		}
-            	}
-            	CurrentImageCount = NewImageCount;
-                
-            }
+        	UpdateImages();
             TimeUntilNextSpriteCheck = 0.5f;
         }
     }
