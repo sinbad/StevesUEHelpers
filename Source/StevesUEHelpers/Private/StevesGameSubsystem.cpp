@@ -432,6 +432,8 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(U
 	UUiTheme* Theme,
 	bool bSearchInactiveMappings)
 {
+	if (!PC)
+		return nullptr;
     
     if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
     {
@@ -476,6 +478,9 @@ void UStevesGameSubsystem::GetAllInputImageSpritesFromEnhancedInputAction(
 	bool bSearchInactiveMappings)
 {
 	OutSprites.Reset();
+	
+	if (!PC)
+		return;
 	
 	if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 	{
