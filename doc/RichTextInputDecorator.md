@@ -41,11 +41,28 @@ This displays the image for a bound Enhanced Input action. The name of the actio
 should match the action name, which is relative to one of the directories
 you specify in Project Settings > Plugins > StevesUEHelpers.
 
+#### Inactive Mappings
+
 You can also optionally add `inactive=1` to the input tag if you want to look up mappings for actions which are 
 not currently active as a mapping context. This can be useful if you're trying to indicate an input which is not 
 currently active in the mapping contexts.
 
 `<input eaction="IA_MyAction" inactive="1"/>`
+
+#### Multiple Mappings
+
+If multiple keys are mapped to an action, particularly to 1D and 2D axes such as WSAD, you can allow the input image
+to display multiple entries if you want using `maxnum=n`.
+
+`<input eaction="IA_Move2D" maxnum="4"/>`
+
+`<input eaction="IA_ZoomAxis" maxnum="2"/>`
+
+That way if you have multiple inputs on the same device bound to that axis it will show all of them, in mapping order, but
+collapse if there are fewer.
+
+
+
 
 ### Legacy Input Actions
 

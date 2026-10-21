@@ -27,6 +27,9 @@ struct FRichTextInputImageParams
     TSoftObjectPtr<UInputAction> InputAction;
 	/// Whether to search inactive action mappings as well as active ones
 	bool bSearchInactiveActionMappings = false;
+	/// The max number of mappings to display instead of just the first. Useful for actions which have multiple
+	/// keys bound to different axes
+	int MaxNumMappings = 1;
     /// Player index, if binding type is action or axis
     int PlayerIndex;
     /// Where there are multiple mappings, which to prefer 
@@ -37,8 +40,8 @@ struct FRichTextInputImageParams
     /// Parent decorator, for looking up things later
     URichTextBlockInputImageDecorator* Decorator;
 };
-// Basically the same as SRichInlineImage but I can't re-use that since private
-class SRichInlineInputImage : public SCompoundWidget
+// We're a horizontal box so we can display multiple images if we want (e.g. WSAD is 4 input images for one 2D axis)
+class SStevesRichInlineInputImage : public SHorizontalBox
 {
 protected:
     /// What type of an input binding this image should look up
@@ -51,22 +54,27 @@ protected:
     TSoftObjectPtr<UInputAction> InputAction;
 	/// Whether to search inactive action mappings as well as active ones
 	bool bSearchInactiveActionMappings = false;
-    /// Player index, if binding type is action or axis
+	/// The max number of mappings to display instead of just the first. Useful for actions which have multiple
+	/// keys bound to different axes
+	int MaxNumMappings = 1;
+	/// Player index, if binding type is action or axis
     int PlayerIndex = 0;
     /// Where there are multiple mappings, which to prefer 
     EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
     /// Parent decorator, for looking up things later
     URichTextBlockInputImageDecorator* Decorator = nullptr;
 
-    FSlateBrush Brush;
     float TimeUntilNextSpriteCheck = 0;
     uint16 MaxCharHeight = 0;
     TOptional<int32> RequestedWidth;
     TOptional<int32> RequestedHeight;
-    SBox* ContainerBox = nullptr;
+	
+	TArray<TSharedPtr<SBox>> ImageBoxes;
+	TArray<FSlateBrush> Brushes;
+	int CurrentImageCount = 0;
 
 public:
-    SLATE_BEGIN_ARGS(SRichInlineInputImage)
+    SLATE_BEGIN_ARGS(SStevesRichInlineInputImage)
     {}
     SLATE_END_ARGS()
 
@@ -81,57 +89,76 @@ public:
         Key = InParams.Key;
         InputAction = InParams.InputAction;
     	bSearchInactiveActionMappings = InParams.bSearchInactiveActionMappings;
+    	MaxNumMappings = InParams.MaxNumMappings;
         PlayerIndex = InParams.PlayerIndex;
         Decorator = InParams.Decorator;
         RequestedWidth = Width;
         RequestedHeight = Height;
+    	CurrentImageCount = 0;
+    	
+    	// Horizontal box disables the default tick
+    	SetCanTick(true);
 
         // Sadly, we cannot hook into the events needed to update based on input changes here
         // All attempts to use GetStevesGameSubsystem() fail because the world pointer
         // doesn't work, I think perhaps because this Slate Construct call is in another thread which pre-dates it.
         // We will need to do the work to update the brush from the main thread later
+    	
+    	ImageBoxes.SetNum(MaxNumMappings);
+    	Brushes.SetNum(MaxNumMappings);
 
-        // We can use static methods though
+    	const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+    	MaxCharHeight = FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f);
+
+    	float IconHeight = 32;
+    	float IconWidth = 32;
+        CurrentImageCount = 1; // always show one thing so not invisible in design mode
         if (IsValid(InParams.InitialSprite))
-            UStevesGameSubsystem::SetBrushFromAtlas(&Brush, InParams.InitialSprite, true);
+        {
+	        UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[0], InParams.InitialSprite, true);
+
+        	IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[0].ImageSize.Y);
+        	if (Height.IsSet())
+        	{
+        		IconHeight = Height.GetValue();
+        	}
+
+        	IconWidth = Brushes[0].ImageSize.X * (IconHeight / Brushes[0].ImageSize.Y) ;
+        	if (Width.IsSet())
+        	{
+        		IconWidth = Width.GetValue();
+        	}
+        	
+        }
         TimeUntilNextSpriteCheck = 0.25f;
 
-        const TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-        MaxCharHeight = FontMeasure->GetMaxCharacterHeight(TextStyle.Font, 1.0f);
-        float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
-        if (Height.IsSet())
-        {
-            IconHeight = Height.GetValue();
-        }
 
-        float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
-        if (Width.IsSet())
-        {
-            IconWidth = Width.GetValue();
-        }
-
-        ChildSlot
-        [
-            SNew(SBox)
-            .HeightOverride(IconHeight)
-            .WidthOverride(IconWidth)
-            [
-                SNew(SScaleBox)
-                .Stretch(Stretch)
-                .StretchDirection(EStretchDirection::DownOnly)
-                .VAlign(VAlign_Center)
-                [
-                    SNew(SImage)
-                    .Image(&Brush)
-                ]
-            ]
-        ];
+    	for (int i = 0; i < MaxNumMappings; ++i)
+    	{
+    		AddSlot()
+			[
+				SAssignNew(ImageBoxes[i], SBox)
+				.HeightOverride(IconHeight)
+				.WidthOverride(IconWidth)
+				.Visibility(i < CurrentImageCount ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed)
+				[
+					SNew(SScaleBox)
+					.Stretch(Stretch)
+					.StretchDirection(EStretchDirection::DownOnly)
+					.VAlign(VAlign_Center)
+					[
+						SNew(SImage)
+						.Image(&Brushes[i])
+					]
+				]
+			];
+    	}
     }
 
 
     virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override
     {
-        SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
+        SHorizontalBox::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
 
         // I would prefer to hook into the events here but there is NO safe teardown in these RichText decorators
         // with which to unsub from events, so we're down to brute forcing this in Tick() le sigh
@@ -143,42 +170,63 @@ public:
             if (GS)
             {
                 // Can only support default theme, no way to edit theme in decorator config 
-                UPaperSprite* Sprite = nullptr;
+                TArray<UPaperSprite*> Sprites;
                 if (BindingType == EInputBindingType::EnhancedInputAction && !InputAction.IsNull())
                 {
                     if (auto IA = InputAction.LoadSynchronous())
                     {
                         auto PC = UGameplayStatics::GetPlayerController(Decorator->GetWorld(), PlayerIndex);
-                        Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, PC, nullptr, bSearchInactiveActionMappings);
+                        GS->GetAllInputImageSpritesFromEnhancedInputAction(Sprites, IA, DevicePreference, PlayerIndex, PC, nullptr, bSearchInactiveActionMappings);
                     }
                 }
                 else
                 {
-                    Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex);    
-                }
-                if (Sprite && Brush.GetResourceObject() != Sprite)
-                {
-                    UStevesGameSubsystem::SetBrushFromAtlas(&Brush, Sprite, true);
-
-                    // Deal with aspect ratio changes
-                    TSharedPtr<SWidget> Widget = ChildSlot.GetWidget();
-                    SBox* Box = static_cast<SBox*>(Widget.Get());
-                    float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brush.ImageSize.Y);
-                    if (RequestedHeight.IsSet())
+                    if (auto Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex))
                     {
-                        IconHeight = RequestedHeight.GetValue();
+	                    Sprites.Add(Sprite);
                     }
-                    
-                    float IconWidth = Brush.ImageSize.X * (IconHeight / Brush.ImageSize.Y) ;
-                    if (RequestedWidth.IsSet())
-                    {
-                        IconWidth = RequestedWidth.GetValue();
-                    }
-
-                    Box->SetWidthOverride(IconWidth);
-                    Box->SetHeightOverride(IconHeight);
-                    
                 }
+            	const int NewImageCount = FMath::Min(MaxNumMappings, Sprites.Num());
+            	const int NumToUpdate = FMath::Max(NewImageCount, CurrentImageCount);
+            	for (int i = 0; i < NumToUpdate; ++i)
+            	{
+            		// Deal with visibility changes
+            		if (i >= NewImageCount)
+            		{
+            			ImageBoxes[i]->SetVisibility(EVisibility::Collapsed);
+            		}
+            		else if (i >= CurrentImageCount)
+            		{
+            			ImageBoxes[i]->SetVisibility(EVisibility::SelfHitTestInvisible);
+            		}
+            		
+            		if (i < NewImageCount)
+            		{
+            			auto Sprite = Sprites[i];
+            			if (Sprite && Brushes[i].GetResourceObject() != Sprite)
+            			{
+            				UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[i], Sprite, true);
+
+            				// Deal with aspect ratio changes
+            				float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[i].ImageSize.Y);
+            				if (RequestedHeight.IsSet())
+            				{
+            					IconHeight = RequestedHeight.GetValue();
+            				}
+                    
+            				float IconWidth = Brushes[i].ImageSize.X * (IconHeight / Brushes[i].ImageSize.Y) ;
+            				if (RequestedWidth.IsSet())
+            				{
+            					IconWidth = RequestedWidth.GetValue();
+            				}
+
+            				ImageBoxes[i]->SetWidthOverride(IconWidth);
+            				ImageBoxes[i]->SetHeightOverride(IconHeight);
+                    
+            			}
+            		}
+            	}
+            	CurrentImageCount = NewImageCount;
                 
             }
             TimeUntilNextSpriteCheck = 0.5f;
@@ -187,10 +235,10 @@ public:
 };
 
 // Again, wish I could just subclass FRichInlineImage here, le sigh
-class FRichInlineInputImage : public FRichTextDecorator
+class FStevesRichInlineInputImage : public FRichTextDecorator
 {
 public:
-    FRichInlineInputImage(URichTextBlock* InOwner, URichTextBlockInputImageDecorator* InDecorator)
+    FStevesRichInlineInputImage(URichTextBlock* InOwner, URichTextBlockInputImageDecorator* InDecorator)
         : FRichTextDecorator(InOwner)
         , Decorator(InDecorator)
     {
@@ -257,6 +305,12 @@ protected:
         		Params.bSearchInactiveActionMappings = (FDefaultValueHelper::ParseInt(*InactiveStr, BTemp) ? BTemp : 0) > 0;            
         	}
 
+        	if (const FString* NumStr = RunInfo.MetaData.Find(TEXT("maxnum")))
+        	{
+        		int NTemp;
+        		Params.MaxNumMappings = FDefaultValueHelper::ParseInt(*NumStr, NTemp) ? NTemp : 1;            
+        	}
+        
         }
 
         if (const FString* PreferStr = RunInfo.MetaData.Find(TEXT("prefer")))
@@ -337,7 +391,7 @@ protected:
         }
 
         // SNew only supports 5 custom arguments! Thats why we batch up in struct
-        return SNew(SRichInlineInputImage, Params, TextStyle, Width, Height, Stretch);
+        return SNew(SStevesRichInlineInputImage, Params, TextStyle, Width, Height, Stretch);
     }
 
 private:
@@ -346,5 +400,5 @@ private:
 
 TSharedPtr<ITextDecorator> URichTextBlockInputImageDecorator::CreateDecorator(URichTextBlock* InOwner)
 {
-    return MakeShareable(new FRichInlineInputImage(InOwner, this));
+    return MakeShareable(new FStevesRichInlineInputImage(InOwner, this));
 }

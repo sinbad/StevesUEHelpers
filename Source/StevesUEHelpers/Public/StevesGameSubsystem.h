@@ -289,6 +289,30 @@ public:
                                                              APlayerController* PC,
                                                              UUiTheme* Theme = nullptr, 
                                                              bool bSearchInactiveMappings = false);
+	
+	/**
+     * @brief Get all input button / key / axis images as a sprite based on an enhanced input action.
+     *   Can return multiple sprites to deal with axes which are bound to multiple keys / buttons, e.g. WSAD.
+     *   They will be returned in the order they are listed in the input mappings.
+     * @param OutSprites Array to fill with the output sprites
+     * @param Action The input action 
+     * @param DevicePreference The order of preference for images where multiple devices have mappings. In the case of multiple mappings for the same device, the first one will be used.
+     * @param PlayerIdx The player index to look up the binding for 
+     * @param PC The player controller to look up the binding for 
+     * @param Theme Optional explicit theme, if blank use the default theme
+     * @param bSearchInactiveMappings If true, and no current mapping is found for this action, will search all the possible
+     *    mappings for this action. This is to allow you to e.g. make tips which mention inputs which are not currently in the active context.
+     * @return 
+     */
+    UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
+    void GetAllInputImageSpritesFromEnhancedInputAction(TArray<UPaperSprite*>& OutSprites,
+                                                        UInputAction* Action,
+                                                        EInputImageDevicePreference
+                                                        DevicePreference,
+                                                        int PlayerIdx,
+                                                        APlayerController* PC,
+                                                        UUiTheme* Theme = nullptr,
+                                                        bool bSearchInactiveMappings = false);
     
     /**
     * @brief Get an input button / key image from an action

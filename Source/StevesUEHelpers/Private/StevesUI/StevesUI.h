@@ -99,3 +99,10 @@ const FKey* GetPreferedKeyMapping(const TArray<FKey>& AllKeys,
                                   EInputMode LastInputDevice,
                                   EInputMode LastButtonInputDevice,
                                   EInputMode LastAxisInputDevice);
+
+void GetPreferedKeyMappings(TArray<FKey>& OutPreferredKeys,
+                            const TArray<FKey>& InKeys,
+                            EInputImageDevicePreference DevicePreference,
+                            EInputMode LastInputDevice,
+                            EInputMode LastButtonInputDevice,
+                            EInputMode LastAxisInputDevice);

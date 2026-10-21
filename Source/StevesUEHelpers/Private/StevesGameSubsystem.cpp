@@ -466,6 +466,55 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(U
     return nullptr;
 }
 
+void UStevesGameSubsystem::GetAllInputImageSpritesFromEnhancedInputAction(
+	TArray<UPaperSprite*>& OutSprites,
+	UInputAction* Action,
+	EInputImageDevicePreference DevicePreference,
+	int PlayerIdx,
+	APlayerController* PC,
+	UUiTheme* Theme,
+	bool bSearchInactiveMappings)
+{
+	OutSprites.Reset();
+	
+	if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+	{
+		TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+    	
+		if (Keys.Num() == 0 && bSearchInactiveMappings)
+		{
+			Keys = QueryAllInputMappings(Action);
+		}
+
+		// For default, prefer mouse for axes
+		if (DevicePreference == EInputImageDevicePreference::Auto)
+		{
+			if (Action->ValueType == EInputActionValueType::Boolean)
+			{
+				DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
+			}
+			else
+			{
+				DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
+			}
+		}
+		const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+		const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+		const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+
+		TArray<FKey> PreferredKeys;
+		GetPreferedKeyMappings(PreferredKeys, Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput);
+		
+		for (const auto& PreferredKey : PreferredKeys)
+		{
+			if (UPaperSprite* Sprite = GetInputImageSpriteFromKey(PreferredKey, PlayerIdx, Theme))
+			{
+				OutSprites.Add(Sprite);
+			}
+		}
+	}
+}
+
 
 TSoftObjectPtr<UDataTable> UStevesGameSubsystem::GetGamepadImages(int PlayerIndex, const UUiTheme* Theme)
 {
