@@ -41,7 +41,7 @@ struct FRichTextInputImageParams
     URichTextBlockInputImageDecorator* Decorator;
 };
 // We're a horizontal box so we can display multiple images if we want (e.g. WSAD is 4 input images for one 2D axis)
-class SStevesRichInlineInputImage : public SHorizontalBox
+class SStevesRichInlineInputImage : public SHorizontalBox, public FGCObject
 {
 protected:
     /// What type of an input binding this image should look up
@@ -77,8 +77,6 @@ public:
     SLATE_BEGIN_ARGS(SStevesRichInlineInputImage)
     {}
     SLATE_END_ARGS()
-
-public:
 
     void Construct(const FArguments& InArgs, FRichTextInputImageParams InParams,
                    const FTextBlockStyle& TextStyle, TOptional<int32> Width, TOptional<int32> Height, EStretch::Type Stretch)
@@ -188,6 +186,7 @@ public:
             	if (i >= NewImageCount)
             	{
             		ImageBoxes[i]->SetVisibility(EVisibility::Collapsed);
+            		Brushes[i].SetResourceObject(nullptr);
             	}
             	else if (i >= CurrentImageCount)
             	{
@@ -197,25 +196,28 @@ public:
             	if (i < NewImageCount)
             	{
             		auto Sprite = Sprites[i];
-            		if (Sprite && Brushes[i].GetResourceObject() != Sprite)
+            		if (Sprite) // should always be true since we only add non-null sprites, but be sure
             		{
-            			UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[i], Sprite, true);
-
-            			// Deal with aspect ratio changes
-            			float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[i].ImageSize.Y);
-            			if (RequestedHeight.IsSet())
+            			if (!IsValid(Brushes[i].GetResourceObject()) || Brushes[i].GetResourceObject() != Sprite)
             			{
-            				IconHeight = RequestedHeight.GetValue();
-            			}
+            				UStevesGameSubsystem::SetBrushFromAtlas(&Brushes[i], Sprite, true);
+
+							// Deal with aspect ratio changes
+							float IconHeight = FMath::Min(static_cast<float>(MaxCharHeight), Brushes[i].ImageSize.Y);
+							if (RequestedHeight.IsSet())
+							{
+								IconHeight = RequestedHeight.GetValue();
+							}
                 
-            			float IconWidth = Brushes[i].ImageSize.X * (IconHeight / Brushes[i].ImageSize.Y) ;
-            			if (RequestedWidth.IsSet())
-            			{
-            				IconWidth = RequestedWidth.GetValue();
-            			}
+							float IconWidth = Brushes[i].ImageSize.X * (IconHeight / Brushes[i].ImageSize.Y) ;
+							if (RequestedWidth.IsSet())
+							{
+								IconWidth = RequestedWidth.GetValue();
+							}
 
-            			ImageBoxes[i]->SetWidthOverride(IconWidth);
-            			ImageBoxes[i]->SetHeightOverride(IconHeight);
+							ImageBoxes[i]->SetWidthOverride(IconWidth);
+							ImageBoxes[i]->SetHeightOverride(IconHeight);
+            			}
                 
             		}
             	}
@@ -240,6 +242,20 @@ public:
             TimeUntilNextSpriteCheck = 0.5f;
         }
     }
+	
+	//~ Begin FGCObject interface
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override
+    {
+	    for (auto& B : Brushes)
+	    {
+		    B.AddReferencedObjects(Collector);
+	    }
+    }
+	virtual FString GetReferencerName() const override
+	{
+		return TEXT("SStevesRichInlineInputImage");
+	}
+	//~ End FGCObject interface
 };
 
 // Again, wish I could just subclass FRichInlineImage here, le sigh
