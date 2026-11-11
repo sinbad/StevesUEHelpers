@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "PlayerMappableKeySettings.h"
 #include "StevesGameViewportClientBase.h"
 #include "StevesPluginSettings.h"
 #include "StevesUEHelpers.h"
@@ -577,6 +578,20 @@ void UStevesGameSubsystem::SetBrushFromAtlas(FSlateBrush* Brush, TScriptInterfac
             }
         }
     }
+}
+
+const UInputAction* UStevesGameSubsystem::FindInputActionFromPlayerMappableKey(const FName MappingName)
+{
+	for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+	{
+		if (Mapping.IsPlayerMappable() && Mapping.GetPlayerMappableKeySettings() &&
+			Mapping.GetPlayerMappableKeySettings()->Name == MappingName)
+		{
+			return Mapping.Action;
+		}
+	}
+	
+	return nullptr;
 }
 
 FStevesTextureRenderTargetPoolPtr UStevesGameSubsystem::GetTextureRenderTargetPool(FName Name, bool bAutoCreate)

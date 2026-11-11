@@ -365,6 +365,16 @@ public:
                           bool bMatchSize);
 
 
+	
+	/**
+	 * Locate an Enhanced Input Action from a player mappable input Mapping Name. There seems to be
+	 * no way to do this in the engine otherwise, unless an input has already been player mapped?
+	 * @param MappingName The name defined in Player Mappable Key Settings
+	 * @return The input action or null if not found
+	 */
+	UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
+    const UInputAction* FindInputActionFromPlayerMappableKey(const FName MappingName);
+	
 
     /**
     * Retrieve a pool of texture render targets. If a pool doesn't exist with the given name, it can be created.
