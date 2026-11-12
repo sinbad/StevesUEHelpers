@@ -198,7 +198,6 @@ protected:
     void EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance);
 	void CacheEnhancedInputMappings();
 	void QueryInputMappings(APlayerController* PC, UInputAction* Action, bool bSearchInactive, TArray<FKey>& OutKeys);
-    TArray<FKey> QueryAllInputMappings(UInputAction* Action);
 	FKey QueryInputMapping(const FName& MappingName);
 
 public:

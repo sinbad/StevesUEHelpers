@@ -166,21 +166,6 @@ void UStevesGameSubsystem::QueryInputMappings(APlayerController* PC,
 	
 }
 
-TArray<FKey> UStevesGameSubsystem::QueryAllInputMappings(UInputAction* Action)
-{
-	TArray<FKey> MappedKeys;
-	
-	for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
-	{
-		if (Mapping.Action == Action)
-		{
-			MappedKeys.AddUnique(Mapping.Key);
-		}
-	}
-	
-	return MappedKeys;
-}
-
 FKey UStevesGameSubsystem::QueryInputMapping(const FName& MappingName)
 {
 	// Get a specific mapping as defined by the Player Mappable Key Settings on a context mapping
