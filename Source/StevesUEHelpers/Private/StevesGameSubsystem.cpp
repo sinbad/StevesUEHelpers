@@ -144,40 +144,102 @@ void UStevesGameSubsystem::QueryInputMappings(APlayerController* PC,
                                               bool bSearchInactive,
                                               TArray<FKey>& OutKeys)
 {
-	if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+	bool bFoundInUserSettings = false;
+	if (auto UserSettings = GetEnhancedInputUserSettings(PC))
 	{
-		TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
-		if (Keys.Num() > 0)
+		// We need to get ALL mapping names for this action
+		// Not just defined in the action, but in the mapping contexts as well
+		// There doesn't seem to be any Find tools for this
+		const auto& Mappings = UserSettings->GetActiveKeyProfile()->GetPlayerMappingRows();
+		for (const auto& Pair : Mappings)
 		{
-			OutKeys.Append(Keys);
+			// There should only be one? You can't use the same MappingName for more than one mapping entry
+			// so I don't understand why this is a Set
+			for (const auto& Mapping : Pair.Value.Mappings)
+			{
+				if (Mapping.GetAssociatedInputAction() == Action)
+				{
+					bFoundInUserSettings = true;
+					OutKeys.Add(Mapping.GetCurrentKey());
+				}
+			}
 		}
 	}
 	
-	if (bSearchInactive)
+	if (!bFoundInUserSettings)
 	{
-		for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+		if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
-			if (Mapping.Action == Action)
+			TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+			if (Keys.Num() > 0)
 			{
-				OutKeys.AddUnique(Mapping.Key);
+				OutKeys.Append(Keys);
+			}
+		}
+	
+		if (bSearchInactive)
+		{
+			for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+			{
+				if (Mapping.Action == Action)
+				{
+					OutKeys.AddUnique(Mapping.Key);
+				}
 			}
 		}
 	}
 	
 }
 
-FKey UStevesGameSubsystem::QueryInputMapping(const FName& MappingName)
+FKey UStevesGameSubsystem::QueryInputMapping(APlayerController* PC, const FName& MappingName, bool bSearchInactive)
 {
-	// Get a specific mapping as defined by the Player Mappable Key Settings on a context mapping
-	for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+	FKey Key(NAME_None);
+	if (auto UserSettings = GetEnhancedInputUserSettings(PC))
 	{
-		if (Mapping.GetMappingName() == MappingName)
+		if (const FKeyMappingRow* Row = UserSettings->GetActiveKeyProfile()->FindKeyMappingRow(MappingName))
 		{
-			return Mapping.Key;
+			if (Row->HasAnyMappings())
+			{
+				// There should only be one? You can't use the same MappingName for more than one mapping entry
+				// so I don't understand why this is a Set
+				const auto& Mapping = Row->Mappings.Array()[0];
+				Key = Mapping.GetCurrentKey();
+			}
 		}
 	}
 	
-	return FKey();
+	if (!Key.IsValid() && bSearchInactive)
+	{
+		// Otherwise, find default from mapping contexts
+		for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+		{
+			if (Mapping.GetMappingName() == MappingName)
+			{
+				Key = Mapping.Key;
+				break;
+			}
+		}
+	}
+	
+	return Key;
+}
+
+UEnhancedInputUserSettings* UStevesGameSubsystem::GetEnhancedInputUserSettings(const APlayerController* PC) const
+{
+	if (IsValid(EnhancedInputUserSettings))
+	{
+		return EnhancedInputUserSettings;
+	}
+	
+	if (PC)
+	{
+		if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			return Subsystem->GetUserSettings();
+		}
+	}
+
+	return nullptr;
 }
 
 
@@ -527,27 +589,7 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputActionMa
 	if (!PC)
 		return nullptr;
 	
-	FKey Key(NAME_None);
-	if (IsValid(EnhancedInputUserSettings))
-	{
-		if (const FKeyMappingRow* Row = EnhancedInputUserSettings->GetActiveKeyProfile()->FindKeyMappingRow(
-			MappingName))
-		{
-			if (Row->HasAnyMappings())
-			{
-				// There should only be one? You can't use the same MappingName for more than one mapping entry
-				// so I don't understand why this is a Set
-				const auto& Mapping = Row->Mappings.Array()[0];
-				Key = Mapping.GetCurrentKey();
-			}
-		}
-	}
-	
-	if (!Key.IsValid() && bSearchInactiveMappings)
-	{
-		// Otherwise, find default from mapping contexts
-		Key = QueryInputMapping(MappingName);
-	}
+	FKey Key = QueryInputMapping(PC, MappingName, bSearchInactiveMappings);
 	
 	if (Key.IsValid())
 	{

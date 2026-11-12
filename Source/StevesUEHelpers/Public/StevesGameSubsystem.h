@@ -171,6 +171,7 @@ protected:
     UPROPERTY(BlueprintReadWrite, Category="StevesGameSubsystem")
     TObjectPtr<UUiTheme> DefaultUiTheme;
 	
+	/// Externally-sourced enhanced input user settings; optional if core ones are not in use.
 	UPROPERTY()
 	UEnhancedInputUserSettings* EnhancedInputUserSettings;
 
@@ -198,7 +199,8 @@ protected:
     void EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance);
 	void CacheEnhancedInputMappings();
 	void QueryInputMappings(APlayerController* PC, UInputAction* Action, bool bSearchInactive, TArray<FKey>& OutKeys);
-	FKey QueryInputMapping(const FName& MappingName);
+	FKey QueryInputMapping(APlayerController* PC, const FName& MappingName, bool bSearchInactive);
+	UEnhancedInputUserSettings* GetEnhancedInputUserSettings(const APlayerController* PC) const;
 
 public:
 
@@ -250,8 +252,11 @@ public:
     bool LastInputWasGamePad(int PlayerIndex = 0) const { return GetLastInputModeUsed(PlayerIndex) == EInputMode::Gamepad; }
 	
     /**
-	 * Tell the system about your user-defined enhanced input remappings - this is required for 
-	 * things like InputImage to correctly display remapped controls instead of the ones defined by default.
+	 * Tell the system about your user-defined enhanced input remappings. 
+	 * If you use the default user settings class in UEnhancedInputLocalPlayerSubsystem you do not need
+	 * to call this; this is only if you have your own manually created UEnhancedInputUserSettings.
+	 * Alternatively set "Enable User Settings" and add Default Mapping Contexts with "Register With User Settings" enabled
+	 * in your Project Settings under Enhanced Input instead of calling this.
 	 * @param Settings The enhanced input user settings
 	 * @param bAutoRegisterMappingContexts If true, automatically calls Settings->RegisterInputMappingContext with
 	 *    all detected Mapping Context assets in the project. If you set this to false you must call this function yourself
@@ -311,7 +316,7 @@ public:
 
 	/**
 	 * @brief Get an input button / key / axis image as a sprite based on an enhanced input action mapping.
-	 * @note For best behaviour, make sure you've called SetEnhancedInputUserSettings to pick up remapped controls.
+	 * @note For best behaviour, make sure you've called SetEnhancedInputUserSettings or set default mappings in your Enhanced Input settings to pick up remapped controls.
 	 * @param MappingName The mapping name that identifies both an input action and a specific mapping to it in Player Mappable Key Settings.
 	 *    These will usually be contained in your mapping context for example to map W to +Y in a move action
 	 * @param PlayerIdx The player index to look up the binding for 
