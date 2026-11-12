@@ -17,7 +17,12 @@
 
 #include "StevesGameSubsystem.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged, int, PlayerIndex, EInputMode, InputMode);
+class UEnhancedInputUserSettings;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputModeChanged,
+                                             int,
+                                             PlayerIndex,
+                                             EInputMode,
+                                             InputMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnhancedInputMappingsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWindowForegroundChanged, bool, bFocussed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEnhancedInputActionTriggered, const UInputAction*, Action, ETriggerEvent, TriggeredEvent);
@@ -165,6 +170,9 @@ protected:
 
     UPROPERTY(BlueprintReadWrite, Category="StevesGameSubsystem")
     TObjectPtr<UUiTheme> DefaultUiTheme;
+	
+	UPROPERTY()
+	UEnhancedInputUserSettings* EnhancedInputUserSettings;
 
     TArray<FStevesTextureRenderTargetPoolPtr> TextureRenderTargetPools;
 
@@ -189,7 +197,9 @@ protected:
     UFUNCTION()
     void EnhancedInputActionTriggered(const FInputActionInstance& InputActionInstance);
 	void CacheEnhancedInputMappings();
+	void QueryInputMappings(APlayerController* PC, UInputAction* Action, bool bSearchInactive, TArray<FKey>& OutKeys);
     TArray<FKey> QueryAllInputMappings(UInputAction* Action);
+	FKey QueryInputMapping(const FName& MappingName);
 
 public:
 
@@ -239,6 +249,16 @@ public:
     
     UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
     bool LastInputWasGamePad(int PlayerIndex = 0) const { return GetLastInputModeUsed(PlayerIndex) == EInputMode::Gamepad; }
+	
+    /**
+	 * Tell the system about your user-defined enhanced input remappings - this is required for 
+	 * things like InputImage to correctly display remapped controls instead of the ones defined by default.
+	 * @param Settings The enhanced input user settings
+	 * @param bAutoRegisterMappingContexts If true, automatically calls Settings->RegisterInputMappingContext with
+	 *    all detected Mapping Context assets in the project. If you set this to false you must call this function yourself
+	 *    with any mapping contexts you care about.
+	 */
+	void SetEnhancedInputUserSettings(UEnhancedInputUserSettings* Settings, bool bAutoRegisterMappingContexts = true);
 
     /// Gets the default UI theme object (defaults to our own)
     /// You can override this if you want
@@ -289,8 +309,28 @@ public:
                                                              APlayerController* PC,
                                                              UUiTheme* Theme = nullptr, 
                                                              bool bSearchInactiveMappings = false);
-	
+
 	/**
+	 * @brief Get an input button / key / axis image as a sprite based on an enhanced input action mapping.
+	 * @note For best behaviour, make sure you've called SetEnhancedInputUserSettings to pick up remapped controls.
+	 * @param MappingName The mapping name that identifies both an input action and a specific mapping to it in Player Mappable Key Settings.
+	 *    These will usually be contained in your mapping context for example to map W to +Y in a move action
+	 * @param PlayerIdx The player index to look up the binding for 
+	 * @param PC The player controller to look up the binding for
+	 * @param Theme Optional explicit theme, if blank use the default theme
+	 * @param bSearchInactiveMappings If true, and no current mapping is found for this action, will search all the possible
+	 *    mappings for this action. This is to allow you to e.g. make tips which mention inputs which are not currently in the active context.
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, Category="StevesGameSubsystem")
+    UPaperSprite* GetInputImageSpriteFromEnhancedInputActionMapping(
+	    const FName& MappingName,
+	    int PlayerIdx,
+	    APlayerController* PC,
+	    UUiTheme* Theme = nullptr,
+	    bool bSearchInactiveMappings = false);
+
+    /**
      * @brief Get all input button / key / axis images as a sprite based on an enhanced input action.
      *   Can return multiple sprites to deal with axes which are bound to multiple keys / buttons, e.g. WSAD.
      *   They will be returned in the order they are listed in the input mappings.

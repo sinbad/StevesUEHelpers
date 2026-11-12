@@ -25,26 +25,30 @@ protected:
     EInputBindingType BindingType;
 
     /// If BindingType is Action/Axis, the name of it 
-    UPROPERTY(EditAnywhere, Category="InputImage")
+    UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::Action || BindingType==EInputBindingType::Axis"))
     FName ActionOrAxisName;
 
     /// If binding type is EnhancedInputAction, a reference to an enhanced input action
-    UPROPERTY(EditAnywhere, Category="InputImage") // can't be inside  #if
+    UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::EnhancedInputAction"))
     TSoftObjectPtr<UInputAction> InputAction;
     
+	/// If binding type is EnhancedInputActionMapping, the name of the mapping
+	UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::EnhancedInputActionMapping"))
+	FName MappingName;
+	
 	/// If true, will search for InputAction in *inactive* mapping contexts as well as active ones. 
 	/// This can allow you to provide images for input actions which are not currently active in a context.
-	UPROPERTY(EditAnywhere, Category="InputImage") 
+	UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::EnhancedInputAction || BindingType==EInputBindingType::EnhancedInputActionMapping")) 
 	bool bSearchInactiveMappingContexts = false;
 	
+	/// If BindingType is Key, the key 
+	UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::Key"))
+	FKey Key;
+
 	/// Where there are multiple mappings, which to prefer 
-    UPROPERTY(EditAnywhere, Category="InputImage")
+    UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType!=EInputBindingType::Key"))
     EInputImageDevicePreference DevicePreference = EInputImageDevicePreference::Auto;
     
-    /// If BindingType is Key, the key 
-    UPROPERTY(EditAnywhere, Category="InputImage")
-    FKey Key;
-
     /// When input mode changes, how quickly to update
     UPROPERTY(EditAnywhere, Category="InputImage")
     float UpdateDelay = 0.1f;
@@ -88,7 +92,11 @@ public:
     /// Tell this image to display Enhanced InputAction
     UFUNCTION(BlueprintCallable, Category="InputImage")
     virtual void SetFromInputAction(UInputAction* Action);
-    
+	
+	/// Tell this image to display Enhanced InputAction mapping
+	UFUNCTION(BlueprintCallable, Category="InputImage")
+	void SetFromInputActionMapping(const FName& InMappingName);
+
     /// Get the binding type that we'll use to populate the image
     UFUNCTION(BlueprintCallable, Category="InputImage")
     virtual EInputBindingType GetBindingType() const { return BindingType; }

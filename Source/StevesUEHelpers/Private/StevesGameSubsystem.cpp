@@ -24,6 +24,7 @@
 #include "Engine/LocalPlayer.h"
 #include "UnrealClient.h"
 #include "Slate/SceneViewport.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
@@ -138,6 +139,33 @@ void UStevesGameSubsystem::CacheEnhancedInputMappings()
 	}
 }
 
+void UStevesGameSubsystem::QueryInputMappings(APlayerController* PC,
+                                              UInputAction* Action,
+                                              bool bSearchInactive,
+                                              TArray<FKey>& OutKeys)
+{
+	if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+	{
+		TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
+		if (Keys.Num() > 0)
+		{
+			OutKeys.Append(Keys);
+		}
+	}
+	
+	if (bSearchInactive)
+	{
+		for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+		{
+			if (Mapping.Action == Action)
+			{
+				OutKeys.AddUnique(Mapping.Key);
+			}
+		}
+	}
+	
+}
+
 TArray<FKey> UStevesGameSubsystem::QueryAllInputMappings(UInputAction* Action)
 {
 	TArray<FKey> MappedKeys;
@@ -151,6 +179,20 @@ TArray<FKey> UStevesGameSubsystem::QueryAllInputMappings(UInputAction* Action)
 	}
 	
 	return MappedKeys;
+}
+
+FKey UStevesGameSubsystem::QueryInputMapping(const FName& MappingName)
+{
+	// Get a specific mapping as defined by the Player Mappable Key Settings on a context mapping
+	for (const FEnhancedActionKeyMapping& Mapping : AllEnhancedInputMappings)
+	{
+		if (Mapping.GetMappingName() == MappingName)
+		{
+			return Mapping.Key;
+		}
+	}
+	
+	return FKey();
 }
 
 
@@ -348,6 +390,34 @@ void UStevesGameSubsystem::OnAxisInputDetectorModeChanged(int PlayerIndex, EInpu
     OnAxisInputModeChanged.Broadcast(PlayerIndex, NewMode);
 }
 
+void UStevesGameSubsystem::SetEnhancedInputUserSettings(UEnhancedInputUserSettings* Settings,
+	bool bAutoRegisterMappingContexts)
+{
+	EnhancedInputUserSettings = Settings;
+	
+	if (bAutoRegisterMappingContexts)
+	{
+		if (FAssetRegistryModule* AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		{
+			IAssetRegistry& AssetRegistry = AssetRegistryModule->Get();
+
+			TArray<FAssetData> Assets;
+			AssetRegistry.GetAssetsByClass(UInputMappingContext::StaticClass()->GetClassPathName(), Assets, false);
+
+			for (const FAssetData& Asset : Assets)
+			{
+				if (Asset.GetClass() == UInputMappingContext::StaticClass())
+				{
+					if (auto Context = Cast<UInputMappingContext>(Asset.GetAsset()))
+					{
+						EnhancedInputUserSettings->RegisterInputMappingContext(Context);
+					}
+				}
+			}
+		}
+	}
+}
+
 FFocusSystem* UStevesGameSubsystem::GetFocusSystem()
 {
     return &FocusSystem;
@@ -433,40 +503,74 @@ UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputAction(U
 	UUiTheme* Theme,
 	bool bSearchInactiveMappings)
 {
-	if (!PC)
+	if (!PC || !Action)
 		return nullptr;
     
-    if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
-    {
-        TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
-    	
-    	if (Keys.Num() == 0 && bSearchInactiveMappings)
-    	{
-    		Keys = QueryAllInputMappings(Action);
-    	}
+	TArray<FKey> Keys;
+	QueryInputMappings(PC, Action, bSearchInactiveMappings, Keys);
 
-        // For default, prefer mouse for axes
-        if (DevicePreference == EInputImageDevicePreference::Auto)
+    // For default, prefer mouse for axes
+    if (DevicePreference == EInputImageDevicePreference::Auto)
+    {
+        if (Action->ValueType == EInputActionValueType::Boolean)
         {
-            if (Action->ValueType == EInputActionValueType::Boolean)
-            {
-                DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
-            }
-            else
-            {
-                DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
-            }
+            DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
         }
-        const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
-        const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
-        const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
-        if (const FKey* PreferredKey = GetPreferedKeyMapping(Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput))
+        else
         {
-            return GetInputImageSpriteFromKey(*PreferredKey, PlayerIdx, Theme);
+            DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
         }
+    }
+    const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+    const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+    const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+    if (const FKey* PreferredKey = GetPreferedKeyMapping(Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput))
+    {
+        return GetInputImageSpriteFromKey(*PreferredKey, PlayerIdx, Theme);
     }
 
     return nullptr;
+}
+
+UPaperSprite* UStevesGameSubsystem::GetInputImageSpriteFromEnhancedInputActionMapping(
+	const FName& MappingName,
+	int PlayerIdx,
+	APlayerController* PC,
+	UUiTheme* Theme,
+	bool bSearchInactiveMappings)
+{
+	if (!PC)
+		return nullptr;
+	
+	FKey Key(NAME_None);
+	if (IsValid(EnhancedInputUserSettings))
+	{
+		if (const FKeyMappingRow* Row = EnhancedInputUserSettings->GetActiveKeyProfile()->FindKeyMappingRow(
+			MappingName))
+		{
+			if (Row->HasAnyMappings())
+			{
+				// There should only be one? You can't use the same MappingName for more than one mapping entry
+				// so I don't understand why this is a Set
+				const auto& Mapping = Row->Mappings.Array()[0];
+				Key = Mapping.GetCurrentKey();
+			}
+		}
+	}
+	
+	if (!Key.IsValid() && bSearchInactiveMappings)
+	{
+		// Otherwise, find default from mapping contexts
+		Key = QueryInputMapping(MappingName);
+	}
+	
+	if (Key.IsValid())
+	{
+		return GetInputImageSpriteFromKey(Key, PlayerIdx, Theme);
+	}
+	
+	return nullptr;
+	
 }
 
 void UStevesGameSubsystem::GetAllInputImageSpritesFromEnhancedInputAction(
@@ -480,43 +584,36 @@ void UStevesGameSubsystem::GetAllInputImageSpritesFromEnhancedInputAction(
 {
 	OutSprites.Reset();
 	
-	if (!PC)
+	if (!PC || !Action)
 		return;
 	
-	if (const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+	TArray<FKey> Keys;
+	QueryInputMappings(PC, Action, bSearchInactiveMappings, Keys);
+	
+	// For default, prefer mouse for axes
+	if (DevicePreference == EInputImageDevicePreference::Auto)
 	{
-		TArray<FKey> Keys = Subsystem->QueryKeysMappedToAction(Action);
-    	
-		if (Keys.Num() == 0 && bSearchInactiveMappings)
+		if (Action->ValueType == EInputActionValueType::Boolean)
 		{
-			Keys = QueryAllInputMappings(Action);
+			DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
 		}
-
-		// For default, prefer mouse for axes
-		if (DevicePreference == EInputImageDevicePreference::Auto)
+		else
 		{
-			if (Action->ValueType == EInputActionValueType::Boolean)
-			{
-				DevicePreference = EInputImageDevicePreference::Gamepad_Keyboard_Mouse_Button;
-			}
-			else
-			{
-				DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
-			}
+			DevicePreference = EInputImageDevicePreference::Gamepad_Mouse_Keyboard;
 		}
-		const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
-		const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
-		const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
+	}
+	const EInputMode LastInput = GetLastInputModeUsed(PlayerIdx);
+	const EInputMode LastButtonInput = GetLastInputButtonPressed(PlayerIdx);
+	const EInputMode LastAxisInput = GetLastInputAxisMoved(PlayerIdx);
 
-		TArray<FKey> PreferredKeys;
-		GetPreferedKeyMappings(PreferredKeys, Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput);
-		
-		for (const auto& PreferredKey : PreferredKeys)
+	TArray<FKey> PreferredKeys;
+	GetPreferedKeyMappings(PreferredKeys, Keys, DevicePreference, LastInput, LastButtonInput, LastAxisInput);
+	
+	for (const auto& PreferredKey : PreferredKeys)
+	{
+		if (UPaperSprite* Sprite = GetInputImageSpriteFromKey(PreferredKey, PlayerIdx, Theme))
 		{
-			if (UPaperSprite* Sprite = GetInputImageSpriteFromKey(PreferredKey, PlayerIdx, Theme))
-			{
-				OutSprites.Add(Sprite);
-			}
+			OutSprites.Add(Sprite);
 		}
 	}
 }

@@ -119,6 +119,14 @@ void UInputImage::SetFromInputAction(UInputAction* Action)
     UpdateImage();
 }
 
+void UInputImage::SetFromInputActionMapping(const FName& InMappingName)
+{
+	BindingType = EInputBindingType::EnhancedInputActionMapping;
+	InputAction.Reset();
+	MappingName = InMappingName;
+	UpdateImage();
+}
+
 void UInputImage::UpdateImage()
 {
     auto GS = GetStevesGameSubsystem(GetWorld());
@@ -132,6 +140,10 @@ void UInputImage::UpdateImage()
                 Sprite = GS->GetInputImageSpriteFromEnhancedInputAction(IA, DevicePreference, PlayerIndex, GetOwningPlayer(), CustomTheme, bSearchInactiveMappingContexts);
             }
         }
+    	else if (BindingType == EInputBindingType::EnhancedInputActionMapping && MappingName != NAME_None)
+    	{
+    		Sprite = GS->GetInputImageSpriteFromEnhancedInputActionMapping(MappingName, PlayerIndex, GetOwningPlayer(), CustomTheme);
+    	}
         else
         {
             Sprite = GS->GetInputImageSprite(BindingType, ActionOrAxisName, Key, DevicePreference, PlayerIndex, CustomTheme);    

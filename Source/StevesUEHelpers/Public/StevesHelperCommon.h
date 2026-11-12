@@ -50,7 +50,11 @@ enum class EInputBindingType : uint8
     /// A manually specified FKey (which can be key, button, axis)
     Key = 2,
     /// An EnhancedInput action
-    EnhancedInputAction = 3
+    EnhancedInputAction = 3,
+	/// An EnhancedInput action mapping - which instead of using an InputAction, refers to a specific
+	/// single user-remappable key mapping associated with that action (good for remap controls pages since e.g. if 
+	/// a key is mapped to a single axis such as W to +Y of a forward action it will only refer to that one)
+	EnhancedInputActionMapping = 4
 };
 
 /// What order of preference should we return input images where an action/axis has multiple mappings
