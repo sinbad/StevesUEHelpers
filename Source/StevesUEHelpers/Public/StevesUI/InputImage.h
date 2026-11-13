@@ -24,6 +24,12 @@ protected:
     UPROPERTY(EditAnywhere, Category="InputImage")
     EInputBindingType BindingType;
 
+	/// Usually the image only checks itself when it's been marked dirty, but certain close timing conditions like
+	/// remappable controls can cause issues. Toggle this to true if you are having problems with images
+	/// not updating until you move a mouse or something.
+	UPROPERTY(EditAnywhere, Category="InputImage")
+	bool bAlwaysTick = false;
+
     /// If BindingType is Action/Axis, the name of it 
     UPROPERTY(EditAnywhere, Category="InputImage", meta=(EditConditionHides, EditCondition="BindingType==EInputBindingType::Action || BindingType==EInputBindingType::Axis"))
     FName ActionOrAxisName;

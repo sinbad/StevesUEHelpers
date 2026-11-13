@@ -193,7 +193,7 @@ void UInputImage::MarkImageDirty()
 // We need a tick rather than FTimer because timers won't run when game is paused, and UIs are useful while paused! 
 ETickableTickType UInputImage::GetTickableTickType() const
 {
-    return ETickableTickType::Conditional;
+    return bAlwaysTick ? ETickableTickType::Always : ETickableTickType::Conditional;
 }
 
 void UInputImage::FinishDestroy()
