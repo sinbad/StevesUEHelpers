@@ -200,7 +200,6 @@ protected:
 	void CacheEnhancedInputMappings();
 	void QueryInputMappings(APlayerController* PC, UInputAction* Action, bool bSearchInactive, TArray<FKey>& OutKeys);
 	FKey QueryInputMapping(APlayerController* PC, const FName& MappingName, bool bSearchInactive);
-	UEnhancedInputUserSettings* GetEnhancedInputUserSettings(const APlayerController* PC) const;
 
 public:
 
@@ -262,7 +261,19 @@ public:
 	 *    all detected Mapping Context assets in the project. If you set this to false you must call this function yourself
 	 *    with any mapping contexts you care about.
 	 */
+	UFUNCTION(BlueprintCallable)
 	void SetEnhancedInputUserSettings(UEnhancedInputUserSettings* Settings, bool bAutoRegisterMappingContexts = true);
+
+    /**
+     * Helper function to retrieve Enhanced Input User Settings class. This will retrieve either the 
+     * standard user settings created by opting into "Enable User Settings" in project settings, or
+     * the custom user settings class previously passed into SetEnhancedInputUserSettings.
+     * @param PC The Player controller associated with the user settings
+     * @return User settings
+     */
+    UFUNCTION(BlueprintCallable)
+	UEnhancedInputUserSettings* GetEnhancedInputUserSettings(const APlayerController* PC) const;
+
 
     /// Gets the default UI theme object (defaults to our own)
     /// You can override this if you want
