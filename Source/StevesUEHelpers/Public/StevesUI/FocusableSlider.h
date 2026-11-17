@@ -65,4 +65,8 @@ public:
 	/// Needed because we can't override SetStyle
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Focus")
 	void RefreshFocussedStyle();
+	
+	/// Dynamically set whether the mouse is using the step size
+	UFUNCTION(BlueprintCallable, Category="Input")
+	void SetMouseUsesStepSize(bool bInUseStep);
 };

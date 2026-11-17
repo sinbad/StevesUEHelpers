@@ -30,6 +30,15 @@ TSharedRef<SWidget> UFocusableSlider::RebuildWidget()
    
 }
 
+void UFocusableSlider::SetMouseUsesStepSize(bool bInUseStep)
+{
+	MouseUsesStep = bInUseStep;
+	if (MySlider)
+	{
+		MySlider->SetMouseUsesStep(bInUseStep);
+	}
+}
+
 void UFocusableSlider::RefreshFocussedStyle_Implementation()
 {
     // Copy Widget style but make normal same as hovered    
