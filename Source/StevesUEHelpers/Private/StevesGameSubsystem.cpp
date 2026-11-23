@@ -202,8 +202,8 @@ FKey UStevesGameSubsystem::QueryInputMapping(APlayerController* PC, const FName&
 			{
 				// There should only be one? You can't use the same MappingName for more than one mapping entry
 				// so I don't understand why this is a Set
-				const auto& Mapping = Row->Mappings.Array()[0];
-				Key = Mapping.GetCurrentKey();
+				TArray<FPlayerKeyMapping> MappingArray = Row->Mappings.Array();
+				Key = MappingArray[0].GetCurrentKey();
 			}
 		}
 	}
