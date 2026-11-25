@@ -105,6 +105,9 @@ protected:
     TArray<FText> Options;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Content)
     int SelectedIndex;
+	/// If true, will use the gamepad mode when a key is pressed. If false, will use the mouse version.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
+	bool bUseGamepadModeForKeyboard = true;
 
     /// Whether this option widget should set the up/down widgets to disabled at
     /// the end of the range instead of hiding them as is the default.

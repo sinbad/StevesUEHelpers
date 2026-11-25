@@ -9,6 +9,8 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
+UE_DISABLE_OPTIMIZATION
+
 void UOptionWidgetBase::NativeConstruct()
 {
     Super::NativeConstruct();
@@ -102,6 +104,15 @@ void UOptionWidgetBase::UpdateFromInputMode(EInputMode Mode)
         SetMouseMode();
         break;
     case EInputMode::Keyboard:
+    	if (bUseGamepadModeForKeyboard)
+    	{
+    		SetButtonMode();
+    	}
+    	else
+    	{
+    		SetMouseMode();
+    	}
+    	break;
     case EInputMode::Gamepad:
         SetButtonMode();
         break;
@@ -257,3 +268,4 @@ EInputMode UOptionWidgetBase::GetCurrentInputMode() const
     return EInputMode::Unknown;
 }
 
+UE_ENABLE_OPTIMIZATION
